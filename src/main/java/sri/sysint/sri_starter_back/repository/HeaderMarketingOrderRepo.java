@@ -39,7 +39,7 @@ public interface HeaderMarketingOrderRepo extends JpaRepository <HeaderMarketing
 	@Query(value = "SELECT "
     		+ "    		  ROUND(SUM(CASE WHEN DESCRIPTION = 'WD_NORMAL' THEN ( "
     		+ "    		      SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME "
-    		+ "    		  ) / 60 / 24 ELSE 0 END), 2) AS FINAL_WD, "
+    		+ "    		  ) / 60 / 24 ELSE 0 END), 2) - 0.32 AS FINAL_WD, "
     		+ "    		  "
     		+ "    		  ROUND(SUM(CASE WHEN DESCRIPTION = 'OT_TT' THEN ( "
     		+ "    		      SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME "
