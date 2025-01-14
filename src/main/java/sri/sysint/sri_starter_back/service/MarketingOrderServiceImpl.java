@@ -1979,9 +1979,9 @@ public class MarketingOrderServiceImpl {
 				MarketingOrder saveMo = new MarketingOrder(mo.getMarketingOrder());
 				if (saveMo.getRevisionPpc() == null) {
 				    saveMo.setRevisionPpc(BigDecimal.ZERO); // Set to 0 if null or zero
-					saveMo.setStatusFilled(BigDecimal.ONE);
+					saveMo.setStatusFilled(BigDecimal.valueOf(3));
 
-				} else {
+				} else {	
 					saveMo.setRevisionPpc(saveMo.getRevisionPpc());
 				    saveMo.setStatusFilled(BigDecimal.valueOf(3));
 				}
