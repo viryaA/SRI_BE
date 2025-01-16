@@ -16,7 +16,7 @@ public class MachineProduct {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ITEM_CURING", nullable = false)
-    private BigDecimal ITEM_CURING;
+    private String ITEM_CURING;
 
 	@Column(name = "WORK_CENTER_TEXT", nullable = false)
 	private String WORK_CENTER_TEXT;
@@ -26,17 +26,17 @@ public class MachineProduct {
 		super();
 	}
 
-	public MachineProduct(BigDecimal iTEM_CURING, String wORK_CENTER_TEXT) {
+	public MachineProduct(String iTEM_CURING, String wORK_CENTER_TEXT) {
 		super();
 		ITEM_CURING = iTEM_CURING;
 		WORK_CENTER_TEXT = wORK_CENTER_TEXT;
 	}
 
-	public BigDecimal getITEM_CURING() {
+	public String getITEM_CURING() {
 		return ITEM_CURING;
 	}
 
-	public void setITEM_CURING(BigDecimal iTEM_CURING) {
+	public void setITEM_CURING(String iTEM_CURING) {
 		ITEM_CURING = iTEM_CURING;
 	}
 

@@ -13,17 +13,17 @@ import org.springframework.data.repository.query.Param;
 import sri.sysint.sri_starter_back.model.ShiftMonthlyPlan;
 
 public interface ShiftMonthlyPlanRepo extends JpaRepository<ShiftMonthlyPlan, BigDecimal>{
-	@Query(value = "SELECT * FROM SRI_IMPP_D_SHIFTMONTHLYPLAN_CURING WHERE MO_ID = :moId AND DATE = :date", nativeQuery = true)
+	@Query(value = "SELECT * FROM SRI_IMPP_D_DAILY_PLAN_CURING WHERE MO_ID = :moId AND DATE = :date", nativeQuery = true)
 	List<ShiftMonthlyPlan> findByMoIdAndDate(@Param("moId") String moId, @Param("date") Date date);
 	
 	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_M_BUILDING", nativeQuery = true)
     BigDecimal getNewId();
 	
 	@Query(value = "SELECT * "
-			+ "            FROM SRI_IMPP_D_SHIFTMONTHLYPLAN_CURING "
+			+ "            FROM SRI_IMPP_D_DAILY_PLAN_CURING "
 			+ "            WHERE ACTUAL_DATE = ("
 			+ "                SELECT MAX(ACTUAL_DATE) "
-			+ "                FROM SRI_IMPP_D_SHIFTMONTHLYPLAN_CURING "
+			+ "                FROM SRI_IMPP_D_DAILY_PLAN_CURING "
 			+ "                WHERE ACTUAL_DATE < TO_DATE(:inputDate, 'DD-MM-YYYY')) AND ITEM_CURING = :itemCuring", nativeQuery = true)
 	List<ShiftMonthlyPlan> findYesterdaysShiftPlan(@Param("inputDate") String inputDate, @Param("itemCuring") String itemCuring);
 	
