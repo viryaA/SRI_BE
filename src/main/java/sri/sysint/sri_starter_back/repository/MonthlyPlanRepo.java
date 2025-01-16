@@ -19,7 +19,7 @@ public interface MonthlyPlanRepo extends JpaRepository<MonthlyPlan, String>{
 	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_D_MONTHLYPLAN_CURING", nativeQuery = true)
     BigDecimal getNewId();
 	
-	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_D_DAILYMONTHLYPLAN_CURING", nativeQuery = true)
+	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_D_DAILY_PLAN_CURING", nativeQuery = true)
     BigDecimal getNewIdDaily();
 	
 	@Query(value = "SELECT \r\n"
@@ -53,7 +53,7 @@ public interface MonthlyPlanRepo extends JpaRepository<MonthlyPlan, String>{
 	@Query(value = "SELECT * FROM SRI_IMPP_D_MONTHLYPLAN_CURING WHERE DOC_NUM_CURING = :mpId ORDER BY DOC_NUM_CURING ASC", nativeQuery = true)
 	List<DetailMonthlyPlanCuring> findDetailMpById(@Param ("mpId") String mpId);
 	
-	@Query(value = "SELECT * FROM SRI_IMPP_D_DAILYMONTHLYPLAN_CURING WHERE DETAIL_ID_CURING = :detailId ORDER BY DETAIL_ID_CURING ASC", nativeQuery = true)
+	@Query(value = "SELECT * FROM SRI_IMPP_D_DAILY_PLAN_CURING WHERE DETAIL_ID_CURING = :detailId ORDER BY DETAIL_ID_CURING ASC", nativeQuery = true)
 	List<DetailDailyMonthlyPlanCuring> findDetailDailyMpById(@Param ("detailId") BigDecimal detailId);
 	
 	@Query(value = "SELECT \r\n"
@@ -104,7 +104,7 @@ public interface MonthlyPlanRepo extends JpaRepository<MonthlyPlan, String>{
 	List<Map<String, Object>> getDetailMPById(@Param("docNum") String docNum);
 	
 	@Query(value = "SELECT dm.*,wd.DESCRIPTION\r\n"
-			+ "FROM SRI_IMPP_D_DAILYMONTHLYPLAN_CURING dm\r\n"
+			+ "FROM SRI_IMPP_D_DAILY_PLAN_CURING dm\r\n"
 			+ "JOIN SRI_IMPP_D_WD_HOURS wd\r\n"
 			+ "ON dm.DATE_DAILY_MP = wd.DATE_WD\r\n"
 			+ "WHERE dm.DETAIL_ID_CURING = :detailId\r\n"
@@ -116,7 +116,7 @@ public interface MonthlyPlanRepo extends JpaRepository<MonthlyPlan, String>{
 			+ "    mo.CHANGE_DATE,\r\n"
 			+ "    mo.WORK_CENTER_TEXT as WCT,\r\n"
 			+ "    mo.SHIFT\r\n"
-			+ "FROM SRI_IMPP_D_SHIFTMONTHLYPLAN_CURING sf JOIN SRI_IMPP_D_DAILYMONTHLYPLAN_CURING dm \r\n"
+			+ "FROM SRI_IMPP_D_SHIFT_PLAN_CURING sf JOIN SRI_IMPP_D_DAILY_PLAN_CURING dm \r\n"
 			+ "ON sf.DETAIL_DAILY_ID_CURING = dm.DETAIL_DAILY_ID_CURING\r\n"
 			+ "JOIN SRI_IMPP_D_MONTHLYPLAN_CURING mp \r\n"
 			+ "ON dm.DETAIL_ID_CURING = mp.DETAIL_ID_CURING\r\n"
@@ -137,7 +137,7 @@ public interface MonthlyPlanRepo extends JpaRepository<MonthlyPlan, String>{
 
 	
 	@Query(value = "SELECT * \r\n"
-			+ "FROM SRI_IMPP_D_SHIFTMONTHLYPLAN_CURING \r\n"
+			+ "FROM SRI_IMPP_D_SHIFT_PLAN_CURING \r\n"
 			+ "WHERE DETAIL_DAILY_ID_CURING = :detailDailyId\r\n"
 			+ "AND EXTRACT(YEAR FROM ACTUAL_DATE) = :year\r\n"
 			+ "AND EXTRACT(MONTH FROM ACTUAL_DATE) = :month", nativeQuery = true)
@@ -152,7 +152,7 @@ public interface MonthlyPlanRepo extends JpaRepository<MonthlyPlan, String>{
 			+ "    CURING.STATUS,\r\n"
 			+ "    WD_HOURS.DESCRIPTION\r\n"
 			+ "FROM \r\n"
-			+ "    SRI_IMPP_D_DAILYMONTHLYPLAN_CURING CURING\r\n"
+			+ "    SRI_IMPP_D_DAILY_PLAN_CURING CURING\r\n"
 			+ "LEFT JOIN \r\n"
 			+ "    SRI_IMPP_D_WD_HOURS WD_HOURS\r\n"
 			+ "ON \r\n"

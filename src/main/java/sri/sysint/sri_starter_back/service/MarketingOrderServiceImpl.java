@@ -1998,7 +1998,7 @@ public class MarketingOrderServiceImpl {
 	            throw e;
 			}
 			
-			//Save to SRI_IMPP_D_HEADERMARKETINGORDER
+			//Save to SRI_IMPP_D_HEADER_MKT_ORDER
 			try {
 		        List<HeaderMarketingOrder> headerMoList = mo.getHeaderMarketingOrder();
 		        for (HeaderMarketingOrder headerMO : headerMoList) {

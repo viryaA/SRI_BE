@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "SRI_IMPP_D_DAILYMONTHLYPLAN_CURING")
+@Table(name = "SRI_IMPP_D_DAILY_PLAN_CURING")
 public class DetailDailyMonthlyPlanCuring {
 	
 	@Id
