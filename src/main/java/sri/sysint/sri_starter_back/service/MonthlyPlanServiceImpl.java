@@ -153,15 +153,15 @@ public class MonthlyPlanServiceImpl {
 	
 	private BigDecimal minProduction;
 	
-	public List<ShiftMonthlyPlan> MonthlyPlan(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) {
+	public List<ShiftMonthlyPlan> MonthlyPlan(String moIdFed, String moIdFdr, int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) {
 //		percentagePlusMinus = percentage;
 		maxChangeMould = limitChange;
-		getDataHeader(month, year);
+		getDataHeader(moIdFed, moIdFdr, month, year);
         boolean tempShift = false;
 		if(machineProductList != null) {
 			for(MachineProduct mn : machineProductList) {
 	        	for(DetailMo dtMo : detailMarketingOrderListAB) {
-	        		if(dtMo.getPartNumber().equals(mn.getPART_NUMBER())) {
+	        		if(dtMo.getItemCuring().equals(mn.getITEM_CURING())) {
 	        			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	        			order = dtMo.getTotalAR();
 	        			tempShift = generateFromManualMapping(mn.getPART_NUMBER(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
@@ -171,7 +171,7 @@ public class MonthlyPlanServiceImpl {
 	        		}
 	        	}
 	        	for(DetailMo dtMo : detailMarketingOrderListDual) {
-	        		if(dtMo.getPartNumber().equals(mn.getPART_NUMBER())) {
+	        		if(dtMo.getItemCuring().equals(mn.getITEM_CURING())) {
 	        			order = dtMo.getTotalAR();
 	        			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	        			tempShift = generateFromManualMapping(mn.getPART_NUMBER(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
@@ -181,7 +181,7 @@ public class MonthlyPlanServiceImpl {
 	        		}
 	        	}
 	        	for(DetailMo dtMo : detailMarketingOrderListBOM) {
-	        		if(dtMo.getPartNumber().equals(mn.getPART_NUMBER())) {
+	        		if(dtMo.getItemCuring().equals(mn.getITEM_CURING())) {
 	        			order = dtMo.getTotalAR();
 	        			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	        			tempShift = generateFromManualMapping(mn.getPART_NUMBER(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
@@ -1172,20 +1172,19 @@ public class MonthlyPlanServiceImpl {
 		return false;
 	}
 	
-	public void getDataHeader(int month, int year) {
+	public void getDataHeader(String moIdFed, String moIdFdr, int month, int year) {
 		machineCuringList = machineCuringRepo.findMachineCuringActive();
 		machineCuringListTemp = machineCuringRepo.findMachineCuringActive();
 		machineProductList = machineProductRepo.findAll();
 		System.out.println("ukuran list mesin " + machineCuringList.size() + " " + machineCuringListTemp.size());
 		 
-    	////System.out.println(machineCuringList.size());
-    	workDayList = workDayRepo.findByMonthYear(month, year); //Flowchart 3
+    	workDayList = workDayRepo.findByMonthYear(month, year); 
 		
     	smallOrderLimit = new BigDecimal(settingRepo.findSmallOrderLimit().getSETTING_VALUE());
     	
-    	List<MarketingOrder> marketingOrderList = marketingOrderRepo.findByMonthYear(month, year); //flowchart 4
+    	List<MarketingOrder> marketingOrderList = marketingOrderRepo.findByidAndMonthYear( month, year, moIdFed, moIdFdr); //flowchart 4
 
-    	 //flowchart 5 6 7 8
+    	//flowchart 5 6 7 8
     	////System.out.println("Done flow 5");
     	////System.out.println(marketingOrderList.get(0).getMoId() + " " + marketingOrderList.get(1).getMoId());
     	
@@ -1203,208 +1202,71 @@ public class MonthlyPlanServiceImpl {
     	List<Map<String, Object>> detailMarkOrderListDualFrontRear = new ArrayList<>();
 
     	detailMarkOrderListAB = detailMarketingOrderRepo.findByMoIdSortProductTypeAbNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    ////System.out.println("check4");
     	detailMarkOrderListBOM = detailMarketingOrderRepo.findByMoIdSortProductTypeBomNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    ////System.out.println("check5");
-    	detailMarkOrderListDual = detailMarketingOrderRepo.findByMoIdSortProductTypeBomAbNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    	
+    	detailMarkOrderListDual = detailMarketingOrderRepo.findByMoIdSortProductTypeBomAbNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());	
     	detailMarkOrderListABFrontRear = detailMarketingOrderRepo.findByMoIdSortProductTypeAbFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-        ////System.out.println("check4");
     	detailMarkOrderListBOMFrontRear = detailMarketingOrderRepo.findByMoIdSortProductTypeBomAbFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    ////System.out.println("check5");
     	detailMarkOrderListDualFrontRear = detailMarketingOrderRepo.findByMoIdSortProductTypeBomFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    ////System.out.println("check6");
-    System.out.println("ukuran  " + detailMarkOrderListAB.size() + " " + detailMarkOrderListBOM.size() + " " + detailMarkOrderListDual.size()+ " " + detailMarkOrderListABFrontRear.size() + " " + detailMarkOrderListBOMFrontRear.size() + " " + detailMarkOrderListDualFrontRear.size());
+
+    	System.out.println("ukuran  " + detailMarkOrderListAB.size() + " " + detailMarkOrderListBOM.size() + " " + detailMarkOrderListDual.size()+ " " + detailMarkOrderListABFrontRear.size() + " " + detailMarkOrderListBOMFrontRear.size() + " " + detailMarkOrderListDualFrontRear.size());
     	////System.out.println("Done flow 6");
         for (Map<String, Object> map : detailMarkOrderListAB) {
         	DetailMo obj = new DetailMo();
-            obj.setPpd((BigDecimal) map.get("PPD"));
-            obj.setLowerConstant((BigDecimal) map.get("LOWER_CONSTANT"));
-            obj.setMoMonth0((BigDecimal) map.get("MO_MONTH_0"));
-            obj.setProductCategory((String) map.get("PRODUCT_CATEGORY"));
-            obj.setMachineType((String) map.get("MACHINE_TYPE"));
-            obj.setItemExt((String) map.get("ITEM_EXT"));
-            obj.setExtDescription((String) map.get("EXT_DESCRIPTION"));
-            obj.setMinOrder((BigDecimal) map.get("MIN_ORDER"));
-            obj.setSizeId((String) map.get("SIZE_ID"));
-            obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
-            obj.setRim((BigDecimal) map.get("RIM"));
+            obj.setRim((BigDecimal) map.get("LIST_RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
-            obj.setWibTube((String) map.get("WIB_TUBE"));
-            obj.setPatternId((String) map.get("PATTERN_ID"));
-            obj.setItemAssy((String) map.get("ITEM_ASSY"));
-            obj.setCategory((String) map.get("CATEGORY"));
-            obj.setCav((BigDecimal) map.get("CAV"));
-            obj.setQtyPerRak((BigDecimal) map.get("QTY_PER_RAK"));
-            obj.setDescription((String) map.get("DESCRIPTION"));
-            obj.setQtyPerMould((BigDecimal) map.get("QTY_PER_MOULD"));
-            obj.setMoId((String) map.get("MO_ID"));
-            obj.setInitialStock((BigDecimal) map.get("INITIAL_STOCK"));
-            obj.setCapacity((BigDecimal) map.get("CAPACITY"));
-            obj.setProductType((String) map.get("PRODUCT_TYPE"));
-            obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
-            obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
-            obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            obj.setCav((BigDecimal) map.get("TOTAL_CAV"));
+            obj.setQtyPerMould((BigDecimal) map.get("NUMBER_OF_MOULD"));
+            obj.setTotalAR((BigDecimal) map.get("TOTAL_TOTAL_AR"));
             detailMarketingOrderListAB.add(obj);
         }
         
         for (Map<String, Object> map : detailMarkOrderListBOM) {
         	DetailMo obj = new DetailMo();
-            obj.setPpd((BigDecimal) map.get("PPD"));
-            obj.setLowerConstant((BigDecimal) map.get("LOWER_CONSTANT"));
-            obj.setMoMonth0((BigDecimal) map.get("MO_MONTH_0"));
-            obj.setProductCategory((String) map.get("PRODUCT_CATEGORY"));
-            obj.setMachineType((String) map.get("MACHINE_TYPE"));
-            obj.setItemExt((String) map.get("ITEM_EXT"));
-            obj.setExtDescription((String) map.get("EXT_DESCRIPTION"));
-            obj.setMinOrder((BigDecimal) map.get("MIN_ORDER"));
-            obj.setSizeId((String) map.get("SIZE_ID"));
-            obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
-            obj.setRim((BigDecimal) map.get("RIM"));
+        	obj.setRim((BigDecimal) map.get("LIST_RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
-            obj.setWibTube((String) map.get("WIB_TUBE"));
-            obj.setPatternId((String) map.get("PATTERN_ID"));
-            obj.setItemAssy((String) map.get("ITEM_ASSY"));
-            obj.setCategory((String) map.get("CATEGORY"));
-            obj.setCav((BigDecimal) map.get("CAV"));
-            obj.setQtyPerRak((BigDecimal) map.get("QTY_PER_RAK"));
-            obj.setDescription((String) map.get("DESCRIPTION"));
-            obj.setQtyPerMould((BigDecimal) map.get("QTY_PER_MOULD"));
-            obj.setMoId((String) map.get("MO_ID"));
-            obj.setInitialStock((BigDecimal) map.get("INITIAL_STOCK"));
-            obj.setCapacity((BigDecimal) map.get("CAPACITY"));
-            obj.setProductType((String) map.get("PRODUCT_TYPE"));
-            obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
-            obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
-            obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            obj.setCav((BigDecimal) map.get("TOTAL_CAV"));
+            obj.setQtyPerMould((BigDecimal) map.get("NUMBER_OF_MOULD"));
+            obj.setTotalAR((BigDecimal) map.get("TOTAL_TOTAL_AR"));
             detailMarketingOrderListBOM.add(obj);
         }
         
         for (Map<String, Object> map : detailMarkOrderListDual) {
         	DetailMo obj = new DetailMo();
-            obj.setPpd((BigDecimal) map.get("PPD"));
-            obj.setLowerConstant((BigDecimal) map.get("LOWER_CONSTANT"));
-            obj.setMoMonth0((BigDecimal) map.get("MO_MONTH_0"));
-            obj.setProductCategory((String) map.get("PRODUCT_CATEGORY"));
-            obj.setMachineType((String) map.get("MACHINE_TYPE"));
-            obj.setItemExt((String) map.get("ITEM_EXT"));
-            obj.setExtDescription((String) map.get("EXT_DESCRIPTION"));
-            obj.setMinOrder((BigDecimal) map.get("MIN_ORDER"));
-            obj.setSizeId((String) map.get("SIZE_ID"));
-            obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
-            obj.setRim((BigDecimal) map.get("RIM"));
+        	obj.setRim((BigDecimal) map.get("LIST_RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
-            obj.setWibTube((String) map.get("WIB_TUBE"));
-            obj.setPatternId((String) map.get("PATTERN_ID"));
-            obj.setItemAssy((String) map.get("ITEM_ASSY"));
-            obj.setCategory((String) map.get("CATEGORY"));
-            obj.setCav((BigDecimal) map.get("CAV"));
-            obj.setQtyPerRak((BigDecimal) map.get("QTY_PER_RAK"));
-            obj.setDescription((String) map.get("DESCRIPTION"));
-            obj.setQtyPerMould((BigDecimal) map.get("QTY_PER_MOULD"));
-            obj.setMoId((String) map.get("MO_ID"));
-            obj.setInitialStock((BigDecimal) map.get("INITIAL_STOCK"));
-            obj.setCapacity((BigDecimal) map.get("CAPACITY"));
-            obj.setProductType((String) map.get("PRODUCT_TYPE"));
-            obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
-            obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
-            obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            obj.setCav((BigDecimal) map.get("TOTAL_CAV"));
+            obj.setQtyPerMould((BigDecimal) map.get("NUMBER_OF_MOULD"));
+            obj.setTotalAR((BigDecimal) map.get("TOTAL_TOTAL_AR"));
             detailMarketingOrderListDual.add(obj);
         }
         
         for (Map<String, Object> map : detailMarkOrderListABFrontRear) {
         	DetailMo obj = new DetailMo();
-            obj.setPpd((BigDecimal) map.get("PPD"));
-            obj.setLowerConstant((BigDecimal) map.get("LOWER_CONSTANT"));
-            obj.setMoMonth0((BigDecimal) map.get("MO_MONTH_0"));
-            obj.setProductCategory((String) map.get("PRODUCT_CATEGORY"));
-            obj.setMachineType((String) map.get("MACHINE_TYPE"));
-            obj.setItemExt((String) map.get("ITEM_EXT"));
-            obj.setExtDescription((String) map.get("EXT_DESCRIPTION"));
-            obj.setMinOrder((BigDecimal) map.get("MIN_ORDER"));
-            obj.setSizeId((String) map.get("SIZE_ID"));
-            obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
-            obj.setRim((BigDecimal) map.get("RIM"));
+        	obj.setRim((BigDecimal) map.get("LIST_RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
-            obj.setWibTube((String) map.get("WIB_TUBE"));
-            obj.setPatternId((String) map.get("PATTERN_ID"));
-            obj.setItemAssy((String) map.get("ITEM_ASSY"));
-            obj.setCategory((String) map.get("CATEGORY"));
-            obj.setCav((BigDecimal) map.get("CAV"));
-            obj.setQtyPerRak((BigDecimal) map.get("QTY_PER_RAK"));
-            obj.setDescription((String) map.get("DESCRIPTION"));
-            obj.setQtyPerMould((BigDecimal) map.get("QTY_PER_MOULD"));
-            obj.setMoId((String) map.get("MO_ID"));
-            obj.setInitialStock((BigDecimal) map.get("INITIAL_STOCK"));
-            obj.setCapacity((BigDecimal) map.get("CAPACITY"));
-            obj.setProductType((String) map.get("PRODUCT_TYPE"));
-            obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
-            obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
-            obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            obj.setCav((BigDecimal) map.get("TOTAL_CAV"));
+            obj.setQtyPerMould((BigDecimal) map.get("NUMBER_OF_MOULD"));
+            obj.setTotalAR((BigDecimal) map.get("TOTAL_TOTAL_AR"));
             detailMarketingOrderListABFrontRear.add(obj);
         }
         
         for (Map<String, Object> map : detailMarkOrderListBOMFrontRear) {
         	DetailMo obj = new DetailMo();
-            obj.setPpd((BigDecimal) map.get("PPD"));
-            obj.setLowerConstant((BigDecimal) map.get("LOWER_CONSTANT"));
-            obj.setMoMonth0((BigDecimal) map.get("MO_MONTH_0"));
-            obj.setProductCategory((String) map.get("PRODUCT_CATEGORY"));
-            obj.setMachineType((String) map.get("MACHINE_TYPE"));
-            obj.setItemExt((String) map.get("ITEM_EXT"));
-            obj.setExtDescription((String) map.get("EXT_DESCRIPTION"));
-            obj.setMinOrder((BigDecimal) map.get("MIN_ORDER"));
-            obj.setSizeId((String) map.get("SIZE_ID"));
-            obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
-            obj.setRim((BigDecimal) map.get("RIM"));
+        	obj.setRim((BigDecimal) map.get("LIST_RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
-            obj.setWibTube((String) map.get("WIB_TUBE"));
-            obj.setPatternId((String) map.get("PATTERN_ID"));
-            obj.setItemAssy((String) map.get("ITEM_ASSY"));
-            obj.setCategory((String) map.get("CATEGORY"));
-            obj.setCav((BigDecimal) map.get("CAV"));
-            obj.setQtyPerRak((BigDecimal) map.get("QTY_PER_RAK"));
-            obj.setDescription((String) map.get("DESCRIPTION"));
-            obj.setQtyPerMould((BigDecimal) map.get("QTY_PER_MOULD"));
-            obj.setMoId((String) map.get("MO_ID"));
-            obj.setInitialStock((BigDecimal) map.get("INITIAL_STOCK"));
-            obj.setCapacity((BigDecimal) map.get("CAPACITY"));
-            obj.setProductType((String) map.get("PRODUCT_TYPE"));
-            obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
-            obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
-            obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            obj.setCav((BigDecimal) map.get("TOTAL_CAV"));
+            obj.setQtyPerMould((BigDecimal) map.get("NUMBER_OF_MOULD"));
+            obj.setTotalAR((BigDecimal) map.get("TOTAL_TOTAL_AR"));
             detailMarketingOrderListBOMFrontRear.add(obj);
         }
         
         for (Map<String, Object> map : detailMarkOrderListDualFrontRear) {
         	DetailMo obj = new DetailMo();
-            obj.setPpd((BigDecimal) map.get("PPD"));
-            obj.setLowerConstant((BigDecimal) map.get("LOWER_CONSTANT"));
-            obj.setMoMonth0((BigDecimal) map.get("MO_MONTH_0"));
-            obj.setProductCategory((String) map.get("PRODUCT_CATEGORY"));
-            obj.setMachineType((String) map.get("MACHINE_TYPE"));
-            obj.setItemExt((String) map.get("ITEM_EXT"));
-            obj.setExtDescription((String) map.get("EXT_DESCRIPTION"));
-            obj.setMinOrder((BigDecimal) map.get("MIN_ORDER"));
-            obj.setSizeId((String) map.get("SIZE_ID"));
-            obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
-            obj.setRim((BigDecimal) map.get("RIM"));
+        	obj.setRim((BigDecimal) map.get("LIST_RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
-            obj.setWibTube((String) map.get("WIB_TUBE"));
-            obj.setPatternId((String) map.get("PATTERN_ID"));
-            obj.setItemAssy((String) map.get("ITEM_ASSY"));
-            obj.setCategory((String) map.get("CATEGORY"));
-            obj.setCav((BigDecimal) map.get("CAV"));
-            obj.setQtyPerRak((BigDecimal) map.get("QTY_PER_RAK"));
-            obj.setDescription((String) map.get("DESCRIPTION"));
-            obj.setQtyPerMould((BigDecimal) map.get("QTY_PER_MOULD"));
-            obj.setMoId((String) map.get("MO_ID"));
-            obj.setInitialStock((BigDecimal) map.get("INITIAL_STOCK"));
-            obj.setCapacity((BigDecimal) map.get("CAPACITY"));
-            obj.setProductType((String) map.get("PRODUCT_TYPE"));
-            obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
-            obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
-            obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            obj.setCav((BigDecimal) map.get("TOTAL_CAV"));
+            obj.setQtyPerMould((BigDecimal) map.get("NUMBER_OF_MOULD"));
+            obj.setTotalAR((BigDecimal) map.get("TOTAL_TOTAL_AR"));
             detailMarketingOrderListDualFrontRear.add(obj);
         }
 	}
@@ -1709,91 +1571,21 @@ public class MonthlyPlanServiceImpl {
     }
     
     public class DetailMo {
-        private BigDecimal ppd;
-        private BigDecimal lowerConstant;
-        private BigDecimal moMonth0;
         private BigDecimal totalAR;
-        private String productCategory;
-        private String machineType;
-        private String itemExt;
-        private String extDescription;
-        private BigDecimal minOrder;
-        private String sizeId;
-        private BigDecimal detailId;
         private BigDecimal rim;
         private String itemCuring;
-        private String wibTube;
-        private String patternId;
-        private String itemAssy;
-        private String category;
         private BigDecimal cav;
-        private BigDecimal qtyPerRak;
-        private String description;
         private BigDecimal qtyPerMould;
-        private String moId;
-        private BigDecimal initialStock;
-        private BigDecimal capacity;
-        private String productType;
-        private BigDecimal partNumber;
-        private BigDecimal upperConstant;
-        private BigDecimal maxCapMonth0;
-        private BigDecimal productionLimit;
 
         // Getter dan Setter untuk semua properti
-        public BigDecimal getPpd() { return ppd; }
-        public void setPpd(BigDecimal ppd) { this.ppd = ppd; }
-        public BigDecimal getLowerConstant() { return lowerConstant; }
-        public void setLowerConstant(BigDecimal lowerConstant) { this.lowerConstant = lowerConstant; }
-        public BigDecimal getMoMonth0() { return moMonth0; }
-        public void setMoMonth0(BigDecimal moMonth0) { this.moMonth0 = moMonth0; }
-        public String getProductCategory() { return productCategory; }
-        public void setProductCategory(String productCategory) { this.productCategory = productCategory; }
-        public String getMachineType() { return machineType; }
-        public void setMachineType(String machineType) { this.machineType = machineType; }
-        public String getItemExt() { return itemExt; }
-        public void setItemExt(String itemExt) { this.itemExt = itemExt; }
-        public String getExtDescription() { return extDescription; }
-        public void setExtDescription(String extDescription) { this.extDescription = extDescription; }
-        public BigDecimal getMinOrder() { return minOrder; }
-        public void setMinOrder(BigDecimal minOrder) { this.minOrder = minOrder; }
-        public String getSizeId() { return sizeId; }
-        public void setSizeId(String sizeId) { this.sizeId = sizeId; }
-        public BigDecimal getDetailId() { return detailId; }
-        public void setDetailId(BigDecimal detailId) { this.detailId = detailId; }
         public BigDecimal getRim() { return rim; }
         public void setRim(BigDecimal rim) { this.rim = rim; }
         public String getItemCuring() { return itemCuring; }
         public void setItemCuring(String itemCuring) { this.itemCuring = itemCuring; }
-        public String getWibTube() { return wibTube; }
-        public void setWibTube(String wibTube) { this.wibTube = wibTube; }
-        public String getPatternId() { return patternId; }
-        public void setPatternId(String patternId) { this.patternId = patternId; }
-        public String getItemAssy() { return itemAssy; }
-        public void setItemAssy(String itemAssy) { this.itemAssy = itemAssy; }
-        public String getCategory() { return category; }
-        public void setCategory(String category) { this.category = category; }
         public BigDecimal getCav() { return cav; }
         public void setCav(BigDecimal cav) { this.cav = cav; }
-        public BigDecimal getQtyPerRak() { return qtyPerRak; }
-        public void setQtyPerRak(BigDecimal qtyPerRak) { this.qtyPerRak = qtyPerRak; }
-        public String getDescription() { return description; }
-        public void setDescription(String description) { this.description = description; }
         public BigDecimal getQtyPerMould() { return qtyPerMould; }
         public void setQtyPerMould(BigDecimal qtyPerMould) { this.qtyPerMould = qtyPerMould; }
-        public String getMoId() { return moId; }
-        public void setMoId(String moId) { this.moId = moId; }
-        public BigDecimal getInitialStock() { return initialStock; }
-        public void setInitialStock(BigDecimal initialStock) { this.initialStock = initialStock; }
-        public BigDecimal getCapacity() { return capacity; }
-        public void setCapacity(BigDecimal capacity) { this.capacity = capacity; }
-        public String getProductType() { return productType; }
-        public void setProductType(String productType) { this.productType = productType; }
-        public BigDecimal getPartNumber() { return partNumber; }
-        public void setPartNumber(BigDecimal partNumber) { this.partNumber = partNumber; }
-        public BigDecimal getUpperConstant() { return upperConstant; }
-        public void setUpperConstant(BigDecimal upperConstant) { this.upperConstant = upperConstant; }
-        public BigDecimal getMaxCapMonth0() { return maxCapMonth0; }
-        public void setMaxCapMonth0(BigDecimal maxCapMonth0) { this.maxCapMonth0 = maxCapMonth0; }
         
         public BigDecimal getTotalAR() {
 			return totalAR;
@@ -1801,12 +1593,7 @@ public class MonthlyPlanServiceImpl {
 		public void setTotalAR(BigDecimal totalAR) {
 			this.totalAR = totalAR;
 		}
-		public BigDecimal getProductionLimit() {
-			return productionLimit;
-		}
-		public void setProductionLimit(BigDecimal productionLimit) {
-			this.productionLimit = productionLimit;
-		}
+
 		@Override
         public String toString() {
             return "CustomObject{" +
@@ -1842,8 +1629,8 @@ public class MonthlyPlanServiceImpl {
         }
     }
     
-    public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) throws IOException {
-    	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
+    public ByteArrayInputStream exportExcel(String moIdFed, String moIdFdr, int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) throws IOException {
+    	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(moIdFed, moIdFdr, month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
     	System.out.println(shiftMonthlyPlan.size());
     	List<String> productDescription = new ArrayList<>();
     	
@@ -3056,8 +2843,8 @@ public class MonthlyPlanServiceImpl {
     
     
     
-    public ViewMonthlyPlanning getDetailMonthlyPlan(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) {
-        List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
+    public ViewMonthlyPlanning getDetailMonthlyPlan(String moIdFed, String moIdFdr, int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) {
+        List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(moIdFed, moIdFdr, month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
 
         ViewMonthlyPlanning viewMonthlyPlanning = new ViewMonthlyPlanning();
         List<DetailMonthlyPlanCuring> detailList1 = new ArrayList<>();

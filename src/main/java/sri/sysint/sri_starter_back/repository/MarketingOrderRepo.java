@@ -183,6 +183,21 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 		        "AND EXTRACT(YEAR FROM MONTH_0) = :year", nativeQuery = true)
 		List<MarketingOrder> findByMonthYear(@Param("month") int month,@Param("year") int year);
 		
+		@Query(value = "SELECT * " +
+		               "FROM SRI_IMPP_T_MARKETINGORDER " +
+		               "WHERE EXTRACT(MONTH FROM MONTH_0) = :month " +
+		               "AND EXTRACT(YEAR FROM MONTH_0) = :year " +
+		               "AND (" +
+		               "(MO_ID = :moIdFed) " +
+		               "OR " +
+		               "(MO_ID = :moIdFdr)" +
+		               ");", nativeQuery = true)
+		List<MarketingOrder> findByidAndMonthYear(
+		        @Param("month") int month,
+		        @Param("year") int year,
+		        @Param("moIdFed") String moIdFed,
+		        @Param("moIdFdr") String moIdFdr);
+
 		@Query(value = "SELECT DISTINCT " +
 	            "TO_CHAR(t.MONTH_0, 'YYYY-MM-DD') AS month0, " +
 	            "TO_CHAR(t.MONTH_1, 'YYYY-MM-DD') AS month1, " +

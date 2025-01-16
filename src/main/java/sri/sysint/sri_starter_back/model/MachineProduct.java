@@ -15,8 +15,8 @@ import javax.persistence.Table;
 public class MachineProduct {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PART_NUMBER", nullable = false)
-    private BigDecimal PART_NUMBER;
+    @Column(name = "ITEM_CURING", nullable = false)
+    private BigDecimal ITEM_CURING;
 
 	@Column(name = "WORK_CENTER_TEXT", nullable = false)
 	private String WORK_CENTER_TEXT;
@@ -26,25 +26,29 @@ public class MachineProduct {
 		super();
 	}
 
-	public MachineProduct(BigDecimal pART_NUMBER, String wORK_CENTER_TEXT) {
+	public MachineProduct(BigDecimal iTEM_CURING, String wORK_CENTER_TEXT) {
 		super();
-		PART_NUMBER = pART_NUMBER;
+		ITEM_CURING = iTEM_CURING;
 		WORK_CENTER_TEXT = wORK_CENTER_TEXT;
 	}
 
-	public BigDecimal getPART_NUMBER() {
-		return PART_NUMBER;
+	public BigDecimal getITEM_CURING() {
+		return ITEM_CURING;
 	}
 
-	public void setPART_NUMBER(BigDecimal pART_NUMBER) {
-		PART_NUMBER = pART_NUMBER;
+	public void setITEM_CURING(BigDecimal iTEM_CURING) {
+		ITEM_CURING = iTEM_CURING;
 	}
+
 
 	public String getWORK_CENTER_TEXT() {
 		return WORK_CENTER_TEXT;
 	}
 
+
 	public void setWORK_CENTER_TEXT(String wORK_CENTER_TEXT) {
 		WORK_CENTER_TEXT = wORK_CENTER_TEXT;
 	}
+	
+	
 }
