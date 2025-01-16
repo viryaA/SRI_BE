@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
-@Table(name = "SRI_IMPP_D_SHIFTMONTHLYPLAN_CURING")
+@Table(name = "SRI_IMPP_D_SHIFT_PLAN_CURING")
 public class ShiftMonthlyPlan {
 	@Id
     @Column(name = "DETAIL_SHIFT_ID_CURING")

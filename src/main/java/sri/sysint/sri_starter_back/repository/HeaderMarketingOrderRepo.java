@@ -15,14 +15,14 @@ import sri.sysint.sri_starter_back.model.HeaderMarketingOrder;
 
 public interface HeaderMarketingOrderRepo extends JpaRepository <HeaderMarketingOrder, BigDecimal> {
 	
-	@Query(value = "SELECT * FROM SRI_IMPP_D_HEADERMARKETINGORDER WHERE HEADER_ID = :id", nativeQuery = true)
+	@Query(value = "SELECT * FROM SRI_IMPP_D_HEADER_MKT_ORDER WHERE HEADER_ID = :id", nativeQuery = true)
     Optional<HeaderMarketingOrder> findById(@Param("id") BigDecimal id);
 	
-	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_D_HEADERMARKETINGORDER", nativeQuery = true)
+	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_D_HEADER_MKT_ORDER", nativeQuery = true)
     BigDecimal getNewId();
 	
 
-	@Query(value = "SELECT * FROM SRI_IMPP_D_HEADERMARKETINGORDER  WHERE MO_ID = :moId ORDER BY MONTH ASC", nativeQuery = true)
+	@Query(value = "SELECT * FROM SRI_IMPP_D_HEADER_MKT_ORDER  WHERE MO_ID = :moId ORDER BY MONTH ASC", nativeQuery = true)
 	List<HeaderMarketingOrder> findByMoId(@Param("moId") String moId);
 
 //    @Query(value = "SELECT ROUND(SUM(IWD_SHIFT_1 + IWD_SHIFT_2 + IWD_SHIFT_3) / 3, 2) AS FINAL_WD, "
@@ -134,7 +134,7 @@ public interface HeaderMarketingOrderRepo extends JpaRepository <HeaderMarketing
 		Map<String, Object> getMonthlyWorkData(@Param("month") int month, @Param("year") int year);
 
 	//HeaderMarketingOrderRepo
-	@Query(value = "SELECT * FROM SRI_IMPP_D_HEADERMARKETINGORDER WHERE MO_ID = :moId1 OR MO_ID = :moId2", nativeQuery = true)
+	@Query(value = "SELECT * FROM SRI_IMPP_D_HEADER_MKT_ORDER WHERE MO_ID = :moId1 OR MO_ID = :moId2", nativeQuery = true)
 	List<HeaderMarketingOrder> findByTwoMoId(@Param("moId1") String moId1, @Param("moId2") String moId2);
    
 }
