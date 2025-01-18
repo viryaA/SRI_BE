@@ -8,6 +8,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import sri.sysint.sri_starter_back.model.MachineCuring;
 import sri.sysint.sri_starter_back.model.MachineProduct;
 import sri.sysint.sri_starter_back.repository.MachineProductRepo;
 
@@ -41,5 +42,9 @@ public class MachineProductServiceImpl {
 	
     public void deleteAll() {
     	machineProductRepo.deleteAll();
+    }
+
+    public List<MachineProduct> getAllProductMobyCuring(String moId1, String moId2, String itemCuring) {
+        return machineProductRepo.findPartNumByCuring(moId1, moId2, itemCuring);
     }
 }

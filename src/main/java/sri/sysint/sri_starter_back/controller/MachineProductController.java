@@ -7,9 +7,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import sri.sysint.sri_starter_back.exception.ResourceNotFoundException;
@@ -48,5 +51,14 @@ public class MachineProductController {
              
 
         return response;
+    }
+    
+    @GetMapping("/getMachineProductsmoByCuring")
+    public ResponseEntity<List<MachineProduct>> getMachineProductsByCuring(
+            @RequestParam("moId1") String moId1,
+            @RequestParam("moId2") String moId2,
+            @RequestParam("itemCuring") String itemCuring) {
+        List<MachineProduct> filteredProducts = machineProductServiceImpl.getAllProductMobyCuring(moId1, moId2, itemCuring);
+        return ResponseEntity.ok(filteredProducts);
     }
 }
