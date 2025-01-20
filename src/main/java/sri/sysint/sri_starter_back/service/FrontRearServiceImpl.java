@@ -102,4 +102,9 @@ public class FrontRearServiceImpl {
     public void deleteAllFrontRear() {
         frontRearRepo.deleteAllFr();
     }
+    
+    public List<FrontRear> getAlldetailIdMobyCuring(String moId1, String moId2, String itemCuring) {
+        return frontRearRepo.finddetailIdMoByCuring(moId1, moId2, itemCuring);
+    }
+
 }
