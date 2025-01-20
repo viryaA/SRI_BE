@@ -164,7 +164,7 @@ public class MonthlyPlanServiceImpl {
 	        		if(dtMo.getPartNumber().equals(mn.getPART_NUMBER())) {
 	        			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	        			order = dtMo.getTotalAR();
-	        			tempShift = generateFromManualMapping(mn.getITEM_CURING(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
+	        			tempShift = generateFromManualMapping(mn.getPART_NUMBER(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
 	        			if(tempShift == true) {
 	        				dtMo.setMoMonth0(order);
 	        			}
@@ -174,7 +174,7 @@ public class MonthlyPlanServiceImpl {
 	        		if(dtMo.getPartNumber().equals(mn.getPART_NUMBER())) {
 	        			order = dtMo.getTotalAR();
 	        			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
-	        			tempShift = generateFromManualMapping(mn.getITEM_CURING(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
+	        			tempShift = generateFromManualMapping(mn.getPART_NUMBER(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
 	        			if(tempShift == true) {
 	        				dtMo.setMoMonth0(order);
 	        			}
@@ -184,7 +184,7 @@ public class MonthlyPlanServiceImpl {
 	        		if(dtMo.getPartNumber().equals(mn.getPART_NUMBER())) {
 	        			order = dtMo.getTotalAR();
 	        			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
-	        			tempShift = generateFromManualMapping(mn.getITEM_CURING(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
+	        			tempShift = generateFromManualMapping(mn.getPART_NUMBER(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
 	        			if(tempShift == true) {
 	        				dtMo.setMoMonth0(order);
 	        			}
@@ -306,12 +306,12 @@ public class MonthlyPlanServiceImpl {
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
 	            ////System.out.println("test 15");
-    	            tempShift = generateFromMidMonth(dtMo.getItemCuring(), month, year,  ctCurList);
+    	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
 	           ////System.out.println("test 16");
 	            if(!tempShift) {
 	            ////System.out.println("test 17");
-	            	clearShift(dtMo.getItemCuring());
+	            	clearShift(dtMo.getPartNumber());
 	            ////System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
@@ -371,12 +371,12 @@ public class MonthlyPlanServiceImpl {
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
 	            ////System.out.println("test 15");
-    	            tempShift = generateFromMidMonth(dtMo.getItemCuring(), month, year,  ctCurList);
+    	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
 	           ////System.out.println("test 16");
 	            if(!tempShift) {
 	            ////System.out.println("test 17");
-	            	clearShift(dtMo.getItemCuring());
+	            	clearShift(dtMo.getPartNumber());
 	            ////System.out.println("test 18");]
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
@@ -437,12 +437,12 @@ public class MonthlyPlanServiceImpl {
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
 	            ////System.out.println("test 15");
-    	            tempShift = generateFromMidMonth(dtMo.getItemCuring(), month, year,  ctCurList);
+    	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
 	           ////System.out.println("test 16");
 	            if(!tempShift) {
 	            ////System.out.println("test 17");
-	            	clearShift(dtMo.getItemCuring());
+	            	clearShift(dtMo.getPartNumber());
 	            ////System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
@@ -599,12 +599,12 @@ public class MonthlyPlanServiceImpl {
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
 	            ////System.out.println("test 15");
-    	            tempShift = generateFromMidMonth(dtMo.getItemCuring(), month, year,  ctCurList);
+    	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
 	           ////System.out.println("test 16");
 	            if(!tempShift) {
 	            ////System.out.println("test 17");
-	            	clearShift(dtMo.getItemCuring());
+	            	clearShift(dtMo.getPartNumber());
 	            ////System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
@@ -664,12 +664,12 @@ public class MonthlyPlanServiceImpl {
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
 	            ////System.out.println("test 15");
-    	            tempShift = generateFromMidMonth(dtMo.getItemCuring(), month, year,  ctCurList);
+    	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
 	           ////System.out.println("test 16");
 	            if(!tempShift) {
 	            ////System.out.println("test 17");
-	            	clearShift(dtMo.getItemCuring());
+	            	clearShift(dtMo.getPartNumber());
 	            ////System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
@@ -730,12 +730,12 @@ public class MonthlyPlanServiceImpl {
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
 	            ////System.out.println("test 15");
-    	            tempShift = generateFromMidMonth(dtMo.getItemCuring(), month, year,  ctCurList);
+    	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
 	           ////System.out.println("test 16");
 	            if(!tempShift) {
 	            ////System.out.println("test 17");
-	            	clearShift(dtMo.getItemCuring());
+	            	clearShift(dtMo.getPartNumber());
 	            ////System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
@@ -780,26 +780,26 @@ public class MonthlyPlanServiceImpl {
 		}
 		
 		for(ChangeMould obj : changeMouldList) {
-			System.out.println(obj.getItemCuring() + " " + obj.getChangeDate() + " " + obj.getWct() + " " + obj.getShift());
+			System.out.println(obj.getPartNum() + " " + obj.getChangeDate() + " " + obj.getWct() + " " + obj.getShift());
 		}
 		System.out.println("ini ab doang");
 		for(DetailMo dtm : detailMarketingOrderListAB) {
 			if(dtm.getTotalAR().intValue() > 0) {
-				System.out.println(dtm.getItemCuring() + " " + dtm.getTotalAR());
+				System.out.println(dtm.getPartNumber() + " " + dtm.getTotalAR());
 			}
 		}
 		
 		System.out.println("ini bom doang");
 		for(DetailMo dtm : detailMarketingOrderListBOM) {
 			if(dtm.getTotalAR().intValue() > 0) {
-				System.out.println(dtm.getItemCuring() + " " + dtm.getTotalAR());
+				System.out.println(dtm.getPartNumber() + " " + dtm.getTotalAR());
 			}
 		}
 		
 		System.out.println("ini dual ");
 		for(DetailMo dtm : detailMarketingOrderListDual) {
 			if(dtm.getTotalAR().intValue() > 0) {
-				System.out.println(dtm.getItemCuring() + " " + dtm.getTotalAR());
+				System.out.println(dtm.getPartNumber() + " " + dtm.getTotalAR());
 			}
 		}
 		
@@ -870,7 +870,7 @@ public class MonthlyPlanServiceImpl {
 	}
 	//4338
 	
-	public boolean generateFromManualMapping(String mnItemCuring, int month, int year, String itemCuring, String wct) {
+	public boolean generateFromManualMapping(BigDecimal partNum, int month, int year, String itemCuring, String wct) {
 		int cav = 0;
 	////System.out.println("ini minimal bikin nya " + minProduction);
 		for (MachineCuring machineCuring : machineCuringListTemp) {
@@ -883,7 +883,7 @@ public class MonthlyPlanServiceImpl {
 				}else {
 				////System.out.println("masuk old shift2");
 					list = dWorkDayHourSpecificRepo.getCuringCapacityChangeMouldFirstDate(itemCuring , wct, cav, month, year);
-					addChangeMould(workDayList.get(0).getDATE_WD(), mnItemCuring , 1, machineCuring.getWORK_CENTER_TEXT() +  " dari manual mapping");
+					addChangeMould(workDayList.get(0).getDATE_WD(), partNum , 1, machineCuring.getWORK_CENTER_TEXT() +  " dari manual mapping");
 				}
 				if (list != null && !list.isEmpty()) {
 					for(Map<String, Object> capacityData : list) {
@@ -895,6 +895,7 @@ public class MonthlyPlanServiceImpl {
 		                    shift.setKAPA_SHIFT_2(BigDecimal.ZERO);
 		                    shift.setKAPA_SHIFT_3(BigDecimal.ZERO);
 		                    shift.setDATE(parseDate(capacityData.get("DATE_WD").toString()));
+		                    shift.setPART_NUMBER(partNum);
 		                    shift.setCAVITY(new BigDecimal(cav));
 		                    shift.setWORK_CENTER_TEXT(wct);
 		                    shift.setCAVITY_USAGE(new BigDecimal(cav));
@@ -928,7 +929,7 @@ public class MonthlyPlanServiceImpl {
 		        			if(order.intValue() < minProduction.intValue() && validateChangeMould(parseDate(capacityData.get("DATE_WD").toString()), 1)) {
 		        				machineCuring.setSTATUS_USAGE(tempShift);
 		        				machineCuring.setLAST_UPDATE_DATE(parseDate(capacityData.get("DATE_WD").toString()));
-		        				addEndMould(parseDate(capacityData.get("DATE_WD").toString()), mnItemCuring , tempShift.intValue(), machineCuring.getWORK_CENTER_TEXT(), 0);
+		        				addEndMould(parseDate(capacityData.get("DATE_WD").toString()), partNum , tempShift.intValue(), machineCuring.getWORK_CENTER_TEXT(), 0);
 		                    	return true;
 		                    }
 						}
@@ -951,7 +952,7 @@ public class MonthlyPlanServiceImpl {
 		return false;
 	}
 	
-	public boolean generateFromMidMonth(String itemCuring, int month, int year, List<CTCuring> ctCurList) {
+	public boolean generateFromMidMonth(BigDecimal partNum, int month, int year, List<CTCuring> ctCurList) {
 	////System.out.println("Masuk ke mid month0");
 		for (CTCuring ctCur : ctCurList) {
 		////System.out.println("Masuk ke mid month1");
@@ -968,7 +969,7 @@ public class MonthlyPlanServiceImpl {
                 	////System.out.println("ukuran list " + list.size() + " " + ctCur.getWIP() + " " + ctCur.getOPERATION_SHORT_TEXT());
     					if (list != null && !list.isEmpty()) {
     					////System.out.println("masuk list tidak sama dengan null " + ctCur.getWIP());
-    						addChangeMould(machineCuring.getLAST_UPDATE_DATE(), itemCuring , machineCuring.getSTATUS_USAGE().intValue(), machineCuring.getWORK_CENTER_TEXT() + " dari mid month");
+    						addChangeMould(machineCuring.getLAST_UPDATE_DATE(), partNum , machineCuring.getSTATUS_USAGE().intValue(), machineCuring.getWORK_CENTER_TEXT() + " dari mid month");
     						for(Map<String, Object> capacityData : list) {
     	            			////System.out.println("masuk 8 " + new BigDecimal(capacityData.get("SHIFT1_CAPACITY").toString()) + " tanggal " + capacityData.get("DATE_WD").toString());
     							if(order.intValue() > minProduction.intValue() || !validateChangeMould(parseDate(capacityData.get("DATE_WD").toString()), 1)) {
@@ -978,7 +979,7 @@ public class MonthlyPlanServiceImpl {
     		                        shift.setKAPA_SHIFT_2(BigDecimal.ZERO);
     		                        shift.setKAPA_SHIFT_3(BigDecimal.ZERO);
     		                        shift.setDATE(parseDate(capacityData.get("DATE_WD").toString()));
-    		                        shift.setITEM_CURING(itemCuring);
+    		                        shift.setPART_NUMBER(partNum);
     		                        shift.setCAVITY(machineCuring.getCAVITY());
     		                        shift.setWORK_CENTER_TEXT(machineCuring.getWORK_CENTER_TEXT());
     		                        shift.setCAVITY_USAGE(machineCuring.getCAVITY());
@@ -1011,7 +1012,7 @@ public class MonthlyPlanServiceImpl {
     		            			if(order.intValue() < minProduction.intValue() && validateChangeMould(parseDate(capacityData.get("DATE_WD").toString()), 1)) {
     		            				machineCuring.setSTATUS_USAGE(tempShift);
     		            				machineCuring.setLAST_UPDATE_DATE(parseDate(capacityData.get("DATE_WD").toString()));
-    		            				addEndMould(parseDate(capacityData.get("DATE_WD").toString()), itemCuring , tempShift.intValue(), machineCuring.getWORK_CENTER_TEXT(), 1);
+    		            				addEndMould(parseDate(capacityData.get("DATE_WD").toString()), partNum , tempShift.intValue(), machineCuring.getWORK_CENTER_TEXT(), 1);
     		                        	return true;
     		                        }
     							}
@@ -1099,19 +1100,19 @@ public class MonthlyPlanServiceImpl {
 		return false;
 	}
   	
-	public void addChangeMould(Date cahangeDate, String itemCuring, int shift, String wct) {
+	public void addChangeMould(Date cahangeDate, BigDecimal partNum, int shift, String wct) {
 		ChangeMould obj = new ChangeMould();
 		obj.setChangeDate(cahangeDate);
-		obj.setItemCuring(itemCuring);
+		obj.setPartNum(partNum);
 		obj.setShift(shift);
 		obj.setWct(wct);
 		changeMouldList.add(obj);
 	}
 	
-	public void addEndMould(Date cahangeDate, String itemCuring, int shift, String wct, int status) {
+	public void addEndMould(Date cahangeDate, BigDecimal partNum, int shift, String wct, int status) {
 		ChangeMould obj = new ChangeMould();
 		obj.setChangeDate(cahangeDate);
-		obj.setItemCuring(itemCuring);
+		obj.setPartNum(partNum);
 		obj.setShift(shift);
 		obj.setWct(wct);
 		obj.setStatus(status);
@@ -1408,13 +1409,13 @@ public class MonthlyPlanServiceImpl {
         }
 	}
 	    
-	public void clearShift(String itemCuring) {
+	public void clearShift(BigDecimal partNum) {
 	////System.out.println("masuk clear shift");
 		List<String> listWct = new ArrayList<>(); // Gunakan ArrayList untuk penambahan elemen dinamis
 		Iterator<ChangeMould> iterator = changeMouldList.iterator();
 		while (iterator.hasNext()) {
 		    ChangeMould cm = iterator.next();
-		    if (cm.getItemCuring().equals(itemCuring)) {
+		    if (cm.getPartNum().equals(partNum)) {
 		        listWct.add(cm.getWct());
 		        iterator.remove(); // Gunakan iterator untuk menghapus elemen dengan aman
 		    }
@@ -1422,7 +1423,7 @@ public class MonthlyPlanServiceImpl {
 		
 		for (int i = 0; i < changeMouldList.size(); i++) {
 		    ChangeMould cm = changeMouldList.get(i);
-		    if (cm.getItemCuring().equals(itemCuring)) {
+		    if (cm.getPartNum().equals(partNum)) {
 		        listWct.add(cm.getWct());
 		        changeMouldList.remove(i);
 		        i--; // Kurangi indeks karena elemen dihapus
@@ -1431,7 +1432,7 @@ public class MonthlyPlanServiceImpl {
 		
 		for (int i = 0; i < endProductList.size(); i++) {
 		    ChangeMould cm = endProductList.get(i);
-		    if (cm.getItemCuring().equals(itemCuring) && cm.getStatus() == 1) {
+		    if (cm.getPartNum().equals(partNum) && cm.getStatus() == 1) {
 		        changeMouldList.remove(i);
 		        i--; // Kurangi indeks karena elemen dihapus
 		    }
@@ -1443,7 +1444,7 @@ public class MonthlyPlanServiceImpl {
 		Iterator<ShiftMonthlyPlan> iteratorrr = newShiftMonthlyPlan.iterator();
 		while (iterator.hasNext()) {
 		    ShiftMonthlyPlan shf = iteratorrr.next();
-		    if (shf.getITEM_CURING().equals(itemCuring) && shf.getSTATUS().compareTo(BigDecimal.ONE) != 0) {
+		    if (shf.getPART_NUMBER().equals(partNum) && shf.getSTATUS().compareTo(BigDecimal.ONE) != 0) {
 		    	order = order.add(shf.getTOTAL_KAPA());
 		        iterator.remove(); // Gunakan iterator untuk menghapus elemen
 		    }
@@ -1610,7 +1611,7 @@ public class MonthlyPlanServiceImpl {
     }
     
     public class ChangeMould{
-    	private String itemCuring;
+    	private BigDecimal partNum;
     	private String wct;
     	private Date changeDate;
     	private int shift;
@@ -1622,12 +1623,11 @@ public class MonthlyPlanServiceImpl {
 		public void setStatus(int status) {
 			this.status = status;
 		}
-		
-		public String getItemCuring() {
-			return itemCuring;
+		public BigDecimal getPartNum() {
+			return partNum;
 		}
-		public void setItemCuring(String itemCuring) {
-			this.itemCuring = itemCuring;
+		public void setPartNum(BigDecimal partNum) {
+			this.partNum = partNum;
 		}
 		public String getWct() {
 			return wct;
