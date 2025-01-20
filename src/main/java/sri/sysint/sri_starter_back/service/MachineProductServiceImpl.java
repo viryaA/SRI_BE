@@ -39,7 +39,7 @@ public class MachineProductServiceImpl {
         }
         return saved;
     }
-	
+			
     public void deleteAll() {
     	machineProductRepo.deleteAll();
     }

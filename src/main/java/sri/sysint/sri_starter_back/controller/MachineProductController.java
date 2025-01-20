@@ -54,11 +54,23 @@ public class MachineProductController {
     }
     
     @GetMapping("/getMachineProductsmoByCuring")
-    public ResponseEntity<List<MachineProduct>> getMachineProductsByCuring(
+    public Response getMachineProductsByCuring(
+            HttpServletRequest req, 
             @RequestParam("moId1") String moId1,
             @RequestParam("moId2") String moId2,
             @RequestParam("itemCuring") String itemCuring) {
         List<MachineProduct> filteredProducts = machineProductServiceImpl.getAllProductMobyCuring(moId1, moId2, itemCuring);
-        return ResponseEntity.ok(filteredProducts);
+
+        response = new Response(
+                new Date(),
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                filteredProducts
+        );
+
+        return response;
     }
+
 }

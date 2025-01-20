@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import sri.sysint.sri_starter_back.model.FrontRear;
+import sri.sysint.sri_starter_back.model.MachineProduct;
 import sri.sysint.sri_starter_back.repository.FrontRearRepo;
 
 @Service
@@ -69,7 +70,6 @@ public class FrontRearServiceImpl {
     }
 
 
-
     public FrontRear updateFrontRear(FrontRear frontRear) {
         try {
             Optional<FrontRear> currentFrontRearOpt = frontRearRepo.findById(frontRear.getID_FRONT_REAR());
@@ -88,6 +88,10 @@ public class FrontRearServiceImpl {
             System.err.println("Error updating FrontRear: " + e.getMessage());
             throw e;
         }
+    }
+    
+    public List<FrontRear> getAlldetailIdMobyCuring(String moId1, String moId2, String itemCuring) {
+        return frontRearRepo.finddetailIdMoByCuring(moId1, moId2, itemCuring);
     }
 
    

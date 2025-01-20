@@ -20,6 +20,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 
 import sri.sysint.sri_starter_back.exception.ResourceNotFoundException;
 import sri.sysint.sri_starter_back.model.FrontRear;
+import sri.sysint.sri_starter_back.model.MachineProduct;
 import sri.sysint.sri_starter_back.model.Response;
 import sri.sysint.sri_starter_back.service.FrontRearServiceImpl;
 
@@ -125,10 +126,8 @@ public class FrontRearController {
 
             if (user != null) {
 
-                // Tambahkan pemanggilan deleteAllFrontRear sebelum menyimpan data baru
                 frontRearService.deleteAllFrontRear();  // Menghapus semua data sebelumnya
 
-                // Validasi ID_FRONT_REAR untuk setiap item
                 for (FrontRear frontRear : frontRearList) {
                     if (frontRear.getID_FRONT_REAR() == null) {
                         throw new IllegalArgumentException("ID_FRONT_REAR is required for all items");
@@ -302,7 +301,27 @@ public class FrontRearController {
             throw new ResourceNotFoundException("Unexpected error: " + e.getMessage());
         }
 
+        return response;
+    }
+    
+    @GetMapping("/getAlldetailIdMobyCuring")
+    public Response getAlldetailIdMobyCuring(
+            HttpServletRequest req, 
+            @RequestParam("moId1") String moId1,
+            @RequestParam("moId2") String moId2,
+            @RequestParam("itemCuring") String itemCuring) {
+        List<FrontRear> filteredProducts = frontRearService.getAlldetailIdMobyCuring(moId1, moId2, itemCuring);
+
+        response = new Response(
+                new Date(),
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                filteredProducts
+        );
 
         return response;
     }
+
 }

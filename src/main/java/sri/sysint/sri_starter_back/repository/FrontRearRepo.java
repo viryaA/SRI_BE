@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import sri.sysint.sri_starter_back.model.FrontRear;
+import sri.sysint.sri_starter_back.model.MachineProduct;
 
 public interface FrontRearRepo extends JpaRepository<FrontRear, BigDecimal>{
 	@Query(value = "SELECT * FROM SRI_IMPP_M_FRONT_REAR WHERE ID_FRONT_REAR = :id", nativeQuery = true)
@@ -31,6 +32,22 @@ public interface FrontRearRepo extends JpaRepository<FrontRear, BigDecimal>{
 	
     @Query(value = "SELECT COALESCE(MAX(ID_FRONT_REAR), 0) + 1 FROM SRI_IMPP_M_FRONT_REAR", nativeQuery = true)
     BigDecimal getNextId();
+	
+	@Query(value = "SELECT  \r\n"
+			+ "        NULL AS ID_FRONT_REAR,\r\n"
+			+ "        D.DETAIL_ID, \r\n"
+			+ "        1 AS STATUS, \r\n"
+			+ "        SYSDATE  AS CREATION_DATE,\r\n"
+			+ "        NULL AS CREATED_BY, \r\n"
+			+ "        SYSDATE  AS LAST_UPDATE_DATE, \r\n"
+			+ "        NULL AS LAST_UPDATED_BY\r\n"
+			+ "FROM SRI_IMPP_D_MARKETINGORDER D\r\n"
+			+ "JOIN SRI_IMPP_M_PRODUCT P ON D.PART_NUMBER = P.PART_NUMBER\r\n"
+			+ "WHERE (D.MO_ID = :moId1 OR D.MO_ID = :moId2)\r\n"
+			+ "  AND P.ITEM_CURING = :itemCuring;", nativeQuery = true)
+	List<FrontRear> finddetailIdMoByCuring(@Param("moId1") String moId1, 
+	                                          @Param("moId2") String moId2, 
+	                                          @Param("itemCuring") String itemCuring);
 	
     @Query(value = "SELECT * FROM SRI_IMPP_M_FRONT_REAR WHERE STATUS = :status", nativeQuery = true)
     List<FrontRear> findByStatus(@Param("status") BigDecimal status);
