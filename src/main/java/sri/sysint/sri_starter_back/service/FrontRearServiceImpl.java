@@ -104,7 +104,19 @@ public class FrontRearServiceImpl {
     }
     
     public List<FrontRear> getAlldetailIdMobyCuring(String moId1, String moId2, String itemCuring) {
-        return frontRearRepo.finddetailIdMoByCuring(moId1, moId2, itemCuring);
+        System.out.println("moId1: " + moId1);
+        System.out.println("moId2: " + moId2);
+        System.out.println("itemCuring: " + itemCuring);
+        
+        List<FrontRear> result = frontRearRepo.finddetailIdMoByCuring(moId1, moId2, itemCuring);
+
+        // Cetak hasil query
+        System.out.println("Hasil Query: ");
+        for (FrontRear fr : result) {
+            System.out.println(fr);
+        }
+
+        return result;
     }
 
 }
