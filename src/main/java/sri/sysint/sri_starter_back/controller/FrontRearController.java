@@ -126,6 +126,8 @@ public class FrontRearController {
 
             if (user != null) {
 
+            	
+            	
                 frontRearService.deleteAllFrontRear();  // Menghapus semua data sebelumnya
 
                 for (FrontRear frontRear : frontRearList) {
