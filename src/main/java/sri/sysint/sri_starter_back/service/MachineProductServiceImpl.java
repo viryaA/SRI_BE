@@ -43,8 +43,9 @@ public class MachineProductServiceImpl {
     public void deleteAll() {
     	machineProductRepo.deleteAll();
     }
-
+    
     public List<MachineProduct> getAllProductMobyCuring(String moId1, String moId2, String itemCuring) {
         return machineProductRepo.findPartNumByCuring(moId1, moId2, itemCuring);
     }
+
 }
