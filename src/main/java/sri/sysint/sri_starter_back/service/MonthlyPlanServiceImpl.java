@@ -194,125 +194,125 @@ public class MonthlyPlanServiceImpl {
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListABFrontRear) {
-		////System.out.println("test 2");
+		System.out.println("test 2");
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 3");
+           System.out.println("test 3");
 		    order = dtMo.getTotalAR();
-		   ////System.out.println("test 4");
+		   System.out.println("test 4");
     	    oldShiftPlan = shiftMonthlyRepo.findYesterdaysShiftPlan(formatDateToString(workDayList.get(0).getDATE_WD()), dtMo.getItemCuring());
-    	   ////System.out.println("test 5");
+    	   System.out.println("test 5");
     	    if (oldShiftPlan != null && !oldShiftPlan.isEmpty()) { // if 1
     			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
     	    	while (order.intValue() > minProduction.intValue()) {
-        	    ////System.out.println("test 6");
+        	    System.out.println("test 6");
         	    	if(!checkAllActiveMachine()) {
         	    		break;
         	    	}
-        	    ////System.out.println("test 7");
+        	    System.out.println("test 7");
 
     	            tempShift = generateFromOldShift(month, year);
     	            
-        	       ////System.out.println("test 8");
+        	       System.out.println("test 8");
         	        if(!tempShift){
         	        	break;
         	        }
         	    }
-        	   ////System.out.println("test 9");
+        	   System.out.println("test 9");
         	    dtMo.setMoMonth0(order);
 	        }
     	    machineCuringList = machineCuringListTemp;
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListBOMFrontRear) {
-			////System.out.println("test 2");
+			System.out.println("test 2");
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 3");
+           System.out.println("test 3");
 		    order = dtMo.getTotalAR();
-		   ////System.out.println("test 4");
+		   System.out.println("test 4");
     	    oldShiftPlan = shiftMonthlyRepo.findYesterdaysShiftPlan(formatDateToString(workDayList.get(0).getDATE_WD()), dtMo.getItemCuring());
-    	   ////System.out.println("test 5");
+    	   System.out.println("test 5");
     	    if (oldShiftPlan != null && !oldShiftPlan.isEmpty()) { // if 1
     	    	minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
     	    	while (order.intValue() > minProduction.intValue()) {
-        	    ////System.out.println("test 6");
+        	    System.out.println("test 6");
         	    	if(!checkAllActiveMachine()) {
         	    		break;
         	    	}
-        	    ////System.out.println("test 7");
+        	    System.out.println("test 7");
 
     	            tempShift = generateFromOldShift(month, year);
     	            
-        	       ////System.out.println("test 8");
+        	       System.out.println("test 8");
         	        if(!tempShift){
         	        	break;
         	        }
         	    }
-        	   ////System.out.println("test 9");
+        	   System.out.println("test 9");
         	    dtMo.setMoMonth0(order);
 	        }
     	    machineCuringList = machineCuringListTemp;
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListDualFrontRear) {
-		////System.out.println("test 2");
+		System.out.println("test 2");
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 3");
+           System.out.println("test 3");
 		    order = dtMo.getTotalAR();
-		   ////System.out.println("test 4");
+		   System.out.println("test 4");
     	    oldShiftPlan = shiftMonthlyRepo.findYesterdaysShiftPlan(formatDateToString(workDayList.get(0).getDATE_WD()), dtMo.getItemCuring());
-    	   ////System.out.println("test 5");
+    	   System.out.println("test 5");
     	    if (oldShiftPlan != null && !oldShiftPlan.isEmpty()) { // if 1
     	    	minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
     	    	while (order.intValue() > minProduction.intValue()) {
-        	    ////System.out.println("test 6");
+        	    System.out.println("test 6");
         	    	if(!checkAllActiveMachine()) {
         	    		break;
         	    	}
-        	    	////System.out.println("test 7");
+        	    	System.out.println("test 7");
 
     	            tempShift = generateFromOldShift(month, year);
     	            
-        	       ////System.out.println("test 8");
+        	       System.out.println("test 8");
         	        if(!tempShift){
         	        	break;
         	        }
         	    }
-        	   ////System.out.println("test 9");
+        	   System.out.println("test 9");
         	    dtMo.setMoMonth0(order);
 	        }
     	    machineCuringList = machineCuringListTemp;
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListABFrontRear) {
-		////System.out.println("test 11");
+		System.out.println("test 11");
 			if(!checkAllActiveMachine()) {
 				break;
 			}
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 12");
+           System.out.println("test 12");
             order = dtMo.getTotalAR();
-           ////System.out.println("test 13");
+           System.out.println("test 13.1");
             minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	    	while (order.intValue() > minProduction.intValue()) {
-            ////System.out.println("test 14");
+            System.out.println("test 14");
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
-	            ////System.out.println("test 15");
+	            System.out.println("test 15");
     	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
-	           ////System.out.println("test 16");
+	           System.out.println("test 16");
 	            if(!tempShift) {
-	            ////System.out.println("test 17");
+	            System.out.println("test 17");
 	            	clearShift(dtMo.getPartNumber());
-	            ////System.out.println("test 18");
+	            System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
     	            } else if (statusPrioritasMesin == 2) {
@@ -355,29 +355,29 @@ public class MonthlyPlanServiceImpl {
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListBOMFrontRear) {
-		////System.out.println("test 11");
+		System.out.println("test 11");
 			if(!checkAllActiveMachine()) {
 				break;
 			}
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 12");
+           System.out.println("test 12");
             order = dtMo.getTotalAR();
-           ////System.out.println("test 13");
+           System.out.println("test 13.2");
             minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	    	while (order.intValue() > minProduction.intValue()) {
-            ////System.out.println("test 14");
+            System.out.println("test 14");
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
-	            ////System.out.println("test 15");
+	            System.out.println("test 15");
     	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
-	           ////System.out.println("test 16");
+	           System.out.println("test 16");
 	            if(!tempShift) {
-	            ////System.out.println("test 17");
+	            System.out.println("test 17");
 	            	clearShift(dtMo.getPartNumber());
-	            ////System.out.println("test 18");]
+	            System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
     	            } else if (statusPrioritasMesin == 2) {
@@ -421,29 +421,29 @@ public class MonthlyPlanServiceImpl {
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListDualFrontRear) {
-		////System.out.println("test 11");
+		System.out.println("test 11");
 			if(!checkAllActiveMachine()) {
 				break;
 			}
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 12");
+           System.out.println("test 12");
             order = dtMo.getTotalAR();
-           ////System.out.println("test 13");
+           System.out.println("test 13.3");
             minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	    	while (order.intValue() > minProduction.intValue()) {
-            ////System.out.println("test 14");
+            System.out.println("test 14");
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
-	            ////System.out.println("test 15");
+	            System.out.println("test 15");
     	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
-	           ////System.out.println("test 16");
+	           System.out.println("test 16");
 	            if(!tempShift) {
-	            ////System.out.println("test 17");
+	            System.out.println("test 17");
 	            	clearShift(dtMo.getPartNumber());
-	            ////System.out.println("test 18");
+	            System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
     	            } else if (statusPrioritasMesin == 2) {
@@ -487,125 +487,125 @@ public class MonthlyPlanServiceImpl {
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListAB) {
-		////System.out.println("test 2");
+		System.out.println("test 2");
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 3");
+           System.out.println("test 3");
 		    order = dtMo.getTotalAR();
-		   ////System.out.println("test 4");
+		   System.out.println("test 4");
     	    oldShiftPlan = shiftMonthlyRepo.findYesterdaysShiftPlan(formatDateToString(workDayList.get(0).getDATE_WD()), dtMo.getItemCuring());
-    	   ////System.out.println("test 5");
+    	   System.out.println("test 5");
     	    if (oldShiftPlan != null && !oldShiftPlan.isEmpty()) { // if 1
     			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
     	    	while (order.intValue() > minProduction.intValue()) {
-        	    ////System.out.println("test 6");
+        	    System.out.println("test 6");
         	    	if(!checkAllActiveMachine()) {
         	    		break;
         	    	}
-        	    ////System.out.println("test 7");
+        	    System.out.println("test 7");
 
     	            tempShift = generateFromOldShift(month, year);
     	            
-        	       ////System.out.println("test 8");
+        	       System.out.println("test 8");
         	        if(!tempShift){
         	        	break;
         	        }
         	    }
-        	   ////System.out.println("test 9");
+        	   System.out.println("test 9");
         	    dtMo.setMoMonth0(order);
 	        }
     	    machineCuringList = machineCuringListTemp;
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListBOM) {
-			////System.out.println("test 2");
+			System.out.println("test 2");
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 3");
+           System.out.println("test 3");
 		    order = dtMo.getTotalAR();
-		   ////System.out.println("test 4");
+		   System.out.println("test 4");
     	    oldShiftPlan = shiftMonthlyRepo.findYesterdaysShiftPlan(formatDateToString(workDayList.get(0).getDATE_WD()), dtMo.getItemCuring());
-    	   ////System.out.println("test 5");
+    	   System.out.println("test 5");
     	    if (oldShiftPlan != null && !oldShiftPlan.isEmpty()) { // if 1
     	    	minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
     	    	while (order.intValue() > minProduction.intValue()) {
-        	    ////System.out.println("test 6");
+        	    System.out.println("test 6");
         	    	if(!checkAllActiveMachine()) {
         	    		break;
         	    	}
-        	    ////System.out.println("test 7");
+        	    System.out.println("test 7");
 
     	            tempShift = generateFromOldShift(month, year);
     	            
-        	       ////System.out.println("test 8");
+        	       System.out.println("test 8");
         	        if(!tempShift){
         	        	break;
         	        }
         	    }
-        	   ////System.out.println("test 9");
+        	   System.out.println("test 9");
         	    dtMo.setMoMonth0(order);
 	        }
     	    machineCuringList = machineCuringListTemp;
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListDual) {
-		////System.out.println("test 2");
+		System.out.println("test 2");
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 3");
+           System.out.println("test 3");
 		    order = dtMo.getTotalAR();
-		   ////System.out.println("test 4");
+		   System.out.println("test 4");
     	    oldShiftPlan = shiftMonthlyRepo.findYesterdaysShiftPlan(formatDateToString(workDayList.get(0).getDATE_WD()), dtMo.getItemCuring());
-    	   ////System.out.println("test 5");
+    	   System.out.println("test 5");
     	    if (oldShiftPlan != null && !oldShiftPlan.isEmpty()) { // if 1
     	    	minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
     	    	while (order.intValue() > minProduction.intValue()) {
-        	    ////System.out.println("test 6");
+        	    System.out.println("test 6");
         	    	if(!checkAllActiveMachine()) {
         	    		break;
         	    	}
-        	    	////System.out.println("test 7");
+        	    	System.out.println("test 7");
 
     	            tempShift = generateFromOldShift(month, year);
     	            
-        	       ////System.out.println("test 8");
+        	       System.out.println("test 8");
         	        if(!tempShift){
         	        	break;
         	        }
         	    }
-        	   ////System.out.println("test 9");
+        	   System.out.println("test 9");
         	    dtMo.setMoMonth0(order);
 	        }
     	    machineCuringList = machineCuringListTemp;
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListAB) {
-		////System.out.println("test 11");
+		System.out.println("test 11");
 			if(!checkAllActiveMachine()) {
 				break;
 			}
 			int statusPrioritasMesin = 0;
 			tempShift = false;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 12");
+           System.out.println("test 12");
             order = dtMo.getTotalAR();
-           ////System.out.println("test 13");
+           System.out.println("test 13.4");
             minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	    	while (order.intValue() > minProduction.intValue()) {
-            ////System.out.println("test 14");
+            System.out.println("test 14");
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
-	            ////System.out.println("test 15");
+	            System.out.println("test 15");
     	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
-	           ////System.out.println("test 16");
+	           System.out.println("test 16");
 	            if(!tempShift) {
-	            ////System.out.println("test 17");
+	            System.out.println("test 17");
 	            	clearShift(dtMo.getPartNumber());
-	            ////System.out.println("test 18");
+	            System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
     	            } else if (statusPrioritasMesin == 2) {
@@ -648,29 +648,29 @@ public class MonthlyPlanServiceImpl {
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListBOM) {
-		////System.out.println("test 11");
+		System.out.println("test 11");
 			if(!checkAllActiveMachine()) {
 				break;
 			}
 			tempShift = false;
 			int statusPrioritasMesin = 0;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 12");
+           System.out.println("test 12");
             order = dtMo.getTotalAR();
-           ////System.out.println("test 13");
+           System.out.println("test 13.5");
             minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	    	while (order.intValue() > minProduction.intValue()) {
-            ////System.out.println("test 14");
+            System.out.println("test 14");
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
-	            ////System.out.println("test 15");
+	            System.out.println("test 15");
     	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
-	           ////System.out.println("test 16");
+	           System.out.println("test 16");
 	            if(!tempShift) {
-	            ////System.out.println("test 17");
+	            System.out.println("test 17");
 	            	clearShift(dtMo.getPartNumber());
-	            ////System.out.println("test 18");
+	            System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
     	            } else if (statusPrioritasMesin == 2) {
@@ -714,29 +714,30 @@ public class MonthlyPlanServiceImpl {
 		}
 		
 		for(DetailMo dtMo : detailMarketingOrderListDual) {
-		////System.out.println("test 11");
+		System.out.println("test 11");
 			if(!checkAllActiveMachine()) {
 				break;
 			}
 			tempShift = false;
 			int statusPrioritasMesin = 0;
             statusPrioritasMesin = getStatusPrioritasMesin(dtMo, smallOrderLimit);
-           ////System.out.println("test 12");
+           System.out.println("test 12");
             order = dtMo.getTotalAR();
-           ////System.out.println("test 13");
+			System.out.println("INI TOTAL ORDER AR"+order);
+           System.out.println("test 13");
             minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	    	while (order.intValue() > minProduction.intValue()) {
-            ////System.out.println("test 14");
+            System.out.println("test 14");
             	List<CTCuring> ctCurList = getMachine(statusPrioritasMesin, dtMo.getItemCuring());
 	            if(ctCurList.size() > 0) {
-	            ////System.out.println("test 15");
+	            System.out.println("test 15");
     	            tempShift = generateFromMidMonth(dtMo.getPartNumber(), month, year,  ctCurList);
 	            }
-	           ////System.out.println("test 16");
+	           System.out.println("test 16");
 	            if(!tempShift) {
-	            ////System.out.println("test 17");
+	            System.out.println("test 17");
 	            	clearShift(dtMo.getPartNumber());
-	            ////System.out.println("test 18");
+	            System.out.println("test 18");
 	            	if (statusPrioritasMesin == 1) {
     	        		statusPrioritasMesin = 2;
     	            } else if (statusPrioritasMesin == 2) {
@@ -808,7 +809,7 @@ public class MonthlyPlanServiceImpl {
 	
 	public BigDecimal getMinimalProduction(BigDecimal mo, BigDecimal minA, BigDecimal minB, BigDecimal minC, BigDecimal minD) {
 	    BigDecimal percentage;
-
+        System.out.println("INI NILAI TOTAL AR"+mo);
 	    if (mo.compareTo(BigDecimal.valueOf(2001)) < 0) {
 	        percentage = minA;
 	    } else if (mo.compareTo(BigDecimal.valueOf(10001)) < 0) {
@@ -872,22 +873,22 @@ public class MonthlyPlanServiceImpl {
 	
 	public boolean generateFromManualMapping(BigDecimal partNum, int month, int year, String itemCuring, String wct) {
 		int cav = 0;
-	////System.out.println("ini minimal bikin nya " + minProduction);
+	System.out.println("ini minimal bikin nya " + minProduction);
 		for (MachineCuring machineCuring : machineCuringListTemp) {
 			if(machineCuring.getWORK_CENTER_TEXT().equals(wct)) {
 				cav = machineCuring.getCAVITY().intValue();
 				List<Map<String, Object>> list = new ArrayList<>();
 				if(checkOldShift(itemCuring)) {
-				////System.out.println("masuk old shift");
+				System.out.println("masuk old shift");
 					list = dWorkDayHourSpecificRepo.getCuringCapacity(itemCuring , wct, cav, month, year);
 				}else {
-				////System.out.println("masuk old shift2");
+				System.out.println("masuk old shift2");
 					list = dWorkDayHourSpecificRepo.getCuringCapacityChangeMouldFirstDate(itemCuring , wct, cav, month, year);
 					addChangeMould(workDayList.get(0).getDATE_WD(), partNum , 1, machineCuring.getWORK_CENTER_TEXT() +  " dari manual mapping");
 				}
 				if (list != null && !list.isEmpty()) {
 					for(Map<String, Object> capacityData : list) {
-		    			////System.out.println("masuk 8 " + new BigDecimal(capacityData.get("SHIFT1_CAPACITY").toString()) + " tanggal " + capacityData.get("DATE_WD").toString());
+		    			System.out.println("masuk 8 " + new BigDecimal(capacityData.get("SHIFT1_CAPACITY").toString()) + " tanggal " + capacityData.get("DATE_WD").toString());
 						if(order.intValue() > minProduction.intValue() || !validateChangeMould(parseDate(capacityData.get("DATE_WD").toString()), 1)) {
 							BigDecimal tempShift = BigDecimal.ZERO;
 							ShiftMonthlyPlan shift = new ShiftMonthlyPlan();
@@ -925,7 +926,7 @@ public class MonthlyPlanServiceImpl {
 		                            .add(shift.getKAPA_SHIFT_3());
 		                    shift.setTOTAL_KAPA(totalKapasitasShift);
 		                    newShiftMonthlyPlan.add(shift);
-		        			////System.out.println("masuk 9");
+		        			System.out.println("masuk 9");
 		        			if(order.intValue() < minProduction.intValue() && validateChangeMould(parseDate(capacityData.get("DATE_WD").toString()), 1)) {
 		        				machineCuring.setSTATUS_USAGE(tempShift);
 		        				machineCuring.setLAST_UPDATE_DATE(parseDate(capacityData.get("DATE_WD").toString()));
@@ -933,7 +934,7 @@ public class MonthlyPlanServiceImpl {
 		                    	return true;
 		                    }
 						}
-		    			////System.out.println("masuk 10");
+		    			System.out.println("masuk 10");
 					}
 					machineCuring.setSTATUS(BigDecimal.ZERO);
 					return true;
@@ -953,12 +954,12 @@ public class MonthlyPlanServiceImpl {
 	}
 	
 	public boolean generateFromMidMonth(BigDecimal partNum, int month, int year, List<CTCuring> ctCurList) {
-	////System.out.println("Masuk ke mid month0");
+	System.out.println("Masuk ke mid month0");
 		for (CTCuring ctCur : ctCurList) {
-		////System.out.println("Masuk ke mid month1");
+		System.out.println("Masuk ke mid month1");
             for (MachineCuring machineCuring : machineCuringListTemp) {
                 if (machineCuring.getWORK_CENTER_TEXT().equals(ctCur.getOPERATION_SHORT_TEXT()) && machineCuring.getSTATUS().equals(BigDecimal.ONE)) {
-                ////System.out.println("mesin " + machineCuring.getLAST_UPDATE_DATE() + " " + machineCuring.getSTATUS().intValue());
+                System.out.println("mesin " + machineCuring.getLAST_UPDATE_DATE() + " " + machineCuring.getSTATUS().intValue());
                 	//if(validateChangeMould(machineCuring.getLAST_UPDATE_DATE(), machineCuring.getSTATUS_USAGE().intValue())) {
                 		List<Map<String, Object>> list = new ArrayList<>();
                 		if(machineCuring.getLAST_UPDATE_DATE() == null) {
@@ -966,12 +967,12 @@ public class MonthlyPlanServiceImpl {
                 		}else {
                 			list = dWorkDayHourSpecificRepo.getCuringCapacityMidMonth(ctCur.getWIP() , ctCur.getOPERATION_SHORT_TEXT(), machineCuring.getCAVITY().intValue(), formatDateToString(machineCuring.getLAST_UPDATE_DATE()), machineCuring.getSTATUS_USAGE().intValue());	
                 		}
-                	////System.out.println("ukuran list " + list.size() + " " + ctCur.getWIP() + " " + ctCur.getOPERATION_SHORT_TEXT());
+                	System.out.println("ukuran list " + list.size() + " " + ctCur.getWIP() + " " + ctCur.getOPERATION_SHORT_TEXT());
     					if (list != null && !list.isEmpty()) {
-    					////System.out.println("masuk list tidak sama dengan null " + ctCur.getWIP());
+    					System.out.println("masuk list tidak sama dengan null " + ctCur.getWIP());
     						addChangeMould(machineCuring.getLAST_UPDATE_DATE(), partNum , machineCuring.getSTATUS_USAGE().intValue(), machineCuring.getWORK_CENTER_TEXT() + " dari mid month");
     						for(Map<String, Object> capacityData : list) {
-    	            			////System.out.println("masuk 8 " + new BigDecimal(capacityData.get("SHIFT1_CAPACITY").toString()) + " tanggal " + capacityData.get("DATE_WD").toString());
+    	            			System.out.println("masuk 8 " + new BigDecimal(capacityData.get("SHIFT1_CAPACITY").toString()) + " tanggal " + capacityData.get("DATE_WD").toString());
     							if(order.intValue() > minProduction.intValue() || !validateChangeMould(parseDate(capacityData.get("DATE_WD").toString()), 1)) {
     								BigDecimal tempShift = BigDecimal.ZERO;
     								ShiftMonthlyPlan shift = new ShiftMonthlyPlan();
@@ -1008,7 +1009,7 @@ public class MonthlyPlanServiceImpl {
     		                                .add(shift.getKAPA_SHIFT_3());
     		                        shift.setTOTAL_KAPA(totalKapasitasShift);
     		                        newShiftMonthlyPlan.add(shift);
-    		            			////System.out.println("masuk 9");
+    		            			System.out.println("masuk 9");
     		            			if(order.intValue() < minProduction.intValue() && validateChangeMould(parseDate(capacityData.get("DATE_WD").toString()), 1)) {
     		            				machineCuring.setSTATUS_USAGE(tempShift);
     		            				machineCuring.setLAST_UPDATE_DATE(parseDate(capacityData.get("DATE_WD").toString()));
@@ -1016,9 +1017,9 @@ public class MonthlyPlanServiceImpl {
     		                        	return true;
     		                        }
     							}
-    	            			////System.out.println("masuk 10");
+    	            			System.out.println("masuk 10");
     						}
-    					////System.out.println("habis " + machineCuring.getWORK_CENTER_TEXT());
+    					System.out.println("habis " + machineCuring.getWORK_CENTER_TEXT());
 							machineCuring.setSTATUS(BigDecimal.ZERO);
     						return true;
                         //}
@@ -1041,7 +1042,7 @@ public class MonthlyPlanServiceImpl {
                     	List<Map<String, Object>> list = dWorkDayHourSpecificRepo.getCuringCapacity(shiftPlan.getITEM_CURING() , shiftPlan.getWORK_CENTER_TEXT(), shiftPlan.getCAVITY().intValue(), month, year);
 						if (list != null && !list.isEmpty()) {
 							for(Map<String, Object> capacityData : list) {
-		            			////System.out.println("masuk 8 " + new BigDecimal(capacityData.get("SHIFT1_CAPACITY").toString()) + " tanggal " + capacityData.get("DATE_WD").toString());
+		            			System.out.println("masuk 8 " + new BigDecimal(capacityData.get("SHIFT1_CAPACITY").toString()) + " tanggal " + capacityData.get("DATE_WD").toString());
 								if(order.intValue() > minProduction.intValue() || !validateChangeMould(parseDate(capacityData.get("DATE_WD").toString()), 1)) {
 									BigDecimal tempShift = BigDecimal.ZERO;
 									ShiftMonthlyPlan shift = new ShiftMonthlyPlan();
@@ -1079,7 +1080,7 @@ public class MonthlyPlanServiceImpl {
 			                                .add(shift.getKAPA_SHIFT_3());
 			                        shift.setTOTAL_KAPA(totalKapasitasShift);
 			                        newShiftMonthlyPlan.add(shift);
-			            			////System.out.println("masuk 9");
+			            			System.out.println("masuk 9");
 			            			if(order.intValue() < minProduction.intValue() && validateChangeMould(parseDate(capacityData.get("DATE_WD").toString()), 1)) {
 			            				machineCuring.setSTATUS_USAGE(tempShift);
 			            				machineCuring.setLAST_UPDATE_DATE(parseDate(capacityData.get("DATE_WD").toString()));
@@ -1087,7 +1088,7 @@ public class MonthlyPlanServiceImpl {
 			                        	return true;
 			                        }
 								}
-		            			////System.out.println("masuk 10");
+		            			System.out.println("masuk 10");
 							}
 							machineCuring.setSTATUS(BigDecimal.ZERO);
 							return true;
@@ -1178,7 +1179,7 @@ public class MonthlyPlanServiceImpl {
 		machineProductList = machineProductRepo.findAll();
 		System.out.println("ukuran list mesin " + machineCuringList.size() + " " + machineCuringListTemp.size());
 		 
-    	////System.out.println(machineCuringList.size());
+    	System.out.println(machineCuringList.size());
     	workDayList = workDayRepo.findByMonthYear(month, year); //Flowchart 3
 		
     	smallOrderLimit = new BigDecimal(settingRepo.findSmallOrderLimit().getSETTING_VALUE());
@@ -1186,36 +1187,36 @@ public class MonthlyPlanServiceImpl {
     	List<MarketingOrder> marketingOrderList = marketingOrderRepo.findByMonthYear(month, year); //flowchart 4
 
     	 //flowchart 5 6 7 8
-    	////System.out.println("Done flow 5");
-    	////System.out.println(marketingOrderList.get(0).getMoId() + " " + marketingOrderList.get(1).getMoId());
+    	System.out.println("Done flow 5");
+    	System.out.println(marketingOrderList.get(0).getMoId() + " " + marketingOrderList.get(1).getMoId());
     	
-    ////System.out.println("check");
+    System.out.println("check");
     	List<Map<String, Object>> detailMarkOrderListAB = new ArrayList<>();
-    ////System.out.println("check1");
+    System.out.println("check1");
     	List<Map<String, Object>> detailMarkOrderListBOM = new ArrayList<>();
-    ////System.out.println("check2");
+    System.out.println("check2");
     	List<Map<String, Object>> detailMarkOrderListDual = new ArrayList<>();
-    ////System.out.println("check3");
+    System.out.println("check3");
     	List<Map<String, Object>> detailMarkOrderListABFrontRear = new ArrayList<>();
-    ////System.out.println("check1");
+    System.out.println("check1");
     	List<Map<String, Object>> detailMarkOrderListBOMFrontRear = new ArrayList<>();
-    ////System.out.println("check2");
+    System.out.println("check2");
     	List<Map<String, Object>> detailMarkOrderListDualFrontRear = new ArrayList<>();
 
     	detailMarkOrderListAB = detailMarketingOrderRepo.findByMoIdSortProductTypeAbNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    ////System.out.println("check4");
+    System.out.println("check4");
     	detailMarkOrderListBOM = detailMarketingOrderRepo.findByMoIdSortProductTypeBomNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    ////System.out.println("check5");
+    System.out.println("check5.1");
     	detailMarkOrderListDual = detailMarketingOrderRepo.findByMoIdSortProductTypeBomAbNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
     	
     	detailMarkOrderListABFrontRear = detailMarketingOrderRepo.findByMoIdSortProductTypeAbFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-        ////System.out.println("check4");
+        System.out.println("check4.2");
     	detailMarkOrderListBOMFrontRear = detailMarketingOrderRepo.findByMoIdSortProductTypeBomAbFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    ////System.out.println("check5");
+    System.out.println("check5");
     	detailMarkOrderListDualFrontRear = detailMarketingOrderRepo.findByMoIdSortProductTypeBomFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    ////System.out.println("check6");
+    System.out.println("check6");
     System.out.println("ukuran  " + detailMarkOrderListAB.size() + " " + detailMarkOrderListBOM.size() + " " + detailMarkOrderListDual.size()+ " " + detailMarkOrderListABFrontRear.size() + " " + detailMarkOrderListBOMFrontRear.size() + " " + detailMarkOrderListDualFrontRear.size());
-    	////System.out.println("Done flow 6");
+    	System.out.println("Done flow 6");
         for (Map<String, Object> map : detailMarkOrderListAB) {
         	DetailMo obj = new DetailMo();
             obj.setPpd((BigDecimal) map.get("PPD"));
@@ -1236,6 +1237,7 @@ public class MonthlyPlanServiceImpl {
             obj.setCategory((String) map.get("CATEGORY"));
             obj.setCav((BigDecimal) map.get("CAV"));
             obj.setQtyPerRak((BigDecimal) map.get("QTY_PER_RAK"));
+			obj.setTotalAR((BigDecimal) map.get("TOTAL_AR"));
             obj.setDescription((String) map.get("DESCRIPTION"));
             obj.setQtyPerMould((BigDecimal) map.get("QTY_PER_MOULD"));
             obj.setMoId((String) map.get("MO_ID"));
@@ -1245,6 +1247,8 @@ public class MonthlyPlanServiceImpl {
             obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
             obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
             obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            System.out.println("Done list ab");
+            System.out.println(obj);
             detailMarketingOrderListAB.add(obj);
         }
         
@@ -1262,6 +1266,7 @@ public class MonthlyPlanServiceImpl {
             obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
             obj.setRim((BigDecimal) map.get("RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
+			obj.setTotalAR((BigDecimal) map.get("TOTAL_AR"));
             obj.setWibTube((String) map.get("WIB_TUBE"));
             obj.setPatternId((String) map.get("PATTERN_ID"));
             obj.setItemAssy((String) map.get("ITEM_ASSY"));
@@ -1277,6 +1282,8 @@ public class MonthlyPlanServiceImpl {
             obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
             obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
             obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            System.out.println("Done list bom");
+            System.out.println(obj);
             detailMarketingOrderListBOM.add(obj);
         }
         
@@ -1294,6 +1301,7 @@ public class MonthlyPlanServiceImpl {
             obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
             obj.setRim((BigDecimal) map.get("RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
+			obj.setTotalAR((BigDecimal) map.get("TOTAL_AR"));
             obj.setWibTube((String) map.get("WIB_TUBE"));
             obj.setPatternId((String) map.get("PATTERN_ID"));
             obj.setItemAssy((String) map.get("ITEM_ASSY"));
@@ -1309,6 +1317,8 @@ public class MonthlyPlanServiceImpl {
             obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
             obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
             obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            System.out.println("Done list dual");
+            System.out.println(obj);
             detailMarketingOrderListDual.add(obj);
         }
         
@@ -1326,6 +1336,7 @@ public class MonthlyPlanServiceImpl {
             obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
             obj.setRim((BigDecimal) map.get("RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
+			obj.setTotalAR((BigDecimal) map.get("TOTAL_AR"));
             obj.setWibTube((String) map.get("WIB_TUBE"));
             obj.setPatternId((String) map.get("PATTERN_ID"));
             obj.setItemAssy((String) map.get("ITEM_ASSY"));
@@ -1341,6 +1352,8 @@ public class MonthlyPlanServiceImpl {
             obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
             obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
             obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            System.out.println("Done list ab frontrear");
+            System.out.println(obj);
             detailMarketingOrderListABFrontRear.add(obj);
         }
         
@@ -1358,6 +1371,7 @@ public class MonthlyPlanServiceImpl {
             obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
             obj.setRim((BigDecimal) map.get("RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
+			obj.setTotalAR((BigDecimal) map.get("TOTAL_AR"));
             obj.setWibTube((String) map.get("WIB_TUBE"));
             obj.setPatternId((String) map.get("PATTERN_ID"));
             obj.setItemAssy((String) map.get("ITEM_ASSY"));
@@ -1373,6 +1387,8 @@ public class MonthlyPlanServiceImpl {
             obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
             obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
             obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            System.out.println("Done list bom front rear");
+            System.out.println(obj);
             detailMarketingOrderListBOMFrontRear.add(obj);
         }
         
@@ -1390,6 +1406,7 @@ public class MonthlyPlanServiceImpl {
             obj.setDetailId((BigDecimal) map.get("DETAIL_ID"));
             obj.setRim((BigDecimal) map.get("RIM"));
             obj.setItemCuring((String) map.get("ITEM_CURING"));
+			obj.setTotalAR((BigDecimal) map.get("TOTAL_AR"));
             obj.setWibTube((String) map.get("WIB_TUBE"));
             obj.setPatternId((String) map.get("PATTERN_ID"));
             obj.setItemAssy((String) map.get("ITEM_ASSY"));
@@ -1405,12 +1422,14 @@ public class MonthlyPlanServiceImpl {
             obj.setPartNumber((BigDecimal) map.get("PART_NUMBER"));
             obj.setUpperConstant((BigDecimal) map.get("UPPER_CONSTANT"));
             obj.setMaxCapMonth0((BigDecimal) map.get("MAX_CAP_MONTH_0"));
+            System.out.println("Done list dual frontrear");
+            System.out.println(obj);
             detailMarketingOrderListDualFrontRear.add(obj);
         }
 	}
 	    
 	public void clearShift(BigDecimal partNum) {
-	////System.out.println("masuk clear shift");
+	System.out.println("masuk clear shift");
 		List<String> listWct = new ArrayList<>(); // Gunakan ArrayList untuk penambahan elemen dinamis
 		Iterator<ChangeMould> iterator = changeMouldList.iterator();
 		while (iterator.hasNext()) {
@@ -1508,21 +1527,21 @@ public class MonthlyPlanServiceImpl {
     
     public int getStatusPrioritasMesin(DetailMo dtMo, BigDecimal smallOrderLimit) {
     	if ("TT".equals(dtMo.getProductType()) && dtMo.getRim().compareTo(BigDecimal.valueOf(14)) == 0) { // flowchart 11
-            ////System.out.println("Done flow 11");
+            System.out.println("Done flow 11");
             return 1;
         } else if ("TT".equals(dtMo.getProductType())) { // Flowchart 14
-            ////System.out.println("Done flow 14");
+            System.out.println("Done flow 14");
             return 12;
         } else if ("SINGLE COMPOUND".equals(dtMo.getExtDescription())) { // Flowchart 12
-            ////System.out.println("Done flow 12");
+            System.out.println("Done flow 12");
             return 2;
         } else if ("TL".equals(dtMo.getProductType())) { // Flowchart 13
-            ////System.out.println("Done flow 13");
+            System.out.println("Done flow 13");
             return 22;
         }
     	
         if (dtMo.getTotalAR().compareTo(smallOrderLimit) <= 0) { // flowchart 15
-            ////System.out.println("Done flow 14");
+            System.out.println("Done flow 14");
             return 32;
         }
     	return 0;
@@ -1536,7 +1555,7 @@ public class MonthlyPlanServiceImpl {
         } catch (Exception e) {
             e.printStackTrace();  
         }
-        ////System.out.println("ini date " + date);
+        System.out.println("ini date " + date);
         return date;
     }
     
@@ -1560,7 +1579,7 @@ public class MonthlyPlanServiceImpl {
             return null; // Kembalikan null jika input null
         }
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
-       ////System.out.println("hari " + dayFormat.format(date));
+       System.out.println("hari " + dayFormat.format(date));
         return dayFormat.format(date); // Kembalikan nama hari dalam string
     }
     
@@ -1841,13 +1860,16 @@ public class MonthlyPlanServiceImpl {
                     '}';
         }
     }
-    
+
+
+	    
     public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) throws IOException {
     	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
     	System.out.println(shiftMonthlyPlan.size());
     	List<String> productDescription = new ArrayList<>();
     	
     		for (int i = 0; i < shiftMonthlyPlan.size(); i++) {
+    		    //BigDecimal partNumber = shiftMonthlyPlan.get(i).getPART_NUMBER();
     		    BigDecimal partNumber = shiftMonthlyPlan.get(i).getPART_NUMBER();
     		    String description = shiftMonthlyRepo.findDescriptionByPartNum(partNumber);
     		    if (description == null) {
@@ -2084,7 +2106,7 @@ public class MonthlyPlanServiceImpl {
             Cell tableHeadMpCell;
 
             // Array untuk header teks dan gaya untuk kolom 0-5
-            String[] headerMpLabels = {"", "PART NUMBER", "", "NO.", "SIZE", "PATTERN"};
+            String[] headerMpLabels = {"", "ITEM CURING", "", "NO.", "SIZE", "PATTERN"};
             CellStyle[] headerMpStyles = {calibri11CenterBorder, calibriBold11CenterBorder, calibri11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder};
 
             // Loop untuk kolom 0-5
@@ -2132,7 +2154,8 @@ public class MonthlyPlanServiceImpl {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
             for (int j = 0; j < shiftMonthlyPlan.size(); j++) {
-                String partNumber = String.valueOf(shiftMonthlyPlan.get(j).getPART_NUMBER());
+            	//String partNumber = String.valueOf(shiftMonthlyPlan.get(j).getPART_NUMBER());
+            	String itemCuring = String.valueOf(shiftMonthlyPlan.get(j).getITEM_CURING());
                 String description = productDescription.get(j);
                 int intCapacity = 0;
                 int totalCapacity = 0;
@@ -2141,9 +2164,9 @@ public class MonthlyPlanServiceImpl {
 
                 
                 // Jika partNumber belum pernah ditambahkan
-                if (partNumber != null && !addedPartNumbers.contains(partNumber)) {
+                if (itemCuring != null && !addedPartNumbers.contains(itemCuring)) {
                     // Tambahkan ke HashSet untuk melacak
-                    addedPartNumbers.add(partNumber);
+                    addedPartNumbers.add(itemCuring);
 
                     // Buat baris dan tambahkan data
                     mpDataRow = prepareProdSheet.createRow(mpDatarow);
@@ -2152,7 +2175,7 @@ public class MonthlyPlanServiceImpl {
                     mpDataCell.setCellStyle(calibri11LeftBorder);
                     
                     mpDataCell = mpDataRow.createCell(1);
-                    mpDataCell.setCellValue(partNumber);
+                    mpDataCell.setCellValue(itemCuring);
                     mpDataCell.setCellStyle(calibri11CenterBorder);
                     
                     mpDataCell = mpDataRow.createCell(2);
@@ -2180,13 +2203,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
                     	actualDate = dateFormat.format(date);
-                        if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-                           ////System.out.println(planDate);
-                           ////System.out.println(actualDate);
+                        if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+                           System.out.println(planDate);
+                           System.out.println(actualDate);
                         	intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 1 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 1 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(6);
@@ -2206,13 +2229,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 2 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 2 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(7);
@@ -2232,13 +2255,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 3 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 3 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(8);
@@ -2258,13 +2281,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 4 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 4 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(9);
@@ -2284,13 +2307,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 5 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 5 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(10);
@@ -2310,13 +2333,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 6 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 6 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(11);
@@ -2336,13 +2359,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 7 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 7 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(12);
@@ -2362,13 +2385,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 8 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 8 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(13);
@@ -2388,13 +2411,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 9 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 9 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(14);
@@ -2414,13 +2437,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 10 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 10 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(15);
@@ -2440,13 +2463,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 11 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 11 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(16);
@@ -2466,13 +2489,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 12 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 12 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(17);
@@ -2492,13 +2515,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 13 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 13 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(18);
@@ -2518,13 +2541,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 14 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 14 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(19);
@@ -2544,13 +2567,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 15 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 15 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(20);
@@ -2570,13 +2593,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 16 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 16 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(21);
@@ -2596,13 +2619,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 17 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 17 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(22);
@@ -2622,13 +2645,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 18 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 18 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(23);
@@ -2648,13 +2671,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 19 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 19 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(24);
@@ -2674,13 +2697,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 20 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 20 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(25);
@@ -2700,13 +2723,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 21 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 21 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(26);
@@ -2726,13 +2749,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 22 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 22 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(27);
@@ -2752,13 +2775,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 23 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 23 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(28);
@@ -2778,13 +2801,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 24 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 24 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(29);
@@ -2804,13 +2827,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 25 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 25 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(30);
@@ -2830,13 +2853,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 26 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 26 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(31);
@@ -2856,13 +2879,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	                           ////System.out.println(planDate);
-	                           ////System.out.println(actualDate);
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+	                           System.out.println(planDate);
+	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   ////System.out.println(partNumber + " at day 27 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 27 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(32);
@@ -2883,13 +2906,13 @@ public class MonthlyPlanServiceImpl {
                         for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
     	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
     	                    	actualDate = dateFormat.format(date);
-    	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-    	                           ////System.out.println(planDate);
-    	                           ////System.out.println(actualDate);
+    	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+    	                           System.out.println(planDate);
+    	                           System.out.println(actualDate);
                                 intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                             }
                         }
-                       ////System.out.println(partNumber + " at day 28 : " + intCapacity);
+                       System.out.println(itemCuring + " at day 28 : " + intCapacity);
                         totalCapacity += intCapacity;
                         
                         mpDataCell = mpDataRow.createCell(33);
@@ -2911,13 +2934,13 @@ public class MonthlyPlanServiceImpl {
                         for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
     	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
     	                    	actualDate = dateFormat.format(date);
-    	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-    	                           ////System.out.println(planDate);
-    	                           ////System.out.println(actualDate);
+    	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+    	                           System.out.println(planDate);
+    	                           System.out.println(actualDate);
                                 intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                             }
                         }
-                       ////System.out.println(partNumber + " at day 29 : " + intCapacity);
+                       System.out.println(itemCuring + " at day 29 : " + intCapacity);
                         totalCapacity += intCapacity;
                         
                         mpDataCell = mpDataRow.createCell(34);
@@ -2939,13 +2962,13 @@ public class MonthlyPlanServiceImpl {
                         for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
     	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
     	                    	actualDate = dateFormat.format(date);
-    	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-    	                           ////System.out.println(planDate);
-    	                           ////System.out.println(actualDate);
+    	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+    	                           System.out.println(planDate);
+    	                           System.out.println(actualDate);
                                 intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                             }
                         }
-                       ////System.out.println(partNumber + " at day 30 : " + intCapacity);
+                       System.out.println(itemCuring + " at day 30 : " + intCapacity);
                         totalCapacity += intCapacity;
                         
                         mpDataCell = mpDataRow.createCell(35);
@@ -2967,13 +2990,13 @@ public class MonthlyPlanServiceImpl {
                         for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
     	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
     	                    	actualDate = dateFormat.format(date);
-    	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-    	                           ////System.out.println(planDate);
-    	                           ////System.out.println(actualDate);
+    	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
+    	                           System.out.println(planDate);
+    	                           System.out.println(actualDate);
                                 intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                             }
                         }
-                       ////System.out.println(partNumber + " at day 31 : " + intCapacity);
+                       System.out.println(itemCuring + " at day 31 : " + intCapacity);
                         totalCapacity += intCapacity;
                         
                         mpDataCell = mpDataRow.createCell(36);
@@ -3047,7 +3070,7 @@ public class MonthlyPlanServiceImpl {
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
-           ////System.out.println("Fail to export data");
+           System.out.println("Fail to export data");
             return null;
         } finally {
             out.close(); // Tutup output stream setelah selesai
