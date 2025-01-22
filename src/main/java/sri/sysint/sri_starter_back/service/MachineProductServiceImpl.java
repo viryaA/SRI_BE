@@ -8,6 +8,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import sri.sysint.sri_starter_back.model.MachineCuring;
 import sri.sysint.sri_starter_back.model.MachineProduct;
 import sri.sysint.sri_starter_back.repository.MachineProductRepo;
 
@@ -38,7 +39,7 @@ public class MachineProductServiceImpl {
         }
         return saved;
     }
-	
+			
     public void deleteAll() {
     	machineProductRepo.deleteAll();
     }
