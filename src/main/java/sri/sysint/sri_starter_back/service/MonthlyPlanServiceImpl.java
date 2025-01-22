@@ -1861,1146 +1861,7 @@ public class MonthlyPlanServiceImpl {
         }
     }
 
-    // public ByteArrayInputStream exportExcel() throws IOException {
-    // 	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(11, 2024, 0, new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0));
-    // 	System.out.println(shiftMonthlyPlan.size());
-    // 	List<String> productDescription = new ArrayList<>();
-    	
-    // 		for (int i = 0; i < shiftMonthlyPlan.size(); i++) {
-    // 		    BigDecimal partNumber = shiftMonthlyPlan.get(i).getPART_NUMBER();
-    // 		    String description = shiftMonthlyRepo.findDescriptionByPartNum(partNumber);
-    // 		    if (description == null) {
-    // 		        description = "N/A";
-    // 		    }
-    // 		    productDescription.add(description);
-    // 		}
 
-
-    //     Workbook workbook = new XSSFWorkbook();
-    //     ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-    //     try {
-    //     	//style
-    //     	// Font
-    //         Font calibri11 = workbook.createFont();
-    //         calibri11.setFontName("Calibri");
-    //         calibri11.setFontHeightInPoints((short) 11);
-            
-    //         Font calibri12 = workbook.createFont();
-    //         calibri12.setFontName("Calibri");
-    //         calibri12.setFontHeightInPoints((short) 12);
-            
-    //         Font calibriBold11 = workbook.createFont();
-    //         calibriBold11.setFontName("Calibri");
-    //         calibriBold11.setFontHeightInPoints((short) 11);
-    //         calibriBold11.setBold(true);
-            
-    //         Font calibriBold12 = workbook.createFont();
-    //         calibriBold12.setFontName("Calibri");
-    //         calibriBold12.setFontHeightInPoints((short) 12);
-    //         calibriBold12.setBold(true);
-            
-    //         Font calibriBold14 = workbook.createFont();
-    //         calibriBold14.setFontName("Calibri");
-    //         calibriBold14.setFontHeightInPoints((short) 14);
-    //         calibriBold14.setBold(true);
-    //         // End Font
-            
-    //         // Border cell style
-    //         CellStyle borderStyle = workbook.createCellStyle();
-    //         borderStyle.setBorderTop(BorderStyle.THIN);
-    //         borderStyle.setBorderBottom(BorderStyle.THIN);
-    //         borderStyle.setBorderLeft(BorderStyle.THIN);
-    //         borderStyle.setBorderRight(BorderStyle.THIN);
-    //         borderStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
-    //         borderStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
-    //         borderStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-    //         borderStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
-    //         // End border cell style
-
-    //         // Style untuk cell
-    //         CellStyle title = workbook.createCellStyle();
-    //         title.setFont(calibriBold14);
-    //         title.setAlignment(HorizontalAlignment.CENTER);
-    //         title.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-    //         CellStyle calibri11Left = workbook.createCellStyle();
-    //         calibri11Left.setFont(calibri11);
-    //         calibri11Left.setAlignment(HorizontalAlignment.LEFT);
-    //         calibri11Left.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-    //         CellStyle calibri11Right = workbook.createCellStyle();
-    //         calibri11Right.setFont(calibri11);
-    //         calibri11Right.setAlignment(HorizontalAlignment.RIGHT);
-    //         calibri11Right.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-    //         CellStyle calibri11Center = workbook.createCellStyle();
-    //         calibri11Center.setFont(calibri11);
-    //         calibri11Center.setAlignment(HorizontalAlignment.CENTER);
-    //         calibri11Center.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-    //         CellStyle calibri11LeftBorder = workbook.createCellStyle();
-    //         calibri11LeftBorder.cloneStyleFrom(borderStyle);
-    //         calibri11LeftBorder.setFont(calibri11);
-    //         calibri11LeftBorder.setAlignment(HorizontalAlignment.LEFT);
-    //         calibri11LeftBorder.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-    //         CellStyle calibriBold11LeftBorder = workbook.createCellStyle();
-    //         calibriBold11LeftBorder.cloneStyleFrom(borderStyle);
-    //         calibriBold11LeftBorder.setFont(calibriBold11);
-    //         calibriBold11LeftBorder.setAlignment(HorizontalAlignment.LEFT);
-    //         calibriBold11LeftBorder.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-    //         CellStyle calibri11RightBorder = workbook.createCellStyle();
-    //         calibri11RightBorder.cloneStyleFrom(borderStyle);
-    //         calibri11RightBorder.setFont(calibri11);
-    //         calibri11RightBorder.setAlignment(HorizontalAlignment.RIGHT);
-    //         calibri11RightBorder.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-    //         CellStyle calibri11CenterBorder = workbook.createCellStyle();
-    //         calibri11CenterBorder.cloneStyleFrom(borderStyle);
-    //         calibri11CenterBorder.setFont(calibri11);
-    //         calibri11CenterBorder.setAlignment(HorizontalAlignment.CENTER);
-    //         calibri11CenterBorder.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-    //         CellStyle calibriBold11CenterBorder = workbook.createCellStyle();
-    //         calibriBold11CenterBorder.cloneStyleFrom(borderStyle);
-    //         calibriBold11CenterBorder.setFont(calibriBold11);
-    //         calibriBold11CenterBorder.setAlignment(HorizontalAlignment.CENTER);
-    //         calibriBold11CenterBorder.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-    //         CreationHelper createHelper = workbook.getCreationHelper();
-    //         CellStyle calibri11Date = workbook.createCellStyle();
-    //         calibri11Date.cloneStyleFrom(borderStyle);
-    //         calibri11Date.setFont(calibri11);
-    //         calibri11Date.setAlignment(HorizontalAlignment.CENTER);
-    //         calibri11Date.setVerticalAlignment(VerticalAlignment.CENTER);
-    //         calibri11Date.setDataFormat(createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
-    //         //end style
-            
-    //         //mesin curing sheet
-    //         Sheet curingSheet = workbook.createSheet("mesin curing");
-    //         curingSheet.setColumnWidth(1, 3000);
-    //         curingSheet.setColumnWidth(4, 10000);
-    //         curingSheet.setColumnWidth(5, 3000);
-    //         curingSheet.setColumnWidth(6, 10000);
-            
-    //         //header table
-    //         Row tableHeadCuringRow = curingSheet.createRow(1);
-    //         Cell tableHeadCuringCell;
-            
-    //         String[] curingHeaderLabels = {"Tanggal", "Nomor", "Cavity", "Work Center Text", "Item Curing", "Deskripsi", "Shift 1", "Shift 2", "Shift 3", "Total"};
-    //         CellStyle[] curingHeaderStyles = {calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, 
-    //         		calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder};
-
-    //         // Loop untuk kolom 0-5
-    //         for (int col = 0; col < curingHeaderLabels.length; col++) {
-    //         	tableHeadCuringCell = tableHeadCuringRow.createCell(col+1);
-    //         	tableHeadCuringCell.setCellStyle(curingHeaderStyles[col]);
-    //             if (!curingHeaderLabels[col].isEmpty()) {
-    //             	tableHeadCuringCell.setCellValue(curingHeaderLabels[col]);
-    //             }
-    //         }
-            
-    //         //data tables
-            
-    //         int curingDatarow = 2;
-    //         Row curingDataRow;
-    //         Cell curingDataCell;
-    //         for (int j = 0; j < shiftMonthlyPlan.size(); j++) {
-    //         	int cav = shiftMonthlyPlan.get(j).getCAVITY_USAGE().intValue();
-    //         	if (cav > 1) {
-    //         		curingSheet.addMergedRegion(new CellRangeAddress(curingDatarow, curingDatarow + (cav-1), 1, 1));
-    //         		curingSheet.addMergedRegion(new CellRangeAddress(curingDatarow, curingDatarow + (cav-1), 2, 2));
-    //         	}
-            	
-    //         	curingDataRow = curingSheet.createRow(curingDatarow);
-    //         	curingDataCell = curingDataRow.createCell(1);
-    //             curingDataCell.setCellStyle(calibri11Date);
-    //             curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getDATE());
-                
-                
-    //             curingDataCell = curingDataRow.createCell(2);
-    //             curingDataCell.setCellStyle(calibriBold11CenterBorder);
-    //             curingDataCell.setCellValue(j+1);
-                
-    //             for (int k=0;k<cav;k++) {
-    //             	if (k == 0) {
-    //             		curingDataCell = curingDataRow.createCell(3);
-    //             		curingDataCell.setCellStyle(calibri11CenterBorder);
-    //             		curingDataCell.setCellValue("C" + (k+1));
-                		
-    //             		curingDataCell = curingDataRow.createCell(4);
-    //             		curingDataCell.setCellStyle(calibriBold11LeftBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getWORK_CENTER_TEXT());
-                		
-    //             		curingDataCell = curingDataRow.createCell(5);
-    //             		curingDataCell.setCellStyle(calibriBold11LeftBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getITEM_CURING());
-                		
-    //             		curingDataCell = curingDataRow.createCell(6);
-    //             		curingDataCell.setCellStyle(calibri11LeftBorder);
-    //             		curingDataCell.setCellValue(productDescription.get(j));
-                		
-    //             		curingDataCell = curingDataRow.createCell(7);
-    //             		curingDataCell.setCellStyle(calibri11RightBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getKAPA_SHIFT_1().doubleValue());
-                		
-    //             		curingDataCell = curingDataRow.createCell(8);
-    //             		curingDataCell.setCellStyle(calibri11RightBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getKAPA_SHIFT_2().doubleValue());
-                		
-    //             		curingDataCell = curingDataRow.createCell(9);
-    //             		curingDataCell.setCellStyle(calibri11RightBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getKAPA_SHIFT_3().doubleValue());
-                		
-    //             		curingDataCell = curingDataRow.createCell(10);
-    //             		curingDataCell.setCellStyle(calibri11RightBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getTOTAL_KAPA().doubleValue());
-    //             	} else {
-    //             		curingDataRow = curingSheet.createRow(curingDatarow+k);
-    //             		curingDataCell = curingDataRow.createCell(1);
-    //                     curingDataCell.setCellStyle(calibri11Date);
-    //                     curingDataCell.setCellValue("");
-                		
-    //                     curingDataCell = curingDataRow.createCell(2);
-    //                     curingDataCell.setCellStyle(calibri11CenterBorder);
-    //                     curingDataCell.setCellValue("");
-                		
-    //                     curingDataCell = curingDataRow.createCell(3);
-    //                     curingDataCell.setCellStyle(calibri11CenterBorder);
-    //                     curingDataCell.setCellValue("C" + (k+1));
-                        
-    //                     curingDataCell = curingDataRow.createCell(4);
-    //             		curingDataCell.setCellStyle(calibriBold11LeftBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getWORK_CENTER_TEXT());
-                		
-    //             		curingDataCell = curingDataRow.createCell(5);
-    //             		curingDataCell.setCellStyle(calibriBold11LeftBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getITEM_CURING());
-                		
-    //             		curingDataCell = curingDataRow.createCell(6);
-    //             		curingDataCell.setCellStyle(calibri11LeftBorder);
-    //             		curingDataCell.setCellValue(productDescription.get(j));
-
-    //             		curingDataCell = curingDataRow.createCell(7);
-    //             		curingDataCell.setCellStyle(calibri11RightBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getKAPA_SHIFT_1().doubleValue());
-                		
-    //             		curingDataCell = curingDataRow.createCell(8);
-    //             		curingDataCell.setCellStyle(calibri11RightBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getKAPA_SHIFT_2().doubleValue());
-                		
-    //             		curingDataCell = curingDataRow.createCell(9);
-    //             		curingDataCell.setCellStyle(calibri11RightBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getKAPA_SHIFT_3().doubleValue());
-                		
-    //             		curingDataCell = curingDataRow.createCell(10);
-    //             		curingDataCell.setCellStyle(calibri11RightBorder);
-    //             		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getTOTAL_KAPA().doubleValue());
-    //             	}
-    //             }
-                
-    //             curingDatarow = curingDatarow + cav;
-    //         }
-    //         //end curing sheet
-        	
-    //         //prepare prod sheet
-    //         Sheet prepareProdSheet = workbook.createSheet("PREPARE PRODE TIRE");
-            
-    //         // Set column width
-    //         prepareProdSheet.setColumnWidth(1, 5000);
-    //         prepareProdSheet.setColumnWidth(4, 8000);
-    //         prepareProdSheet.setColumnWidth(5, 8000);
-
-    //         //header
-    //         Row monthRow = prepareProdSheet.createRow(8);
-    //         Cell monthCell = monthRow.createCell(4);
-    //         monthCell.setCellStyle(calibri11Right);
-    //         monthCell.setCellValue("MONTH OF :");
-            
-    //         Row sectionRow = prepareProdSheet.createRow(9);
-    //         Cell sectionCell = sectionRow.createCell(4);
-    //         sectionCell.setCellStyle(calibri11Right);
-    //         sectionCell.setCellValue("SECTION :");
-            
-    //         Row issueDateRow = prepareProdSheet.createRow(11);
-    //         Cell issueDateCell = issueDateRow.createCell(4);
-    //         issueDateCell.setCellStyle(calibri11Right);
-    //         issueDateCell.setCellValue("ISSUE DATE :");
-            
-    //         prepareProdSheet.addMergedRegion(new CellRangeAddress(8, 9, 18, 23));
-    //         Cell titleCell = monthRow.createCell(18);
-    //         titleCell.setCellStyle(title);
-    //         titleCell.setCellValue("M O N T H L Y      P L A N N I N G");
-            
-    //         Cell kadeptCell = monthRow.createCell(41);
-    //         kadeptCell.setCellStyle(calibri11CenterBorder);
-    //         kadeptCell.setCellValue("KADEPT");
-            
-    //         Cell kassieCell = monthRow.createCell(42);
-    //         kassieCell.setCellStyle(calibri11CenterBorder);
-    //         kassieCell.setCellValue("KASSIE PP");
-            
-    //         Cell docNumCell = monthRow.createCell(43);
-    //         docNumCell.setCellStyle(calibri11LeftBorder);
-    //         docNumCell.setCellValue("NO. DOK");
-            
-    //         //table head
-    //         int i;
-    //         Row tableHeadMpRow1 = prepareProdSheet.createRow(16);
-    //         Row tableHeadMpRow2 = prepareProdSheet.createRow(17);
-    //         Cell tableHeadMpCell;
-
-    //         // Array untuk header teks dan gaya untuk kolom 0-5
-    //         String[] headerMpLabels = {"", "PART NUMBER", "", "NO.", "SIZE", "PATTERN"};
-    //         CellStyle[] headerMpStyles = {calibri11CenterBorder, calibriBold11CenterBorder, calibri11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder};
-
-    //         // Loop untuk kolom 0-5
-    //         for (int col = 0; col < headerMpLabels.length; col++) {
-    //         	prepareProdSheet.addMergedRegion(new CellRangeAddress(16, 17, col, col));
-    //             tableHeadMpCell = tableHeadMpRow1.createCell(col);
-    //             tableHeadMpCell.setCellStyle(headerMpStyles[col]);
-    //             if (!headerMpLabels[col].isEmpty()) {
-    //                 tableHeadMpCell.setCellValue(headerMpLabels[col]);
-    //             }
-    //             tableHeadMpCell = tableHeadMpRow2.createCell(col);
-    //             tableHeadMpCell.setCellStyle(calibri11CenterBorder);
-    //         }
-
-    //         // Mendapatkan jumlah hari di bulan ini
-    //         YearMonth yearMonth = YearMonth.of(2024, 11);
-    //         int jumlahHariBulanIni = yearMonth.lengthOfMonth();
-    //         LocalDate localDate;
-    //         Date date = new Date();
-
-    //         // Loop untuk menambah tanggal (kolom 6 ke atas)
-    //         for (i = 0; i < jumlahHariBulanIni; i++) {
-    //             int col = i + 6;
-    //             prepareProdSheet.addMergedRegion(new CellRangeAddress(16, 17, col, col));
-    //             tableHeadMpCell = tableHeadMpRow1.createCell(col);
-    //             tableHeadMpCell.setCellStyle(calibriBold11CenterBorder);
-    //             tableHeadMpCell.setCellValue(i + 1);
-    //             tableHeadMpCell = tableHeadMpRow2.createCell(col);
-    //             tableHeadMpCell.setCellStyle(calibri11CenterBorder);
-    //         }
-
-    //         // Menambahkan kolom "TOTAL" setelah jumlah hari dalam bulan
-    //         int totalCol = i + 6;
-    //         tableHeadMpCell = tableHeadMpRow1.createCell(totalCol);
-    //         tableHeadMpCell.setCellStyle(calibriBold11CenterBorder);
-    //         tableHeadMpCell.setCellValue("TOTAL");
-    //         tableHeadMpCell = tableHeadMpRow2.createCell(totalCol);
-    //         tableHeadMpCell.setCellStyle(calibri11CenterBorder);
-    //         tableHeadMpCell.setCellValue(i);
-            
-    //         int mpDatarow = 18;
-    //         Row mpDataRow;
-    //         Cell mpDataCell;
-    //         Set<String> addedPartNumbers = new HashSet<>();
-    //         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-
-    //         for (int j = 0; j < shiftMonthlyPlan.size(); j++) {
-    //             String partNumber = String.valueOf(shiftMonthlyPlan.get(j).getPART_NUMBER());
-    //             String description = productDescription.get(j);
-    //             int intCapacity = 0;
-    //             int totalCapacity = 0;
-    //             String planDate = "";
-    //             String actualDate = "";
-
-                
-    //             // Jika partNumber belum pernah ditambahkan
-    //             if (partNumber != null && !addedPartNumbers.contains(partNumber)) {
-    //                 // Tambahkan ke HashSet untuk melacak
-    //                 addedPartNumbers.add(partNumber);
-
-    //                 // Buat baris dan tambahkan data
-    //                 mpDataRow = prepareProdSheet.createRow(mpDatarow);
-    //                 mpDataCell = mpDataRow.createCell(0);
-    //                 //mpDataCell.setCellValue("");
-    //                 mpDataCell.setCellStyle(calibri11LeftBorder);
-                    
-    //                 mpDataCell = mpDataRow.createCell(1);
-    //                 mpDataCell.setCellValue(partNumber);
-    //                 mpDataCell.setCellStyle(calibri11CenterBorder);
-                    
-    //                 mpDataCell = mpDataRow.createCell(2);
-    //                 //mpDataCell.setCellValue("");
-    //                 mpDataCell.setCellStyle(calibri11LeftBorder);
-                    
-    //                 mpDataCell = mpDataRow.createCell(3);
-    //                 mpDataCell.setCellValue(mpDatarow-17);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 mpDataCell = mpDataRow.createCell(4);
-    //                 mpDataCell.setCellValue(description);
-    //                 mpDataCell.setCellStyle(calibri11LeftBorder);
-                    
-    //                 mpDataCell = mpDataRow.createCell(5);
-    //                 mpDataCell.setCellValue(description);
-    //                 mpDataCell.setCellStyle(calibri11LeftBorder);
-                    
-    //                 //cap day 1
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(1);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-    //                 	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-    //                 	actualDate = dateFormat.format(date);
-    //                     if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-    //                         System.out.println(planDate);
-    //                         System.out.println(actualDate);
-    //                     	intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 1 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(6);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 2
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(2);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 2 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(7);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 3
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(3);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 3 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(8);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //               //cap day 4
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(4);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 4 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(9);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 5
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(5);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 5 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(10);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 6
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(6);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 6 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(11);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 7
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(7);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 7 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(12);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 8
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(8);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 8 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(13);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 9
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(9);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 9 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(14);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 10
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(10);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 10 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(15);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 11
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(11);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 11 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(16);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 12
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(12);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 12 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(17);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 13
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(13);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 13 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(18);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 14
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(14);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 14 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(19);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 15
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(15);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 15 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(20);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 16
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(16);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 16 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(21);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 17
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(17);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 17 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(22);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 18
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(18);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 18 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(23);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 19
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(19);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 19 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(24);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 20
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(20);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 20 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(25);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 21
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(21);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 21 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(26);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 22
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(22);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 22 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(27);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 23
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(23);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 23 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(28);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 24
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(24);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 24 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(29);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 25
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(25);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 25 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(30);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 26
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(26);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 26 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(31);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 27
-    //                 intCapacity = 0;
-    //                 localDate = yearMonth.atDay(27);
-    //                 planDate = "";
-    //             	actualDate = "";
-    //                 date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                 for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-	//                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-	//                     	actualDate = dateFormat.format(date);
-	//                     	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-	//                             System.out.println(planDate);
-	//                             System.out.println(actualDate);
-    //                         intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                     }
-    //                 }
-    //                 System.out.println(partNumber + " at day 27 : " + intCapacity);
-    //                 totalCapacity += intCapacity;
-                    
-    //                 mpDataCell = mpDataRow.createCell(32);
-    //                 mpDataCell.setCellValue((double) intCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //cap day 28
-    //                 if (yearMonth.lengthOfMonth() >= 28) {
-    //                 	intCapacity = 0;
-    //                     localDate = yearMonth.atDay(28);
-    //                     planDate = "";
-    //                 	actualDate = "";
-    //                     date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-    // 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-    // 	                    	actualDate = dateFormat.format(date);
-    // 	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-    // 	                            System.out.println(planDate);
-    // 	                            System.out.println(actualDate);
-    //                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                         }
-    //                     }
-    //                     System.out.println(partNumber + " at day 28 : " + intCapacity);
-    //                     totalCapacity += intCapacity;
-                        
-    //                     mpDataCell = mpDataRow.createCell(33);
-    //                     mpDataCell.setCellValue((double) intCapacity);
-    //                     mpDataCell.setCellStyle(calibri11RightBorder);
-    //                 }
-                    
-    //                 //cap day 29
-    //                 if (yearMonth.lengthOfMonth() >= 29) {
-    //                 	intCapacity = 0;
-    //                     localDate = yearMonth.atDay(29);
-    //                     planDate = "";
-    //                 	actualDate = "";
-    //                     date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-    // 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-    // 	                    	actualDate = dateFormat.format(date);
-    // 	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-    // 	                            System.out.println(planDate);
-    // 	                            System.out.println(actualDate);
-    //                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                         }
-    //                     }
-    //                     System.out.println(partNumber + " at day 29 : " + intCapacity);
-    //                     totalCapacity += intCapacity;
-                        
-    //                     mpDataCell = mpDataRow.createCell(34);
-    //                     mpDataCell.setCellValue((double) intCapacity);
-    //                     mpDataCell.setCellStyle(calibri11RightBorder);
-    //                 }
-                    
-    //                 //cap day 30
-    //                 if (yearMonth.lengthOfMonth() >= 30) {
-    //                 	intCapacity = 0;
-    //                     localDate = yearMonth.atDay(30);
-    //                     planDate = "";
-    //                 	actualDate = "";
-    //                     date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-    // 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-    // 	                    	actualDate = dateFormat.format(date);
-    // 	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-    // 	                            System.out.println(planDate);
-    // 	                            System.out.println(actualDate);
-    //                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                         }
-    //                     }
-    //                     System.out.println(partNumber + " at day 30 : " + intCapacity);
-    //                     totalCapacity += intCapacity;
-                        
-    //                     mpDataCell = mpDataRow.createCell(35);
-    //                     mpDataCell.setCellValue((double) intCapacity);
-    //                     mpDataCell.setCellStyle(calibri11RightBorder);
-    //                 }
-                    
-    //                 //cap day 31
-    //                 if (yearMonth.lengthOfMonth() >= 31) {
-    //                 	intCapacity = 0;
-    //                     localDate = yearMonth.atDay(31);
-    //                     planDate = "";
-    //                 	actualDate = "";
-    //                     date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    //                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
-    // 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
-    // 	                    	actualDate = dateFormat.format(date);
-    // 	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
-    // 	                            System.out.println(planDate);
-    // 	                            System.out.println(actualDate);
-    //                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
-    //                         }
-    //                     }
-    //                     System.out.println(partNumber + " at day 31 : " + intCapacity);
-    //                     totalCapacity += intCapacity;
-                        
-    //                     mpDataCell = mpDataRow.createCell(36);
-    //                     mpDataCell.setCellValue((double) intCapacity);
-    //                     mpDataCell.setCellStyle(calibri11RightBorder);
-    //                 }
-                    
-    //                 System.out.println(partNumber + " total : " + totalCapacity + " kolom : " + jumlahHariBulanIni);
-    //                 mpDataCell = mpDataRow.createCell(jumlahHariBulanIni + 6);
-    //                 mpDataCell.setCellValue((double) totalCapacity);
-    //                 mpDataCell.setCellStyle(calibri11RightBorder);
-                    
-    //                 //tambah baris baru disini
-                    
-    //                 totalCapacity = 0;
-    //                 mpDatarow++; // Naikkan index baris
-    //             }
-    //         }
-    //         //end prepare prod sheet
-            
-    //         //change mould sheet
-    //         Sheet changeMouldSheet = workbook.createSheet("CHANGE MOULD");
-            
-    //         changeMouldSheet.setColumnWidth(3, 8000);
-    //         changeMouldSheet.setColumnWidth(1, 5000);
-            
-    //         Row tableHeadChangeMouldRow = changeMouldSheet.createRow(1);
-    //         Cell tableHeadChangeMouldCell;
-            
-    //         String[] changeMouldHeaderLabels = {"Tanggal", "Shift", "Work Center Text", "Part Number"};
-    //         CellStyle[] changeMouldHeaderStyles = {calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder};
-
-    //         // Loop untuk kolom 0-5
-    //         for (int col = 0; col < changeMouldHeaderLabels.length; col++) {
-    //         	tableHeadChangeMouldCell = tableHeadChangeMouldRow.createCell(col+1);
-    //         	tableHeadChangeMouldCell.setCellStyle(changeMouldHeaderStyles[col]);
-    //             if (!changeMouldHeaderLabels[col].isEmpty()) {
-    //             	tableHeadChangeMouldCell.setCellValue(changeMouldHeaderLabels[col]);
-    //             }
-    //         }
-            
-    //         int changeMouldRow = 2;
-    //         Row changeMouldDataRow;
-    //         Cell changeMouldDataCell;
-            
-    //         for (int col = 0; col < changeMouldList.size(); col++) {
-    //         	changeMouldDataRow = changeMouldSheet.createRow(changeMouldRow);
-            	
-    //         	changeMouldDataCell = changeMouldDataRow.createCell(1);
-    //         	changeMouldDataCell.setCellStyle(calibri11Date);
-    //         	changeMouldDataCell.setCellValue(changeMouldList.get(col).getChangeDate());
-            	
-    //         	changeMouldDataCell = changeMouldDataRow.createCell(2);
-    //         	changeMouldDataCell.setCellStyle(calibriBold11CenterBorder);
-    //         	changeMouldDataCell.setCellValue(changeMouldList.get(col).getShift());
-            	
-    //         	changeMouldDataCell = changeMouldDataRow.createCell(3);
-    //         	changeMouldDataCell.setCellStyle(calibriBold11CenterBorder);
-    //         	changeMouldDataCell.setCellValue(changeMouldList.get(col).getWct());
-            	
-    //         	changeMouldDataCell = changeMouldDataRow.createCell(4);
-    //         	changeMouldDataCell.setCellStyle(calibriBold11CenterBorder);
-    //         	changeMouldDataCell.setCellValue(changeMouldList.get(col).getPartNum().toString());
-            	
-    //         	changeMouldRow++;
-    //         }
-    //         //end change mould sheet
-            
-    //         workbook.write(out); // Menulis data ke output stream
-    //         return new ByteArrayInputStream(out.toByteArray());
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //         System.out.println("Fail to export data");
-    //         return null;
-    //     } finally {
-    //         out.close(); // Tutup output stream setelah selesai
-    //     }
-    // }
 	    
     public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) throws IOException {
     	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
@@ -3008,6 +1869,7 @@ public class MonthlyPlanServiceImpl {
     	List<String> productDescription = new ArrayList<>();
     	
     		for (int i = 0; i < shiftMonthlyPlan.size(); i++) {
+    		    //BigDecimal partNumber = shiftMonthlyPlan.get(i).getPART_NUMBER();
     		    BigDecimal partNumber = shiftMonthlyPlan.get(i).getPART_NUMBER();
     		    String description = shiftMonthlyRepo.findDescriptionByPartNum(partNumber);
     		    if (description == null) {
@@ -3244,7 +2106,7 @@ public class MonthlyPlanServiceImpl {
             Cell tableHeadMpCell;
 
             // Array untuk header teks dan gaya untuk kolom 0-5
-            String[] headerMpLabels = {"", "PART NUMBER", "", "NO.", "SIZE", "PATTERN"};
+            String[] headerMpLabels = {"", "ITEM CURING", "", "NO.", "SIZE", "PATTERN"};
             CellStyle[] headerMpStyles = {calibri11CenterBorder, calibriBold11CenterBorder, calibri11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder};
 
             // Loop untuk kolom 0-5
@@ -3292,7 +2154,8 @@ public class MonthlyPlanServiceImpl {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
             for (int j = 0; j < shiftMonthlyPlan.size(); j++) {
-                String partNumber = String.valueOf(shiftMonthlyPlan.get(j).getPART_NUMBER());
+            	//String partNumber = String.valueOf(shiftMonthlyPlan.get(j).getPART_NUMBER());
+            	String itemCuring = String.valueOf(shiftMonthlyPlan.get(j).getITEM_CURING());
                 String description = productDescription.get(j);
                 int intCapacity = 0;
                 int totalCapacity = 0;
@@ -3301,9 +2164,9 @@ public class MonthlyPlanServiceImpl {
 
                 
                 // Jika partNumber belum pernah ditambahkan
-                if (partNumber != null && !addedPartNumbers.contains(partNumber)) {
+                if (itemCuring != null && !addedPartNumbers.contains(itemCuring)) {
                     // Tambahkan ke HashSet untuk melacak
-                    addedPartNumbers.add(partNumber);
+                    addedPartNumbers.add(itemCuring);
 
                     // Buat baris dan tambahkan data
                     mpDataRow = prepareProdSheet.createRow(mpDatarow);
@@ -3312,7 +2175,7 @@ public class MonthlyPlanServiceImpl {
                     mpDataCell.setCellStyle(calibri11LeftBorder);
                     
                     mpDataCell = mpDataRow.createCell(1);
-                    mpDataCell.setCellValue(partNumber);
+                    mpDataCell.setCellValue(itemCuring);
                     mpDataCell.setCellStyle(calibri11CenterBorder);
                     
                     mpDataCell = mpDataRow.createCell(2);
@@ -3340,13 +2203,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
                     	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
                     	actualDate = dateFormat.format(date);
-                        if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+                        if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
                            System.out.println(planDate);
                            System.out.println(actualDate);
                         	intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 1 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 1 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(6);
@@ -3366,13 +2229,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 2 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 2 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(7);
@@ -3392,13 +2255,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 3 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 3 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(8);
@@ -3418,13 +2281,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 4 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 4 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(9);
@@ -3444,13 +2307,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 5 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 5 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(10);
@@ -3470,13 +2333,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 6 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 6 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(11);
@@ -3496,13 +2359,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 7 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 7 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(12);
@@ -3522,13 +2385,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 8 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 8 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(13);
@@ -3548,13 +2411,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 9 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 9 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(14);
@@ -3574,13 +2437,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 10 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 10 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(15);
@@ -3600,13 +2463,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 11 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 11 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(16);
@@ -3626,13 +2489,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 12 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 12 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(17);
@@ -3652,13 +2515,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 13 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 13 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(18);
@@ -3678,13 +2541,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 14 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 14 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(19);
@@ -3704,13 +2567,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 15 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 15 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(20);
@@ -3730,13 +2593,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 16 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 16 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(21);
@@ -3756,13 +2619,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 17 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 17 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(22);
@@ -3782,13 +2645,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 18 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 18 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(23);
@@ -3808,13 +2671,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 19 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 19 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(24);
@@ -3834,13 +2697,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 20 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 20 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(25);
@@ -3860,13 +2723,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 21 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 21 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(26);
@@ -3886,13 +2749,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 22 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 22 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(27);
@@ -3912,13 +2775,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 23 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 23 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(28);
@@ -3938,13 +2801,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 24 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 24 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(29);
@@ -3964,13 +2827,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 25 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 25 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(30);
@@ -3990,13 +2853,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 26 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 26 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(31);
@@ -4016,13 +2879,13 @@ public class MonthlyPlanServiceImpl {
                     for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
 	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
 	                    	actualDate = dateFormat.format(date);
-	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
 	                           System.out.println(planDate);
 	                           System.out.println(actualDate);
                             intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                         }
                     }
-                   System.out.println(partNumber + " at day 27 : " + intCapacity);
+                   System.out.println(itemCuring + " at day 27 : " + intCapacity);
                     totalCapacity += intCapacity;
                     
                     mpDataCell = mpDataRow.createCell(32);
@@ -4043,13 +2906,13 @@ public class MonthlyPlanServiceImpl {
                         for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
     	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
     	                    	actualDate = dateFormat.format(date);
-    	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+    	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
     	                           System.out.println(planDate);
     	                           System.out.println(actualDate);
                                 intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                             }
                         }
-                       System.out.println(partNumber + " at day 28 : " + intCapacity);
+                       System.out.println(itemCuring + " at day 28 : " + intCapacity);
                         totalCapacity += intCapacity;
                         
                         mpDataCell = mpDataRow.createCell(33);
@@ -4071,13 +2934,13 @@ public class MonthlyPlanServiceImpl {
                         for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
     	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
     	                    	actualDate = dateFormat.format(date);
-    	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+    	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
     	                           System.out.println(planDate);
     	                           System.out.println(actualDate);
                                 intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                             }
                         }
-                       System.out.println(partNumber + " at day 29 : " + intCapacity);
+                       System.out.println(itemCuring + " at day 29 : " + intCapacity);
                         totalCapacity += intCapacity;
                         
                         mpDataCell = mpDataRow.createCell(34);
@@ -4099,13 +2962,13 @@ public class MonthlyPlanServiceImpl {
                         for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
     	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
     	                    	actualDate = dateFormat.format(date);
-    	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+    	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
     	                           System.out.println(planDate);
     	                           System.out.println(actualDate);
                                 intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                             }
                         }
-                       System.out.println(partNumber + " at day 30 : " + intCapacity);
+                       System.out.println(itemCuring + " at day 30 : " + intCapacity);
                         totalCapacity += intCapacity;
                         
                         mpDataCell = mpDataRow.createCell(35);
@@ -4127,13 +2990,13 @@ public class MonthlyPlanServiceImpl {
                         for (int k = 0; k < shiftMonthlyPlan.size(); k++) {
     	                    	planDate = dateFormat.format(shiftMonthlyPlan.get(k).getDATE());
     	                    	actualDate = dateFormat.format(date);
-    	                    	if (partNumber.equals(String.valueOf(shiftMonthlyPlan.get(k).getPART_NUMBER())) && planDate.equals(actualDate)) {
+    	                    	if (itemCuring.equals(String.valueOf(shiftMonthlyPlan.get(k).getITEM_CURING())) && planDate.equals(actualDate)) {
     	                           System.out.println(planDate);
     	                           System.out.println(actualDate);
                                 intCapacity = intCapacity + shiftMonthlyPlan.get(k).getKAPA_SHIFT_1().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_2().intValue() + shiftMonthlyPlan.get(k).getKAPA_SHIFT_3().intValue(); 
                             }
                         }
-                       System.out.println(partNumber + " at day 31 : " + intCapacity);
+                       System.out.println(itemCuring + " at day 31 : " + intCapacity);
                         totalCapacity += intCapacity;
                         
                         mpDataCell = mpDataRow.createCell(36);
