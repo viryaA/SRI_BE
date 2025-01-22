@@ -69,4 +69,21 @@ public interface FrontRearRepo extends JpaRepository<FrontRear, BigDecimal>{
                 @Param("creationDate") Date creationDate,
                 @Param("lastUpdateDate") Date lastUpdateDate
             );
+            
+            @Query(value = "SELECT \r\n"
+            		+ "    ROWNUM AS ID_FRONT_REAR,\r\n"
+            		+ "    D.DETAIL_ID AS DETAIL_ID_MO, \r\n"
+            		+ "    1 AS STATUS, \r\n"
+            		+ "    SYSDATE AS CREATION_DATE,\r\n"
+            		+ "    NULL AS CREATED_BY, \r\n"
+            		+ "    SYSDATE AS LAST_UPDATE_DATE, \r\n"
+            		+ "    NULL AS LAST_UPDATED_BY\r\n"
+            		+ "FROM SRI_IMPP_D_MARKETINGORDER D\r\n"
+            		+ "JOIN SRI_IMPP_M_PRODUCT P ON D.PART_NUMBER = P.PART_NUMBER\r\n"
+            		+ "WHERE (D.MO_ID = :moId1 OR D.MO_ID = :moId2)\r\n"
+            		+ "  AND P.ITEM_CURING = :itemCuring\r\n", nativeQuery = true)
+        	List<FrontRear> finddetailIdMoByCuring(@Param("moId1") String moId1, 
+        	                                          @Param("moId2") String moId2, 
+        	                                          @Param("itemCuring") String itemCuring);
+
 }
