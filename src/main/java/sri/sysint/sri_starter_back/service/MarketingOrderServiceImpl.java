@@ -1930,7 +1930,7 @@ public class MarketingOrderServiceImpl {
     	return result;
     }
     
-    public GetAllTypeMarketingOrder getAllMarketingOrderGroupCuring(String dateMoMonth0, String dateMoMonth1, String dateMoMonth2) {
+ public GetAllTypeMarketingOrder getAllMarketingOrderGroupCuring(String dateMoMonth0, String dateMoMonth1, String dateMoMonth2) {
     	
     	GetAllTypeMarketingOrder result = new GetAllTypeMarketingOrder();
     	
@@ -1985,7 +1985,6 @@ public class MarketingOrderServiceImpl {
         	detailResponse.setLockStatusM0(detail.getLockStatusM0());
         	detailResponse.setLockStatusM1(detail.getLockStatusM1());
         	detailResponse.setLockStatusM2(detail.getLockStatusM2());
-
         	String itemCuring = null; 
         	for (Product product : prodList) {
         	    if (product.getPART_NUMBER().equals(detail.getPartNumber())) {
@@ -1993,7 +1992,6 @@ public class MarketingOrderServiceImpl {
         	        break;  
         	    }
         	}
-
         	detailResponse.setItemCuring(itemCuring);
             detailResponsesFed.add(detailResponse);
         }
@@ -2032,7 +2030,6 @@ public class MarketingOrderServiceImpl {
         	detailResponse.setLockStatusM0(detail.getLockStatusM0());
         	detailResponse.setLockStatusM1(detail.getLockStatusM1());
         	detailResponse.setLockStatusM2(detail.getLockStatusM2());
-
         	String itemCuring = null; 
         	for (Product product : prodList) {
         	    if (product.getPART_NUMBER().equals(detail.getPartNumber())) {
@@ -2040,7 +2037,6 @@ public class MarketingOrderServiceImpl {
         	        break;  
         	    }
         	}
-
         	detailResponse.setItemCuring(itemCuring);
             detailResponsesFdr.add(detailResponse);
         }

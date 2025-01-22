@@ -305,27 +305,7 @@ public class FrontRearController {
 
         return response;
     }
-    
-    @GetMapping("/getAlldetailIdMobyCuring")
-    public Response getAlldetailIdMobyCuring(
-            HttpServletRequest req, 
-            @RequestParam("moId1") String moId1,
-            @RequestParam("moId2") String moId2,
-            @RequestParam("itemCuring") String itemCuring) {
-        List<FrontRear> filteredProducts = frontRearService.getAlldetailIdMobyCuring(moId1, moId2, itemCuring);
-
-        response = new Response(
-                new Date(),
-                HttpStatus.OK.value(),
-                null,
-                HttpStatus.OK.getReasonPhrase(),
-                req.getRequestURI(),
-                filteredProducts
-        );
-
-        return response;
-    }
-
+   
     
     @GetMapping("/getAlldetailIdMobyCuring")
     public Response getAlldetailIdMobyCuring(

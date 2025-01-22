@@ -170,19 +170,6 @@ public class MarketingOrderController {
         return response;
     }
     
-    @PostMapping("/getAllTypeMarketingOrderCuring")
-    public Response getAllTypeMarketingOrderCuring(final HttpServletRequest req, @RequestBody Map<String, Object> object) throws ResourceNotFoundException{
-    	validateToken(req);
-    	
-    	String moMonth0 = object.get("moMonth0").toString();
-    	String moMonth1 = object.get("moMonth1").toString();
-    	String moMonth2 = object.get("moMonth2").toString();
-
-    	GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllMarketingOrderGroupCuring(moMonth0, moMonth1, moMonth2);
-        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
-        return response;
-    }
-    
     //GET CAPACITY 
     @GetMapping("/getCapacity")
     public Response getCapacity(final HttpServletRequest req) throws ResourceNotFoundException {
@@ -559,5 +546,17 @@ public class MarketingOrderController {
 		        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
 		        .body(file);
 		}
+	    
+	    @PostMapping("/getAllTypeMarketingOrderCuring")
+	    public Response getAllTypeMarketingOrderCuring(final HttpServletRequest req, @RequestBody Map<String, Object> object) throws ResourceNotFoundException{
+	    	validateToken(req);
+	    	
+	    	String moMonth0 = object.get("moMonth0").toString();
+	    	String moMonth1 = object.get("moMonth1").toString();
+	    	String moMonth2 = object.get("moMonth2").toString();
+	    	GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllMarketingOrderGroupCuring(moMonth0, moMonth1, moMonth2);
+	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+	        return response;
+	    }
 
 }
