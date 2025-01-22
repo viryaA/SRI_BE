@@ -90,9 +90,9 @@ public class FrontRearServiceImpl {
         }
     }
     
-    public List<FrontRear> getAlldetailIdMobyCuring(String moId1, String moId2, String itemCuring) {
-        return frontRearRepo.finddetailIdMoByCuring(moId1, moId2, itemCuring);
-    }
+//    public List<FrontRear> getAlldetailIdMobyCuring(String moId1, String moId2, String itemCuring) {
+//        return frontRearRepo.finddetailIdMoByCuring(moId1, moId2, itemCuring);
+//    }
 
    
     public List<Map<String, Object>> getAllMarketingOrders() {
