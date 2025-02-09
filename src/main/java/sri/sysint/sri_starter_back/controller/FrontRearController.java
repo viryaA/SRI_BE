@@ -108,92 +108,92 @@ public class FrontRearController {
         return response;
     }
 
-    @PostMapping("/saveFrontRearItems")
-    public Response saveFrontRearItems(HttpServletRequest req, @RequestBody List<FrontRear> frontRearList) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
-
-            if (user != null) {
-
-            	
-            	
-                frontRearService.deleteAllFrontRear();  // Menghapus semua data sebelumnya
-
-                for (FrontRear frontRear : frontRearList) {
-                    if (frontRear.getID_FRONT_REAR() == null) {
-                        throw new IllegalArgumentException("ID_FRONT_REAR is required for all items");
-                    }
-                }
-
-                // Simpan data baru
-                List<FrontRear> savedFrontRears = frontRearService.saveFrontRearList(frontRearList);
-                response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        savedFrontRears
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
-
-        return response;
-    }
-
-
+//    @PostMapping("/saveFrontRearItems")
+//    public Response saveFrontRearItems(HttpServletRequest req, @RequestBody List<FrontRear> frontRearList) throws ResourceNotFoundException {
+//        String header = req.getHeader("Authorization");
+//
+//        if (header == null || !header.startsWith("Bearer ")) {
+//            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
+//        }
+//
+//        String token = header.replace("Bearer ", "");
+//
+//        try {
+//            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
+//                    .build()
+//                    .verify(token)
+//                    .getSubject();
+//
+//            if (user != null) {
+//
+//            	
+//            	
+//                frontRearService.deleteAllFrontRear();  // Menghapus semua data sebelumnya
+//
+//                for (FrontRear frontRear : frontRearList) {
+//                    if (frontRear.getID_FRONT_REAR() == null) {
+//                        throw new IllegalArgumentException("ID_FRONT_REAR is required for all items");
+//                    }
+//                }
+//
+//                // Simpan data baru
+//                List<FrontRear> savedFrontRears = frontRearService.saveFrontRearList(frontRearList);
+//                response = new Response(
+//                        new Date(),
+//                        HttpStatus.OK.value(),
+//                        null,
+//                        HttpStatus.OK.getReasonPhrase(),
+//                        req.getRequestURI(),
+//                        savedFrontRears
+//                );
+//            } else {
+//                throw new ResourceNotFoundException("User not found");
+//            }
+//        } catch (Exception e) {
+//            throw new ResourceNotFoundException("JWT token is not valid or expired");
+//        }
+//
+//        return response;
+//    }
 
 
-    @PostMapping("/updateFrontRearItem")
-    public Response updateFrontRearItem(HttpServletRequest req, @RequestBody FrontRear frontRear) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
 
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
-
-            if (user != null) {
-                FrontRear updatedFrontRear = frontRearService.updateFrontRear(frontRear);
-                response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        updatedFrontRear
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
-
-        return response;
-    }
+//    @PostMapping("/updateFrontRearItem")
+//    public Response updateFrontRearItem(HttpServletRequest req, @RequestBody FrontRear frontRear) throws ResourceNotFoundException {
+//        String header = req.getHeader("Authorization");
+//
+//        if (header == null || !header.startsWith("Bearer ")) {
+//            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
+//        }
+//
+//        String token = header.replace("Bearer ", "");
+//
+//        try {
+//            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
+//                    .build()
+//                    .verify(token)
+//                    .getSubject();
+//
+//            if (user != null) {
+//                FrontRear updatedFrontRear = frontRearService.updateFrontRear(frontRear);
+//                response = new Response(
+//                        new Date(),
+//                        HttpStatus.OK.value(),
+//                        null,
+//                        HttpStatus.OK.getReasonPhrase(),
+//                        req.getRequestURI(),
+//                        updatedFrontRear
+//                );
+//            } else {
+//                throw new ResourceNotFoundException("User not found");
+//            }
+//        } catch (Exception e) {
+//            throw new ResourceNotFoundException("JWT token is not valid or expired");
+//        }
+//
+//        return response;
+//    }
 
     @GetMapping("/getFrontRearAllMarketingOrders")
     public Response getAllMarketingOrders(HttpServletRequest req) throws ResourceNotFoundException {

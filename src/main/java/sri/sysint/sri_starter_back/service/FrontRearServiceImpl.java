@@ -44,51 +44,51 @@ public class FrontRearServiceImpl {
         return frontRearRepo.findListById(id);
     }
 
-    public List<FrontRear> saveFrontRearList(List<FrontRear> frontRearList) {
-        List<FrontRear> savedFrontRears = new ArrayList<>();
-        try {
-            for (FrontRear frontRear : frontRearList) {
-                if (frontRear.getID_FRONT_REAR() == null) {
-                    throw new IllegalArgumentException("ID_FRONT_REAR cannot be null");
-                }
+//    public List<FrontRear> saveFrontRearList(List<FrontRear> frontRearList) {
+//        List<FrontRear> savedFrontRears = new ArrayList<>();
+//        try {
+//            for (FrontRear frontRear : frontRearList) {
+//                if (frontRear.getID_FRONT_REAR() == null) {
+//                    throw new IllegalArgumentException("ID_FRONT_REAR cannot be null");
+//                }
+//
+//                frontRearRepo.insertNew(
+//                    frontRear.getID_FRONT_REAR(),
+//                    frontRear.getDETAIL_ID_MO(),
+//                    BigDecimal.valueOf(1), 
+//                    new Date(),            
+//                    new Date()             
+//                );
+//
+//                savedFrontRears.add(frontRear); 
+//            }
+//        } catch (Exception e) {
+//            System.err.println("Error saving FrontRear list: " + e.getMessage());
+//            throw e;
+//        }
+//        return savedFrontRears;
+//    }
 
-                frontRearRepo.insertNew(
-                    frontRear.getID_FRONT_REAR(),
-                    frontRear.getDETAIL_ID_MO(),
-                    BigDecimal.valueOf(1), 
-                    new Date(),            
-                    new Date()             
-                );
 
-                savedFrontRears.add(frontRear); 
-            }
-        } catch (Exception e) {
-            System.err.println("Error saving FrontRear list: " + e.getMessage());
-            throw e;
-        }
-        return savedFrontRears;
-    }
-
-
-    public FrontRear updateFrontRear(FrontRear frontRear) {
-        try {
-            Optional<FrontRear> currentFrontRearOpt = frontRearRepo.findById(frontRear.getID_FRONT_REAR());
-            if (currentFrontRearOpt.isPresent()) {
-                FrontRear currentFrontRear = currentFrontRearOpt.get();
-
-                currentFrontRear.setDETAIL_ID_MO(frontRear.getDETAIL_ID_MO());
-                currentFrontRear.setLAST_UPDATE_DATE(new Date());
-                currentFrontRear.setLAST_UPDATED_BY(frontRear.getLAST_UPDATED_BY());
-
-                return frontRearRepo.save(currentFrontRear);
-            } else {
-                throw new RuntimeException("FrontRear with ID " + frontRear.getID_FRONT_REAR() + " not found.");
-            }
-        } catch (Exception e) {
-            System.err.println("Error updating FrontRear: " + e.getMessage());
-            throw e;
-        }
-    }
+//    public FrontRear updateFrontRear(FrontRear frontRear) {
+//        try {
+//            Optional<FrontRear> currentFrontRearOpt = frontRearRepo.findById(frontRear.getID_FRONT_REAR());
+//            if (currentFrontRearOpt.isPresent()) {
+//                FrontRear currentFrontRear = currentFrontRearOpt.get();
+//
+//                currentFrontRear.setDETAIL_ID_MO(frontRear.getDETAIL_ID_MO());
+//                currentFrontRear.setLAST_UPDATE_DATE(new Date());
+//                currentFrontRear.setLAST_UPDATED_BY(frontRear.getLAST_UPDATED_BY());
+//
+//                return frontRearRepo.save(currentFrontRear);
+//            } else {
+//                throw new RuntimeException("FrontRear with ID " + frontRear.getID_FRONT_REAR() + " not found.");
+//            }
+//        } catch (Exception e) {
+//            System.err.println("Error updating FrontRear: " + e.getMessage());
+//            throw e;
+//        }
+//    }
     
 //    public List<FrontRear> getAlldetailIdMobyCuring(String moId1, String moId2, String itemCuring) {
 //        return frontRearRepo.finddetailIdMoByCuring(moId1, moId2, itemCuring);
