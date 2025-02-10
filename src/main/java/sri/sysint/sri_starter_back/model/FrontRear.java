@@ -11,35 +11,49 @@ public class FrontRear implements Serializable {
     @EmbeddedId
     private FrontRearId id;
 
+    @Column(name = "COUPLE")
+    private Integer COUPLE;    
+    
     @Column(name = "STATUS")
-    private Integer status;
+    private Integer STATUS;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "CREATION_DATE")
-    private Date creationDate;
-
-    @Column(name = "CREATED_BY", length = 50)
-    private String createdBy;
-
-    @Temporal(TemporalType.TIMESTAMP)
+    private Date CREATION_DATE;
+    
+    @Column(name = "CREATED_BY")
+    private String CREATED_BY;
+    
     @Column(name = "LAST_UPDATE_DATE")
-    private Date lastUpdateDate;
-
-    @Column(name = "LAST_UPDATED_BY", length = 50)
-    private String lastUpdatedBy;
+    private Date LAST_UPDATE_DATE;
+    
+    @Column(name = "LAST_UPDATED_BY")
+    private String LAST_UPDATED_BY;
 
     // Default constructor
     public FrontRear() {}
 
+    public FrontRear(FrontRear frontRear) {
+        this.id = frontRear.getId();
+		this.COUPLE = frontRear.getCOUPLE();
+		this.STATUS = frontRear.getSTATUS();
+		this.CREATION_DATE = frontRear.getCREATION_DATE();
+		this.CREATED_BY = frontRear.getCREATED_BY();
+		this.LAST_UPDATE_DATE = frontRear.getLAST_UPDATE_DATE();
+		this.LAST_UPDATED_BY = frontRear.getLAST_UPDATED_BY();
+
+    }
+
     // Constructor with all fields
-    public FrontRear(FrontRearId id, Integer status, Date creationDate, 
-                     String createdBy, Date lastUpdateDate, String lastUpdatedBy) {
+    public FrontRear(FrontRearId id,Integer COUPLE, Integer STATUS, Date CREATION_DATE, 
+                     String CREATED_BY, Date LAST_UPDATE_DATE, String LAST_UPDATED_BY) {
+        super();
         this.id = id;
-        this.status = status;
-        this.creationDate = creationDate;
-        this.createdBy = createdBy;
-        this.lastUpdateDate = lastUpdateDate;
-        this.lastUpdatedBy = lastUpdatedBy;
+        this.STATUS = STATUS;
+        this.COUPLE = COUPLE;
+        this.CREATION_DATE = CREATION_DATE;
+        this.CREATED_BY = CREATED_BY;
+        this.LAST_UPDATE_DATE = LAST_UPDATE_DATE;
+        this.LAST_UPDATED_BY = LAST_UPDATED_BY;
     }
 
     // Getters and Setters
@@ -51,43 +65,51 @@ public class FrontRear implements Serializable {
         this.id = id;
     }
 
-    public Integer getStatus() {
-        return status;
+    public Integer getCOUPLE() {
+        return COUPLE;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setCOUPLE(Integer COUPLE) {
+        this.COUPLE = COUPLE;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
+    public Integer getSTATUS() {
+        return STATUS;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+    public void setSTATUS(Integer STATUS) {
+        this.STATUS = STATUS;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public Date getCREATION_DATE() {
+        return CREATION_DATE;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+    public void setCREATION_DATE(Date CREATION_DATE) {
+        this.CREATION_DATE = CREATION_DATE;
     }
 
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
+    public String getCREATED_BY() {
+        return CREATED_BY;
     }
 
-    public void setLastUpdateDate(Date lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
+    public void setCREATED_BY(String CREATED_BY) {
+        this.CREATED_BY = CREATED_BY;
     }
 
-    public String getLastUpdatedBy() {
-        return lastUpdatedBy;
+    public Date getLAST_UPDATE_DATE() {
+        return LAST_UPDATE_DATE;
     }
 
-    public void setLastUpdatedBy(String lastUpdatedBy) {
-        this.lastUpdatedBy = lastUpdatedBy;
+    public void setLAST_UPDATE_DATE(Date LAST_UPDATE_DATE) {
+        this.LAST_UPDATE_DATE = LAST_UPDATE_DATE;
+    }
+
+    public String getLAST_UPDATED_BY() {
+        return LAST_UPDATED_BY;
+    }
+
+    public void setLAST_UPDATED_BY(String LAST_UPDATED_BY) {
+        this.LAST_UPDATED_BY = LAST_UPDATED_BY;
     }
 }
