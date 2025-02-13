@@ -1804,7 +1804,7 @@ public class MarketingOrderServiceImpl {
     
 	//GET ALL MARKETING ORDER ONLY MONTH
     public List<Map<String, Object>> getAllMoOnlyMonth() {
-        return marketingOrderRepo.findOnlyMonth();
+        return marketingOrderRepo.findMarketingOrders();
     }
     
     

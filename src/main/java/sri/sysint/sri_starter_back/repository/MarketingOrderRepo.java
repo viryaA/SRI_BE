@@ -186,16 +186,17 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 		List<MarketingOrder> findByMonthYear(@Param("month") int month,@Param("year") int year);
 		
 		@Query(value = "SELECT DISTINCT " +
-	            "TO_CHAR(t.MONTH_0, 'YYYY-MM-DD') AS month0, " +
-	            "TO_CHAR(t.MONTH_1, 'YYYY-MM-DD') AS month1, " +
-	            "TO_CHAR(t.MONTH_2, 'YYYY-MM-DD') AS month2 " +
-	            "FROM SRI_IMPP_T_MARKETINGORDER t " +
-	            "ORDER BY " +
-	            "TO_CHAR(t.MONTH_0, 'YYYY-MM-DD'), " +
-	            "TO_CHAR(t.MONTH_1, 'YYYY-MM-DD'), " +
-	            "TO_CHAR(t.MONTH_2, 'YYYY-MM-DD')", 
-	    nativeQuery = true)
-		List<Map<String, Object>> findOnlyMonth();
+               "TO_CHAR(t.MONTH_0, 'YYYY-MM-DD') AS month0, " +
+               "TO_CHAR(t.MONTH_1, 'YYYY-MM-DD') AS month1, " +
+               "TO_CHAR(t.MONTH_2, 'YYYY-MM-DD') AS month2 " +
+               "FROM SRI_IMPP_T_MARKETINGORDER t " +
+               "ORDER BY " +
+               "TO_CHAR(t.MONTH_0, 'YYYY-MM-DD'), " +
+               "TO_CHAR(t.MONTH_1, 'YYYY-MM-DD'), " +
+               "TO_CHAR(t.MONTH_2, 'YYYY-MM-DD')", 
+			nativeQuery = true)
+		List<Map<String, Object>> findMarketingOrders();
+
 		
 		@Query(value = "SELECT " +
 	            "MO_ID, " +
