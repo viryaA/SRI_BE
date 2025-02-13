@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -1452,7 +1451,7 @@ public class MarketingOrderServiceImpl {
     }
     
     //Save Ar Defect Reject
-    public int saveArDefectReject(SaveFinalMarketingOrder mo) throws ParseException {
+    public int saveArDefectReject(SaveFinalMarketingOrder mo) {
     	String moIdFed = "";
     	moIdFed = getLastIdMo();
     	
@@ -1618,14 +1617,8 @@ public class MarketingOrderServiceImpl {
         	dataMarketingFed.setRevisionPpc(dataMarketingFed.getRevisionPpc().add(BigDecimal.ONE)); // Tambah 1 pada revisi
         }
 
-        String dateStr = dataMarketingFed.getMonth0().toString();
-        SimpleDateFormat originalFormat = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
-        SimpleDateFormat targetFormat = new SimpleDateFormat("dd-MM-yyyy");
-
-        Date date = originalFormat.parse(dateStr);
-        String formatedtanggal = targetFormat.format(date);
         
-            BigDecimal TopVAfterArRjDf = marketingOrderRepo.findTopVAfterArRjDf(dataMarketingFed.getType(), formatedtanggal);
+            BigDecimal TopVAfterArRjDf = marketingOrderRepo.findTopVAfterArRjDf(dataMarketingFed.getType(), dataMarketingFed.getMonth0().toString());
             BigDecimal NewVAfterArRjDf = TopVAfterArRjDf.add(BigDecimal.ONE);
 
             dataMarketingFed.setvBeforeArRjDf(dataMarketingFed.getvBeforeArRjDf());
@@ -2007,7 +2000,14 @@ public class MarketingOrderServiceImpl {
 				saveMo.setCreationDate(new Date());
 				saveMo.setLastUpdateDate(new Date());
 				
-				BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(saveMo.getType(), saveMo.getMonth0().toString());
+				String dateStr = saveMo.getMonth0().toString();
+		        SimpleDateFormat originalFormat = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
+		        SimpleDateFormat targetFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+		        Date date = originalFormat.parse(dateStr);
+		        String formatedtanggal = targetFormat.format(date);
+		        
+				BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(saveMo.getType(), formatedtanggal);
 	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
 
 	            saveMo.setvBeforeArRjDf(NewVBeforeArRjDf);
