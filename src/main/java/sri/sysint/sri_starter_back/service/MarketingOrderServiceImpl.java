@@ -2012,10 +2012,12 @@ public class MarketingOrderServiceImpl {
 		            String formatedtanggal = sdfOutput.format(date);
 		            System.out.println("Tanggal setelah diformat: " + formatedtanggal);
 
-		            TopVBeforeArRjDf = marketingOrderRepo.findTopVAfterArRjDf(saveMo.getType(), formatedtanggal);
+		            TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(saveMo.getType(), formatedtanggal);
 		        } catch (ParseException e) {
 		            e.printStackTrace();
 		        }
+		        
+		        TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
 		        
 	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
 

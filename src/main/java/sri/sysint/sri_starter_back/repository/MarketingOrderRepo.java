@@ -36,18 +36,18 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER ORDER BY MO_ID DESC", nativeQuery = true)
     List<MarketingOrder> findAllMOByIdDesc();
 
-	@Query(value = "SELECT COALESCE(V_BEFORE_AR_RJ_DF, 0) \r\n" +
+	@Query(value = "SELECT COALESCE( (SELECT V_BEFORE_AR_RJ_DF \r\n" +
             "FROM SRI_IMPP_T_MARKETINGORDER \r\n" +
             "WHERE TYPE = :type \r\n" +
             "  AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') \r\n" +
             "ORDER BY V_BEFORE_AR_RJ_DF DESC \r\n" +
-            "FETCH FIRST 1 ROW ONLY", 
-    nativeQuery = true)
+            "FETCH FIRST 1 ROW ONLY), 0)", 
+	 nativeQuery = true)
 	BigDecimal findTopVBeforeArRjDf(
 	 @Param("type") String type,
 	 @Param("month0") String month0
 	);
-	
+
 	@Query(value = "SELECT COALESCE(V_AFTER_AR_RJ_DF, 0)\r\n"
 			+ "        FROM SRI_IMPP_T_MARKETINGORDER \r\n"
 			+ "        WHERE TYPE = :type \r\n"
