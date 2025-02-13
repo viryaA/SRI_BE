@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -2000,14 +2001,22 @@ public class MarketingOrderServiceImpl {
 				saveMo.setCreationDate(new Date());
 				saveMo.setLastUpdateDate(new Date());
 				
-				String dateStr = saveMo.getMonth0().toString();
-		        SimpleDateFormat originalFormat = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
-		        SimpleDateFormat targetFormat = new SimpleDateFormat("dd-MM-yyyy");
+		        String tanggalAsli = saveMo.getMonth0().toString();
+				SimpleDateFormat sdfInput = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+		        SimpleDateFormat sdfOutput = new SimpleDateFormat("dd-MM-yyyy");
 
-		        Date date = originalFormat.parse(dateStr);
-		        String formatedtanggal = targetFormat.format(date);
+		        BigDecimal TopVBeforeArRjDf = BigDecimal.ZERO;
 		        
-				BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(saveMo.getType(), formatedtanggal);
+		        try {
+		            Date date = sdfInput.parse(tanggalAsli);
+		            String formatedtanggal = sdfOutput.format(date);
+		            System.out.println("Tanggal setelah diformat: " + formatedtanggal);
+
+		            TopVBeforeArRjDf = marketingOrderRepo.findTopVAfterArRjDf(saveMo.getType(), formatedtanggal);
+		        } catch (ParseException e) {
+		            e.printStackTrace();
+		        }
+		        
 	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
 
 	            saveMo.setvBeforeArRjDf(NewVBeforeArRjDf);
