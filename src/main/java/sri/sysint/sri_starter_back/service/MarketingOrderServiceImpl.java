@@ -2483,12 +2483,29 @@ public class MarketingOrderServiceImpl {
             headerMarketingOrderRepo.save(hmo);
             
             disableMarketingOrder(marketingOrder); 
-            BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(marketingOrder.getType(), marketingOrder.getMonth0().toString());
-            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+                String tanggalAsli = marketingOrder.getMonth0().toString();
+				SimpleDateFormat sdfInput = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+		        SimpleDateFormat sdfOutput = new SimpleDateFormat("dd-MM-yyyy");
 
-            marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
-            marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
-            marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
+		        BigDecimal TopVBeforeArRjDf = BigDecimal.ZERO;
+		        
+		        try {
+		            Date date = sdfInput.parse(tanggalAsli);
+		            String formatedtanggal = sdfOutput.format(date);
+		            System.out.println("Tanggal setelah diformat: " + formatedtanggal);
+
+		            TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(marketingOrder.getType(), formatedtanggal);
+		        } catch (ParseException e) {
+		            e.printStackTrace();
+		        }
+		        
+		        TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
+		        
+	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+	            marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
+	            marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
+                marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
             
             marketingOrderRepo.save(marketingOrder);
 
@@ -2662,12 +2679,28 @@ public class MarketingOrderServiceImpl {
         	marketingOrder.setRevisionMarketing(marketingOrder.getRevisionMarketing().add(BigDecimal.ONE)); // Tambah 1 pada revisi
         }
         	      
-        BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(marketingOrder.getType(), marketingOrder.getMonth0().toString());
-        BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+                String tanggalAsli = marketingOrder.getMonth0().toString();
+				SimpleDateFormat sdfInput = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+		        SimpleDateFormat sdfOutput = new SimpleDateFormat("dd-MM-yyyy");
 
-        marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
-        marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
-        marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
+		        BigDecimal TopVBeforeArRjDf = BigDecimal.ZERO;
+		        
+		        try {
+		            Date date = sdfInput.parse(tanggalAsli);
+		            String formatedtanggal = sdfOutput.format(date);
+		            System.out.println("Tanggal setelah diformat: " + formatedtanggal);
+
+		            TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(marketingOrder.getType(), formatedtanggal);
+		        } catch (ParseException e) {
+		            e.printStackTrace();
+		        }
+		        
+		        TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
+		        
+	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+	            marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
+	            marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
         
         marketingOrderRepo.save(marketingOrder);
         
@@ -2876,12 +2909,28 @@ public class MarketingOrderServiceImpl {
 					mo.setStatusFilled(BigDecimal.valueOf(1));
 				}
                 
-                BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(mo.getType(), mo.getMonth0().toString());
-                BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+                String tanggalAsli = mo.getMonth0().toString();
+				SimpleDateFormat sdfInput = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+		        SimpleDateFormat sdfOutput = new SimpleDateFormat("dd-MM-yyyy");
 
-                marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
-                marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
-                marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
+		        BigDecimal TopVBeforeArRjDf = BigDecimal.ZERO;
+		        
+		        try {
+		            Date date = sdfInput.parse(tanggalAsli);
+		            String formatedtanggal = sdfOutput.format(date);
+		            System.out.println("Tanggal setelah diformat: " + formatedtanggal);
+
+		            TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(mo.getType(), formatedtanggal);
+		        } catch (ParseException e) {
+		            e.printStackTrace();
+		        }
+		        
+		        TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
+		        
+	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+	            mo.setvBeforeArRjDf(NewVBeforeArRjDf);
+	            mo.setvAfterArRjDf(BigDecimal.ZERO);
 
 				marketingOrderRepo.save(mo);
 		}
@@ -2893,12 +2942,28 @@ public class MarketingOrderServiceImpl {
 				mo.setStatusFilled(BigDecimal.valueOf(2));
 			}
 
-            BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(mo.getType(), mo.getMonth0().toString());
-            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+            String tanggalAsli = mo.getMonth0().toString();
+				SimpleDateFormat sdfInput = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+		        SimpleDateFormat sdfOutput = new SimpleDateFormat("dd-MM-yyyy");
 
-            marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
-            marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
-            marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
+		        BigDecimal TopVBeforeArRjDf = BigDecimal.ZERO;
+		        
+		        try {
+		            Date date = sdfInput.parse(tanggalAsli);
+		            String formatedtanggal = sdfOutput.format(date);
+		            System.out.println("Tanggal setelah diformat: " + formatedtanggal);
+
+		            TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(mo.getType(), formatedtanggal);
+		        } catch (ParseException e) {
+		            e.printStackTrace();
+		        }
+		        
+		        TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
+		        
+	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+	            mo.setvBeforeArRjDf(NewVBeforeArRjDf);
+	            mo.setvAfterArRjDf(BigDecimal.ZERO);
 
 			marketingOrderRepo.save(mo);
 		}
@@ -2910,12 +2975,28 @@ public class MarketingOrderServiceImpl {
 	    			mo.setStatusFilled(BigDecimal.valueOf(3));
 	    		}
 	    		
-                BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(mo.getType(), mo.getMonth0().toString());
-                BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+                String tanggalAsli = mo.getMonth0().toString();
+				SimpleDateFormat sdfInput = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+		        SimpleDateFormat sdfOutput = new SimpleDateFormat("dd-MM-yyyy");
 
-                marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
-                marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
-                marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
+		        BigDecimal TopVBeforeArRjDf = BigDecimal.ZERO;
+		        
+		        try {
+		            Date date = sdfInput.parse(tanggalAsli);
+		            String formatedtanggal = sdfOutput.format(date);
+		            System.out.println("Tanggal setelah diformat: " + formatedtanggal);
+
+		            TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(mo.getType(), formatedtanggal);
+		        } catch (ParseException e) {
+		            e.printStackTrace();
+		        }
+		        
+		        TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
+		        
+	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+	            mo.setvBeforeArRjDf(NewVBeforeArRjDf);
+	            mo.setvAfterArRjDf(BigDecimal.ZERO);
 
 	    		marketingOrderRepo.save(mo);
 	    }
