@@ -1616,7 +1616,13 @@ public class MarketingOrderServiceImpl {
         } else {
         	dataMarketingFed.setRevisionPpc(dataMarketingFed.getRevisionPpc().add(BigDecimal.ONE)); // Tambah 1 pada revisi
         }
-        	        
+
+            BigDecimal TopVAfterArRjDf = marketingOrderRepo.findTopVAfterArRjDf(dataMarketingFed.getType(), dataMarketingFed.getMonth0().toString());
+            BigDecimal NewVAfterArRjDf = TopVAfterArRjDf.add(BigDecimal.ONE);
+
+            dataMarketingFed.setvBeforeArRjDf(dataMarketingFed.getvBeforeArRjDf());
+            dataMarketingFed.setvAfterArRjDf(NewVAfterArRjDf);
+
         marketingOrderRepo.save(dataMarketingFed);
         
        // End Save Marketing Order FED
@@ -1783,11 +1789,15 @@ public class MarketingOrderServiceImpl {
         } else {
         	dataMarketingFdr.setRevisionPpc(dataMarketingFdr.getRevisionPpc().add(BigDecimal.ONE)); // Tambah 1 pada revisi
         }
-        	        
-        marketingOrderRepo.save(dataMarketingFdr);
+
+        BigDecimal TopVAfterArRjDf2 = marketingOrderRepo.findTopVAfterArRjDf(dataMarketingFdr.getType(), dataMarketingFdr.getMonth0().toString());
+        BigDecimal NewVAfterArRjDf2 = TopVAfterArRjDf2.add(BigDecimal.ONE);
+
+        dataMarketingFdr.setvBeforeArRjDf(dataMarketingFed.getvBeforeArRjDf());
+        dataMarketingFdr.setvAfterArRjDf(NewVAfterArRjDf2);
         
-       // End Save Marketing Order FDR
-    	
+        marketingOrderRepo.save(dataMarketingFdr);
+            	
     	return 1;
     }
 
@@ -1945,7 +1955,6 @@ public class MarketingOrderServiceImpl {
         return new ArrayList<>(); 
     }
 
-    
     //GET ALL MARKETING ORDER
     public List<MarketingOrder> getAllMarketingOrder(String month0, String month1, String month2, String type) {
         return marketingOrderRepo.findtMarketingOrders(month0, month1, month2, type);
@@ -1989,6 +1998,14 @@ public class MarketingOrderServiceImpl {
 				saveMo.setStatus(BigDecimal.valueOf(1));  
 				saveMo.setCreationDate(new Date());
 				saveMo.setLastUpdateDate(new Date());
+				
+				BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(saveMo.getType(), saveMo.getMonth0().toString());
+	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+	            saveMo.setvBeforeArRjDf(NewVBeforeArRjDf);
+	            saveMo.setvAfterArRjDf(BigDecimal.ZERO);
+	            saveMo.setRevisionMarketing(BigDecimal.ZERO);
+				
 				MarketingOrder saveDb = marketingOrderRepo.save(saveMo);
 				if(saveDb != null) {
 					statusMo = 1;
@@ -2447,13 +2464,18 @@ public class MarketingOrderServiceImpl {
             headerMarketingOrderRepo.save(hmo);
             
             disableMarketingOrder(marketingOrder); 
-           
+            BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(marketingOrder.getType(), marketingOrder.getMonth0().toString());
+            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+            marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
+            marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
             marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
             
             marketingOrderRepo.save(marketingOrder);
 
         }
-        	return detailResponses; 
+        	
+            return detailResponses; 
     }
     
     //REVISION DETAIL MO (REVISION BY ROLE MARKETING)
@@ -2620,7 +2642,14 @@ public class MarketingOrderServiceImpl {
         } else {
         	marketingOrder.setRevisionMarketing(marketingOrder.getRevisionMarketing().add(BigDecimal.ONE)); // Tambah 1 pada revisi
         }
-        	        
+        	      
+        BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(marketingOrder.getType(), marketingOrder.getMonth0().toString());
+        BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+        marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
+        marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
+        marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
+        
         marketingOrderRepo.save(marketingOrder);
         
         System.out.println("ini " + 13);
@@ -2827,6 +2856,14 @@ public class MarketingOrderServiceImpl {
 				if(mo != null) {
 					mo.setStatusFilled(BigDecimal.valueOf(1));
 				}
+                
+                BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(mo.getType(), mo.getMonth0().toString());
+                BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+                marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
+                marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
+                marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
+
 				marketingOrderRepo.save(mo);
 		}
 	    
@@ -2836,6 +2873,14 @@ public class MarketingOrderServiceImpl {
 			if(mo != null) {
 				mo.setStatusFilled(BigDecimal.valueOf(2));
 			}
+
+            BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(mo.getType(), mo.getMonth0().toString());
+            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+            marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
+            marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
+            marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
+
 			marketingOrderRepo.save(mo);
 		}
 	    
@@ -2846,6 +2891,13 @@ public class MarketingOrderServiceImpl {
 	    			mo.setStatusFilled(BigDecimal.valueOf(3));
 	    		}
 	    		
+                BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(mo.getType(), mo.getMonth0().toString());
+                BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+
+                marketingOrder.setvBeforeArRjDf(NewVBeforeArRjDf);
+                marketingOrder.setvAfterArRjDf(BigDecimal.ZERO);
+                marketingOrder.setRevisionMarketing(BigDecimal.ZERO);
+
 	    		marketingOrderRepo.save(mo);
 	    }
 	    

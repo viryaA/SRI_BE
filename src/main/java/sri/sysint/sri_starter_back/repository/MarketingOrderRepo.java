@@ -18,9 +18,6 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER WHERE MO_ID = :id", nativeQuery = true)
 	Optional<MarketingOrder> findById(@Param("id") String id);
 	
-//	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_T_MARKETINGORDER", nativeQuery = true)
-//	String getNewId();
-	
 	@Query(value = "SELECT * FROM (SELECT * FROM SRI_IMPP_T_MARKETINGORDER ORDER BY MO_ID DESC) WHERE ROWNUM = 1", nativeQuery = true)
 	MarketingOrder findLastMOId();
 	
@@ -33,13 +30,35 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_T_MARKETINGORDER WHERE MONTH_0 = :month0 AND MONTH_1 = :month1 AND MONTH_2 = :month2 AND TYPE = :type", nativeQuery = true)
 	BigDecimal getNewRevisionMarketing(@Param("month0") Date month0, @Param("month1") Date month1, @Param("month2") Date month2, @Param("type") String type);
 	
-	//Add dicky
 	@Query(value = "SELECT MO_ID FROM SRI_IMPP_T_MARKETINGORDER ORDER BY MO_ID DESC FETCH FIRST 1 ROWS ONLY", nativeQuery = true)
 	String getLastIdMo();
 	
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER ORDER BY MO_ID DESC", nativeQuery = true)
     List<MarketingOrder> findAllMOByIdDesc();
 
+	@Query(value = "SELECT V_BEFORE_AR_RJ_DF \r\n"
+			+ "        FROM SRI_IMPP_T_MARKETINGORDER \r\n"
+			+ "        WHERE TYPE = :type \r\n"
+			+ "          AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') \r\n"
+			+ "        ORDER BY V_BEFORE_AR_RJ_DF DESC \r\n"
+			+ "        FETCH FIRST 1 ROW ONLY", 
+	        nativeQuery = true)
+	    BigDecimal findTopVBeforeArRjDf(
+	        @Param("type") String type,
+	        @Param("month0") String month0
+	    );
+	
+	@Query(value = "SELECT V_AFTER_AR_RJ_DF \r\n"
+			+ "        FROM SRI_IMPP_T_MARKETINGORDER \r\n"
+			+ "        WHERE TYPE = :type \r\n"
+			+ "          AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') \r\n"
+			+ "        ORDER BY V_AFTER_AR_RJ_DF DESC \r\n"
+			+ "        FETCH FIRST 1 ROW ONLY", 
+	        nativeQuery = true)
+	    BigDecimal findTopVAfterArRjDf(
+	        @Param("type") String type,
+	        @Param("month0") String month0
+	    );
 	
 	@Query(value = "SELECT *\r\n"
 			+ "FROM SRI_IMPP_T_MARKETINGORDER t1\r\n"
@@ -242,7 +261,5 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	               "ORDER BY MONTH_0, MONTH_1, MONTH_2", 
 	       nativeQuery = true)
 		List<Object[]> findDistinctMonths();
-
-
 
 }

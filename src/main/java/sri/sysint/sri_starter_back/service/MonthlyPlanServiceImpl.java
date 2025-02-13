@@ -119,6 +119,8 @@ public class MonthlyPlanServiceImpl {
 	
 	private List<MachineProduct> machineProductList = new ArrayList<>();
 	
+	private List<MachineProduct> machineProductListperProduct = new ArrayList<>();
+	
 	private List<MachineCuring> machineCuringOrderList = new ArrayList<>();
 	
 	private List<MachineCuring> machineCuringUsedList = new ArrayList<>();
@@ -158,32 +160,60 @@ public class MonthlyPlanServiceImpl {
 		maxChangeMould = limitChange;
 		getDataHeader(month, year);
         boolean tempShift = false;
+        
+        machineProductList.clear();
+        List<Object[]> results = machineProductRepo.findAllWct();
+
+        for (Object[] row : results) {
+            BigDecimal partNumber = (BigDecimal) row[0];
+            String workCenterText = (String) row[1];
+            
+            MachineProduct machineProduct = new MachineProduct(partNumber, workCenterText);
+            machineProductList.add(machineProduct);
+        }
+        
 		if(machineProductList != null) {
 			for(MachineProduct mn : machineProductList) {
+				
 	        	for(DetailMo dtMo : detailMarketingOrderListAB) {
+					
 	        		if(dtMo.getPartNumber().equals(mn.getPART_NUMBER())) {
 	        			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
 	        			order = dtMo.getTotalAR();
+	        			
+	        			System.out.println("loop 2 isi mesin untuk produk" + mn.getPART_NUMBER() + "yaitu" + mn.getWORK_CENTER_TEXT());
+
 	        			tempShift = generateFromManualMapping(mn.getPART_NUMBER(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
 	        			if(tempShift == true) {
 	        				dtMo.setMoMonth0(order);
 	        			}
 	        		}
 	        	}
+	        	
 	        	for(DetailMo dtMo : detailMarketingOrderListDual) {
+	        		
 	        		if(dtMo.getPartNumber().equals(mn.getPART_NUMBER())) {
 	        			order = dtMo.getTotalAR();
 	        			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
+        			    
+	        			System.out.println("loop 3 isi mesin untuk produk" + mn.getPART_NUMBER() + "yaitu" + mn.getWORK_CENTER_TEXT());
+
 	        			tempShift = generateFromManualMapping(mn.getPART_NUMBER(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
+	        			
 	        			if(tempShift == true) {
 	        				dtMo.setMoMonth0(order);
 	        			}
 	        		}
 	        	}
+	        	
 	        	for(DetailMo dtMo : detailMarketingOrderListBOM) {
+	        		
 	        		if(dtMo.getPartNumber().equals(mn.getPART_NUMBER())) {
 	        			order = dtMo.getTotalAR();
 	        			minProduction = getMinimalProduction(dtMo.getTotalAR(), minA, minB, minC, minD);
+	        			
+	        			System.out.println("loop 4 isi mesin untuk produk" + mn.getPART_NUMBER() + "yaitu" + mn.getWORK_CENTER_TEXT());
+
 	        			tempShift = generateFromManualMapping(mn.getPART_NUMBER(), month, year, dtMo.getItemCuring(), mn.getWORK_CENTER_TEXT());
 	        			if(tempShift == true) {
 	        				dtMo.setMoMonth0(order);
@@ -1177,6 +1207,7 @@ public class MonthlyPlanServiceImpl {
 		machineCuringList = machineCuringRepo.findMachineCuringActive();
 		machineCuringListTemp = machineCuringRepo.findMachineCuringActive();
 		machineProductList = machineProductRepo.findAll();
+		
 		System.out.println("ukuran list mesin " + machineCuringList.size() + " " + machineCuringListTemp.size());
 		 
     	System.out.println(machineCuringList.size());
