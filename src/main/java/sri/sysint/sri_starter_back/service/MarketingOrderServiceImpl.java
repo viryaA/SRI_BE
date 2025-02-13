@@ -2942,7 +2942,7 @@ public class MarketingOrderServiceImpl {
 				mo.setStatusFilled(BigDecimal.valueOf(2));
 			}
 
-	            mo.setvBeforeArRjDf(mo.getvBeforeArRjDf);
+	            mo.setvBeforeArRjDf(mo.getvBeforeArRjDf());
 	            mo.setvAfterArRjDf(BigDecimal.ZERO);
 
 			marketingOrderRepo.save(mo);
@@ -2955,7 +2955,7 @@ public class MarketingOrderServiceImpl {
 	    			mo.setStatusFilled(BigDecimal.valueOf(3));
 	    		}
 	    		
-                mo.setvBeforeArRjDf(mo.getvBeforeArRjDf);
+                mo.setvBeforeArRjDf(mo.getvBeforeArRjDf());
 	            mo.setvAfterArRjDf(BigDecimal.ZERO);
 
 	    		marketingOrderRepo.save(mo);

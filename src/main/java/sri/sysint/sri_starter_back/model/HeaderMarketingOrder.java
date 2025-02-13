@@ -9,7 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 
 @Entity
-@Table(name = "SRI_IMPP_D_HEADERMARKETINGORDER")
+@Table(name = "SRI_IMPP_D_HEADERMO")
 public class HeaderMarketingOrder {
 
 	@Id
