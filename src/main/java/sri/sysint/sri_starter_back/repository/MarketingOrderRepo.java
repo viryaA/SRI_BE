@@ -36,68 +36,60 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER ORDER BY MO_ID DESC", nativeQuery = true)
     List<MarketingOrder> findAllMOByIdDesc();
 
-	@Query(value = "SELECT COALESCE(\r\n"
-            + "    (SELECT V_BEFORE_AR_RJ_DF \r\n"
-            + "     FROM SRI_IMPP_T_MARKETINGORDER \r\n"
-            + "     WHERE TYPE = :type \r\n"
-            + "       AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') \r\n"
-            + "     ORDER BY V_BEFORE_AR_RJ_DF DESC \r\n"
-            + "     FETCH FIRST 1 ROW ONLY), \r\n"
-            + "    0\r\n"
-            + ") AS V_BEFORE_AR_RJ_DF\r\n"
-            + "FROM DUAL;", 
-    nativeQuery = true)
-	BigDecimal findTopVBeforeArRjDf(
-	 @Param("type") String type,
-	 @Param("month0") String month0
+	@Query(value = "SELECT COALESCE( " +
+	        "    (SELECT V_AFTER_AR_RJ_DF " +
+	        "     FROM SRI_IMPP_T_MARKETINGORDER " +
+	        "     WHERE TYPE = :type " +
+	        "       AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
+	        "     ORDER BY V_AFTER_AR_RJ_DF DESC " +
+	        "     FETCH FIRST 1 ROW ONLY), 0) " +
+	        " AS V_AFTER_AR_RJ_DF " +
+	        " FROM SRI_IMPP_T_MARKETINGORDER " +
+	        " WHERE TYPE = :type " +
+	        " AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
+	        " FETCH FIRST 1 ROW ONLY",
+	    nativeQuery = true)
+	BigDecimal findTopVAfterArRjDf(
+	    @Param("type") String type,
+	    @Param("month0") String month0
 	);
 	
-	@Query(value = "SELECT COALESCE(\r\n"
-            + "    (SELECT V_BAFTER_AR_RJ_DF \r\n"
-            + "     FROM SRI_IMPP_T_MARKETINGORDER \r\n"
-            + "     WHERE TYPE = :type \r\n"
-            + "       AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') \r\n"
-            + "     ORDER BY V_AFTER_AR_RJ_DF DESC \r\n"
-            + "     FETCH FIRST 1 ROW ONLY), \r\n"
-            + "    0\r\n"
-            + ") AS V_AFTER_AR_RJ_DF\r\n"
-            + "FROM DUAL;", 
-	        nativeQuery = true)
-	    BigDecimal findTopVAfterArRjDf(
-	        @Param("type") String type,
-	        @Param("month0") String month0
-	    );
+	@Query(value = "SELECT COALESCE( " +
+	        "    (SELECT V_BEFORE_AR_RJ_DF " +
+	        "     FROM SRI_IMPP_T_MARKETINGORDER " +
+	        "     WHERE TYPE = :type " +
+	        "       AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
+	        "     ORDER BY V_BEFORE_AR_RJ_DF DESC " +
+	        "     FETCH FIRST 1 ROW ONLY), 0) " +
+	        " AS V_BEFORE_AR_RJ_DF " +
+	        " FROM SRI_IMPP_T_MARKETINGORDER " +
+	        " WHERE TYPE = :type " +
+	        " AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
+	        " FETCH FIRST 1 ROW ONLY",
+	    nativeQuery = true)
+	BigDecimal findTopVBeforeArRjDf(
+	    @Param("type") String type,
+	    @Param("month0") String month0
+	);
 	
-//	@Query(value = "SELECT COALESCE(\r\n"
-//            + "    (SELECT REVISION_MARKETING \r\n"
-//            + "     FROM SRI_IMPP_T_MARKETINGORDER \r\n"
-//            + "     WHERE TYPE = :type \r\n"
-//            + "       AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') \r\n"
-//            + "     ORDER BY REVISION_MARKETING DESC \r\n"
-//            + "     FETCH FIRST 1 ROW ONLY), \r\n"
-//            + "    0\r\n"
-//            + ") AS REVISION_MARKETING\r\n"
-//            + "FROM DUAL;", 
-//    nativeQuery = true)
-//	BigDecimal findTopRevMarketing(
-//	 @Param("type") String type,
-//	 @Param("month0") String month0
-//	);
-	
-	@Query(value = "SELECT COALESCE(( " +
-            "    SELECT REVISION_MARKETING " +
-            "    FROM SRI_IMPP_T_MARKETINGORDER " +
-            "    WHERE TYPE = :type " +
-            "      AND MONTH_0 = TO_DATE(:month0, 'DD-MM-YYYY') " +
-            "    ORDER BY REVISION_MARKETING DESC " +
-            "    FETCH FIRST 1 ROW ONLY" +
-            "), 0) AS REVISION_MARKETING " +
-            "FROM DUAL", 
-    nativeQuery = true)
+	@Query(value = "SELECT COALESCE( " +
+	        "    (SELECT REVISION_MARKETING " +
+	        "     FROM SRI_IMPP_T_MARKETINGORDER " +
+	        "     WHERE TYPE = :type " +
+	        "       AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
+	        "     ORDER BY REVISION_MARKETING DESC " +
+	        "     FETCH FIRST 1 ROW ONLY), 0) " +
+	        " AS REVISION_MARKETING " +
+	        " FROM SRI_IMPP_T_MARKETINGORDER " +
+	        " WHERE TYPE = :type " +
+	        " AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
+	        " FETCH FIRST 1 ROW ONLY",
+	    nativeQuery = true)
 	BigDecimal findTopRevMarketing(
 	    @Param("type") String type,
 	    @Param("month0") String month0
 	);
+	
 	
 	@Query(value = "SELECT *\r\n"
 			+ "FROM SRI_IMPP_T_MARKETINGORDER t1\r\n"
