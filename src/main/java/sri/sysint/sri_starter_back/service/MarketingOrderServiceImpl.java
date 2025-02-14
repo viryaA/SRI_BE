@@ -10,6 +10,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1999,19 +2000,23 @@ public class MarketingOrderServiceImpl {
 			    saveMo.setLastUpdateDate(currentDate);
 
 			    String tanggalAsli = saveMo.getMonth0().toString();
-			    SimpleDateFormat sdfInput = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-			    SimpleDateFormat sdfOutput = new SimpleDateFormat("dd-MM-yyyy");
-			    String formatedtanggal = "";
+			    System.out.println("Tanggal Asli" + tanggalAsli);
 
-			    try {
-			        Date date = sdfInput.parse(tanggalAsli);
-			        formatedtanggal = sdfOutput.format(date);
-			    } catch (ParseException e) {
-			        e.printStackTrace();
-			    }
+			    tanggalAsli = tanggalAsli.replace("WIB", "Asia/Jakarta");
+
+		        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+		        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+		        ZonedDateTime zonedDateTime = ZonedDateTime.parse(tanggalAsli, inputFormatter);
+		        String formatedtanggal = zonedDateTime.format(outputFormatter);
+			    
+			    System.out.println("Hasil Format" + formatedtanggal);
 
 			    BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(saveMo.getType(), formatedtanggal);
+			    System.out.println("TopVBeforeArRjDf : " + TopVBeforeArRjDf);
+
 			    BigDecimal TopRevMarketing = marketingOrderRepo.findTopRevMarketing(saveMo.getType(), formatedtanggal);
+			    System.out.println("TopRevMarketing : " + TopRevMarketing);
 
 			    TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
 			    TopRevMarketing = (TopRevMarketing != null) ? TopRevMarketing : BigDecimal.ZERO;
