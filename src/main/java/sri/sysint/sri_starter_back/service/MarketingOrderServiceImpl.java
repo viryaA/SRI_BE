@@ -1984,51 +1984,47 @@ public class MarketingOrderServiceImpl {
 			int statusDmo = 0;
 			
 			SaveMarketingOrderPPC mo = new SaveMarketingOrderPPC(marketingOrder);
-			
-			//Save to SRI_IMPP_T_MARKETINGORDER
+
 			try {
-				MarketingOrder saveMo = new MarketingOrder(mo.getMarketingOrder());
-				if (saveMo.getRevisionPpc() == null) {
-				    saveMo.setRevisionPpc(BigDecimal.ZERO); // Set to 0 if null or zero
-					saveMo.setStatusFilled(BigDecimal.valueOf(3));
+			    MarketingOrder saveMo = new MarketingOrder(mo.getMarketingOrder());
 
-				} else {	
-					saveMo.setRevisionPpc(saveMo.getRevisionPpc());
-				    saveMo.setStatusFilled(BigDecimal.valueOf(3));
-				}
+			    saveMo.setRevisionPpc(
+			        (saveMo.getRevisionPpc() == null) ? BigDecimal.ZERO : saveMo.getRevisionPpc()
+			    );
+			    saveMo.setStatusFilled(BigDecimal.valueOf(3));
 
-				saveMo.setStatus(BigDecimal.valueOf(1));  
-				saveMo.setCreationDate(new Date());
-				saveMo.setLastUpdateDate(new Date());
-				
-		        String tanggalAsli = saveMo.getMonth0().toString();
-				SimpleDateFormat sdfInput = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-		        SimpleDateFormat sdfOutput = new SimpleDateFormat("dd-MM-yyyy");
+			    saveMo.setStatus(BigDecimal.valueOf(1));  
+			    Date currentDate = new Date();
+			    saveMo.setCreationDate(currentDate);
+			    saveMo.setLastUpdateDate(currentDate);
 
-		        BigDecimal TopVBeforeArRjDf = BigDecimal.ZERO;
-		        
-		        try {
-		            Date date = sdfInput.parse(tanggalAsli);
-		            String formatedtanggal = sdfOutput.format(date);
-		            System.out.println("Tanggal setelah diformat: " + formatedtanggal);
+			    String tanggalAsli = saveMo.getMonth0().toString();
+			    SimpleDateFormat sdfInput = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+			    SimpleDateFormat sdfOutput = new SimpleDateFormat("dd-MM-yyyy");
+			    String formatedtanggal = "";
 
-		            TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(saveMo.getType(), formatedtanggal);
-		        } catch (ParseException e) {
-		            e.printStackTrace();
-		        }
-		        
-		        TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
-		        
-	            BigDecimal NewVBeforeArRjDf = TopVBeforeArRjDf.add(BigDecimal.ONE);
+			    try {
+			        Date date = sdfInput.parse(tanggalAsli);
+			        formatedtanggal = sdfOutput.format(date);
+			    } catch (ParseException e) {
+			        e.printStackTrace();
+			    }
 
-	            saveMo.setvBeforeArRjDf(NewVBeforeArRjDf);
-	            saveMo.setvAfterArRjDf(BigDecimal.ZERO);
-	            saveMo.setRevisionMarketing(BigDecimal.ZERO);
-				
+			    BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(saveMo.getType(), formatedtanggal);
+			    BigDecimal TopRevMarketing = marketingOrderRepo.findTopRevMarketing(saveMo.getType(), formatedtanggal);
+
+			    TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
+			    TopRevMarketing = (TopRevMarketing != null) ? TopRevMarketing : BigDecimal.ZERO;
+
+			    saveMo.setvBeforeArRjDf(TopVBeforeArRjDf.add(BigDecimal.ONE));
+			    saveMo.setvAfterArRjDf(BigDecimal.ZERO);
+			    saveMo.setRevisionMarketing(TopRevMarketing.add(BigDecimal.ONE));
+			    
 				MarketingOrder saveDb = marketingOrderRepo.save(saveMo);
 				if(saveDb != null) {
 					statusMo = 1;
 				}
+				
 			}catch (Exception e){
 	            System.err.println("Error saving MarketingOrder: " + e.getMessage());
 	            throw e;
@@ -2075,7 +2071,7 @@ public class MarketingOrderServiceImpl {
 			statusSave = 1;
 			
 			return statusSave;
-		}
+	}
 	
 	//End add dicky
     
