@@ -68,20 +68,35 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	        @Param("month0") String month0
 	    );
 	
-	@Query(value = "SELECT COALESCE(\r\n"
-            + "    (SELECT REVISION_MARKETING \r\n"
-            + "     FROM SRI_IMPP_T_MARKETINGORDER \r\n"
-            + "     WHERE TYPE = :type \r\n"
-            + "       AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') \r\n"
-            + "     ORDER BY REVISION_MARKETING DESC \r\n"
-            + "     FETCH FIRST 1 ROW ONLY), \r\n"
-            + "    0\r\n"
-            + ") AS REVISION_MARKETING\r\n"
-            + "FROM DUAL;", 
+//	@Query(value = "SELECT COALESCE(\r\n"
+//            + "    (SELECT REVISION_MARKETING \r\n"
+//            + "     FROM SRI_IMPP_T_MARKETINGORDER \r\n"
+//            + "     WHERE TYPE = :type \r\n"
+//            + "       AND TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') \r\n"
+//            + "     ORDER BY REVISION_MARKETING DESC \r\n"
+//            + "     FETCH FIRST 1 ROW ONLY), \r\n"
+//            + "    0\r\n"
+//            + ") AS REVISION_MARKETING\r\n"
+//            + "FROM DUAL;", 
+//    nativeQuery = true)
+//	BigDecimal findTopRevMarketing(
+//	 @Param("type") String type,
+//	 @Param("month0") String month0
+//	);
+	
+	@Query(value = "SELECT COALESCE(( " +
+            "    SELECT REVISION_MARKETING " +
+            "    FROM SRI_IMPP_T_MARKETINGORDER " +
+            "    WHERE TYPE = :type " +
+            "      AND MONTH_0 = TO_DATE(:month0, 'DD-MM-YYYY') " +
+            "    ORDER BY REVISION_MARKETING DESC " +
+            "    FETCH FIRST 1 ROW ONLY" +
+            "), 0) AS REVISION_MARKETING " +
+            "FROM DUAL", 
     nativeQuery = true)
 	BigDecimal findTopRevMarketing(
-	 @Param("type") String type,
-	 @Param("month0") String month0
+	    @Param("type") String type,
+	    @Param("month0") String month0
 	);
 	
 	@Query(value = "SELECT *\r\n"
