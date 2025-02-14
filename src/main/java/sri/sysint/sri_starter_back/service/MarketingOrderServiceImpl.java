@@ -1871,12 +1871,10 @@ public class MarketingOrderServiceImpl {
     	
     	GetAllTypeMarketingOrder result = new GetAllTypeMarketingOrder();
     	
-    	//Search data MO FED FDR
     	String moIdFed = null;
     	String moIdFdr = null;
     	List<MarketingOrder> dataMo = findMoAllTypeByMonth(dateMoMonth0, dateMoMonth1, dateMoMonth2);
     	
-    	//Loop cek berdasarkan type dan set marketing ordernya
     	for (MarketingOrder mo : dataMo) {
     	    if ("FDR".equals(mo.getType())) {
     	    	moIdFdr = mo.getMoId();
