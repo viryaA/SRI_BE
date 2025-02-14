@@ -1619,13 +1619,35 @@ public class MarketingOrderServiceImpl {
         	dataMarketingFed.setRevisionPpc(dataMarketingFed.getRevisionPpc().add(BigDecimal.ONE)); // Tambah 1 pada revisi
         }
 
-        
-            BigDecimal TopVAfterArRjDf = marketingOrderRepo.findTopVAfterArRjDf(dataMarketingFed.getType(), dataMarketingFed.getMonth0().toString());
-            BigDecimal NewVAfterArRjDf = TopVAfterArRjDf.add(BigDecimal.ONE);
+        String tanggalAsli = dataMarketingFed.getMonth0().toString();
+	    System.out.println("Tanggal Asli" + tanggalAsli);
+
+                tanggalAsli = tanggalAsli.replace("WIB", "Asia/Jakarta");
+
+		        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+		        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+		        ZonedDateTime zonedDateTime = ZonedDateTime.parse(tanggalAsli, inputFormatter);
+		        String formatedtanggal = zonedDateTime.format(outputFormatter);
+			    
+			    System.out.println("Hasil Format" + formatedtanggal);
+
+			    BigDecimal TopVBeforeArRjDf = marketingOrderRepo.findTopVBeforeArRjDf(dataMarketingFed.getType(), formatedtanggal);
+			    System.out.println("TopVBeforeArRjDf : " + TopVBeforeArRjDf);
+
+                BigDecimal TopVAfterArRjDf = marketingOrderRepo.findTopVAfterArRjDf(dataMarketingFed.getType(), formatedtanggal);
+			    System.out.println("TopVAfterArRjDf : " + TopVAfterArRjDf);
+
+			    BigDecimal TopRevMarketing = marketingOrderRepo.findTopRevMarketing(dataMarketingFed.getType(), formatedtanggal);
+			    System.out.println("TopRevMarketing : " + TopRevMarketing);
+
+			    TopVBeforeArRjDf = (TopVBeforeArRjDf != null) ? TopVBeforeArRjDf : BigDecimal.ZERO;
+			    TopVAfterArRjDf = (TopVAfterArRjDf != null) ? TopVAfterArRjDf : BigDecimal.ZERO;            
+			    TopRevMarketing = (TopRevMarketing != null) ? TopRevMarketing : BigDecimal.ZERO;
 
             dataMarketingFed.setvBeforeArRjDf(dataMarketingFed.getvBeforeArRjDf());
-            dataMarketingFed.setvAfterArRjDf(NewVAfterArRjDf);
-
+            dataMarketingFed.setvAfterArRjDf(TopVAfterArRjDf.add(BigDecimal.ONE));
+	    
         marketingOrderRepo.save(dataMarketingFed);
         
        // End Save Marketing Order FED
@@ -1793,11 +1815,34 @@ public class MarketingOrderServiceImpl {
         	dataMarketingFdr.setRevisionPpc(dataMarketingFdr.getRevisionPpc().add(BigDecimal.ONE)); // Tambah 1 pada revisi
         }
 
-        BigDecimal TopVAfterArRjDf2 = marketingOrderRepo.findTopVAfterArRjDf(dataMarketingFdr.getType(), dataMarketingFdr.getMonth0().toString());
-        BigDecimal NewVAfterArRjDf2 = TopVAfterArRjDf2.add(BigDecimal.ONE);
+        String tanggalAsli1 = dataMarketingFdr.getMonth0().toString();
+	    System.out.println("Tanggal Asli" + tanggalAsli1);
 
-        dataMarketingFdr.setvBeforeArRjDf(dataMarketingFed.getvBeforeArRjDf());
-        dataMarketingFdr.setvAfterArRjDf(NewVAfterArRjDf2);
+                tanggalAsli = tanggalAsli.replace("WIB", "Asia/Jakarta");
+
+		        DateTimeFormatter inputFormatter1 = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+		        DateTimeFormatter outputFormatter1 = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+		        ZonedDateTime zonedDateTime1 = ZonedDateTime.parse(tanggalAsli, inputFormatter1);
+		        String formatedtanggal1 = zonedDateTime1.format(outputFormatter1);
+			    
+			    System.out.println("Hasil Format" + formatedtanggal1);
+
+			    BigDecimal TopVBeforeArRjDf1 = marketingOrderRepo.findTopVBeforeArRjDf(dataMarketingFdr.getType(), formatedtanggal1);
+			    System.out.println("TopVBeforeArRjDf1 : " + TopVBeforeArRjDf1);
+
+                BigDecimal TopVAfterArRjDf1 = marketingOrderRepo.findTopVAfterArRjDf(dataMarketingFdr.getType(), formatedtanggal1);
+			    System.out.println("TopVAfterArRjDf1 : " + TopVAfterArRjDf1);
+
+			    BigDecimal TopRevMarketing1 = marketingOrderRepo.findTopRevMarketing(dataMarketingFdr.getType(), formatedtanggal1);
+			    System.out.println("TopRevMarketing1 : " + TopRevMarketing1);
+
+			    TopVBeforeArRjDf1 = (TopVBeforeArRjDf1 != null) ? TopVBeforeArRjDf1 : BigDecimal.ZERO;
+			    TopVAfterArRjDf1 = (TopVAfterArRjDf1 != null) ? TopVAfterArRjDf1 : BigDecimal.ZERO;            
+			    TopRevMarketing1 = (TopRevMarketing1 != null) ? TopRevMarketing1 : BigDecimal.ZERO;
+
+            dataMarketingFdr.setvBeforeArRjDf(dataMarketingFed.getvBeforeArRjDf());
+            dataMarketingFdr.setvAfterArRjDf(TopVAfterArRjDf.add(BigDecimal.ONE));
         
         marketingOrderRepo.save(dataMarketingFdr);
             	
