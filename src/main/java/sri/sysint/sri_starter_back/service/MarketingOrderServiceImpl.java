@@ -2018,7 +2018,7 @@ public class MarketingOrderServiceImpl {
 
 			    saveMo.setvBeforeArRjDf(TopVBeforeArRjDf.add(BigDecimal.ONE));
 			    saveMo.setvAfterArRjDf(BigDecimal.ZERO);
-			    saveMo.setRevisionMarketing(TopRevMarketing.add(BigDecimal.ONE));
+			    saveMo.setRevisionMarketing(TopRevMarketing);
 			    
 				MarketingOrder saveDb = marketingOrderRepo.save(saveMo);
 				if(saveDb != null) {

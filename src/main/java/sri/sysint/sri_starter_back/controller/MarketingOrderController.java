@@ -330,7 +330,6 @@ public class MarketingOrderController {
 	            System.out.println("Ini lock status dari db" + detail.toString());
 	        }
 	        
-	        
 	        // Create a list to hold the response data
 	        List<DetailMarketingOrder> MOListProducts = new ArrayList<>();
 
