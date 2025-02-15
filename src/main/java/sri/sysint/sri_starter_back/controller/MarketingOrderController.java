@@ -422,7 +422,20 @@ public class MarketingOrderController {
 
 	        return response;
 	    }
-	    
+
+		
+		@PostMapping("/getWorkDayAllMonth")
+	    public Response getMonthlyWorkData(@RequestBody Map<String, Object> requestBody, final HttpServletRequest req) throws ResourceNotFoundException {
+	        validateToken(req);
+
+	        int year = (int) requestBody.get("year");
+
+	        List<Map<String, Object>> workDays = marketingOrderServiceImpl.getWorkDayAllMonth(year);
+
+	        Response response = new Response(new Date(),HttpStatus.OK.value(),null, HttpStatus.OK.getReasonPhrase(),req.getRequestURI(),workDays);
+
+	        return response;
+	    }
 	    
 	    //EXPORT MARKETING ORDER
 	    @RequestMapping("/exportMOExcel/{id}")

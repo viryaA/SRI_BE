@@ -2848,6 +2848,27 @@ public class MarketingOrderServiceImpl {
 	    		
 	    		marketingOrderRepo.save(mo);
 	    }
+
+        public List<Map<String, Object>> getWorkDayAllMonth(int year) {
+            List<Map<String, Object>> headerList = new ArrayList<>();
+
+            for (int month = 1; month <= 12; month++) {
+                Map<String, Object> result = headerMarketingOrderRepo.getMonthlyWorkData(month, year);
+                
+                Map<String, Object> headerMap = new HashMap<>();
+                headerMap.put("wdNormalTire", result.get("FINAL_WD") != null ? ((BigDecimal) result.get("FINAL_WD")).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                headerMap.put("wdOtTl", result.get("FINAL_OT_TL") != null ? ((BigDecimal) result.get("FINAL_OT_TL")).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                headerMap.put("wdOtTt", result.get("FINAL_OT_TT") != null ? ((BigDecimal) result.get("FINAL_OT_TT")).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                headerMap.put("wdNormalTube", result.get("FINAL_WD") != null ? ((BigDecimal) result.get("FINAL_WD")).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                headerMap.put("totalWdTl", result.get("TOTAL_OT_TL") != null ? ((BigDecimal) result.get("TOTAL_OT_TL")).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                headerMap.put("totalWdTt", result.get("TOTAL_OT_TT") != null ? ((BigDecimal) result.get("TOTAL_OT_TT")).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                
+                headerList.add(headerMap);
+            }
+            
+            return headerList;
+        }
+
 	    
 	    public List<Map<String, Object>> getWorkDay(int month1, int year1, int month2, int year2, int month3, int year3) {
 	        List<Map<String, Object>> headerList = new ArrayList<>();
