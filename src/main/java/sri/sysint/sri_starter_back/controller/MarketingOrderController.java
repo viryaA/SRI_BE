@@ -425,7 +425,7 @@ public class MarketingOrderController {
 
 		
 		@PostMapping("/getWorkDayAllMonth")
-	    public Response getMonthlyWorkData(@RequestBody Map<String, Object> requestBody, final HttpServletRequest req) throws ResourceNotFoundException {
+	    public Response getMonthlyWorkDataAll(@RequestBody Map<String, Object> requestBody, final HttpServletRequest req) throws ResourceNotFoundException {
 	        validateToken(req);
 
 	        int year = (int) requestBody.get("year");
