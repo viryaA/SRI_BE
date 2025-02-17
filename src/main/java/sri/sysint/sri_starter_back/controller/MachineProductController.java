@@ -1,15 +1,20 @@
 package sri.sysint.sri_starter_back.controller;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import sri.sysint.sri_starter_back.exception.ResourceNotFoundException;
@@ -23,30 +28,69 @@ public class MachineProductController {
 	@Autowired
     private MachineProductServiceImpl machineProductServiceImpl;
 
+    public MachineProductController(MachineProductServiceImpl machineProductServiceImpl) {
+        this.machineProductServiceImpl = machineProductServiceImpl;
+    }
+    
     private Response response;
     
     @PostMapping("/saveMachineProduct")
-    public Response saveTempMachineProduct(HttpServletRequest req, @RequestBody List<MachineProduct> list) throws ResourceNotFoundException {
-       System.out.println("halo");
-    	machineProductServiceImpl.deleteAll();  
+    public Response saveMachineProducts(
+            HttpServletRequest req,
+            @RequestBody String jsonInput) {
 
-                for (MachineProduct machineProduct : list) {
-                    if (machineProduct.getPART_NUMBER() == null) {
-                        throw new IllegalArgumentException("ID_FRONT_REAR is required for all items");
-                    }
-                }
+    	machineProductServiceImpl.saveMachineProducts(jsonInput);
 
-                List<MachineProduct> saved = machineProductServiceImpl.save(list);
-                response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        saved
-                );
-             
-
-        return response;
+        return new Response(
+                new Date(),
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                "Data berhasil disimpan."
+        );
     }
+
+    
+    @GetMapping("/getMachineProductsmoByVersion")
+    public Response getMachineProductsByVersion(
+            HttpServletRequest req,
+            @RequestParam("moId1") String moId1,
+            @RequestParam("moId2") String moId2,
+            @RequestParam("verCheating") BigDecimal verCheating) {
+        
+        List<MachineProduct> filteredProducts = machineProductServiceImpl
+                .findCheatingMacProdByMoIdAndVcheating(moId1, moId2, verCheating);
+
+        return new Response(
+                new Date(),
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                filteredProducts
+        );
+    }
+
+    @GetMapping("/getMachineProductsmoByCuring")
+    public Response getMachineProductsByCuring(
+            HttpServletRequest req, 
+            @RequestParam("moId1") String moId1,
+            @RequestParam("moId2") String moId2,
+            @RequestParam("verCheating") BigDecimal verCheating,
+            @RequestParam("itemCuring") String itemCuring) {
+        
+        List<MachineProduct> filteredProducts = machineProductServiceImpl
+                .findCheatingMacProdByMoIdVcheatingAndItemCuring(moId1, moId2, verCheating, itemCuring);
+
+        return new Response(
+                new Date(),
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                filteredProducts
+        );
+    }
+
 }

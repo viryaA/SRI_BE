@@ -1,7 +1,9 @@
 package sri.sysint.sri_starter_back.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -17,29 +19,20 @@ public class MachineProductServiceImpl {
 	@Autowired
     private MachineProductRepo machineProductRepo;
 
-	public List<MachineProduct> save(List<MachineProduct> List) {
-        List<MachineProduct> saved = new ArrayList<>();
-        try {
-            for (MachineProduct temp : List) {
-                if (temp.getPART_NUMBER() == null) {
-                    throw new IllegalArgumentException("Partnumber cannot be null");
-                }
-
-                machineProductRepo.insertNew(
-                    temp.getPART_NUMBER(),
-                    temp.getWORK_CENTER_TEXT()            
-                );
-
-                saved.add(temp); 
-            }
-        } catch (Exception e) {
-            System.err.println("Error saving list: " + e.getMessage());
-            throw e;
-        }
-        return saved;
+	public MachineProductServiceImpl(MachineProductRepo machineProductRepo) {
+        this.machineProductRepo = machineProductRepo;
     }
 	
-    public void deleteAll() {
-    	machineProductRepo.deleteAll();
+    public void saveMachineProducts(String jsonInput) {
+    	machineProductRepo.saveMachineProducts(jsonInput);
     }
+    
+    public List<MachineProduct> findCheatingMacProdByMoIdAndVcheating(String moId1, String moId2, BigDecimal verCheating) {
+        return machineProductRepo.findCheatingMacProdByMoIdAndVcheating(moId1, moId2, verCheating);
+    }
+    
+    public List<MachineProduct> findCheatingMacProdByMoIdVcheatingAndItemCuring(String moId1, String moId2, BigDecimal verCheating, String itemCuring) {
+        return machineProductRepo.findCheatingMacProdByMoIdVcheatingandItemCuring(moId1, moId2, verCheating, itemCuring);
+    }
+
 }

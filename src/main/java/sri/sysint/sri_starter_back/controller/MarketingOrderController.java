@@ -330,7 +330,6 @@ public class MarketingOrderController {
 	            System.out.println("Ini lock status dari db" + detail.toString());
 	        }
 	        
-	        
 	        // Create a list to hold the response data
 	        List<DetailMarketingOrder> MOListProducts = new ArrayList<>();
 
@@ -551,6 +550,7 @@ public class MarketingOrderController {
 		    String filename = "PREPARE PROD NOV 2024.xlsx";
 		    
 		    ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
+			//ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel();
 		    InputStreamResource file = new InputStreamResource(data);
 		    
 		    return ResponseEntity.ok()
@@ -558,5 +558,19 @@ public class MarketingOrderController {
 		        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
 		        .body(file);
 		}
+	    
+	    @PostMapping("/getAllTypeMarketingOrderCuring")
+	    public Response getAllTypeMarketingOrderCuring(final HttpServletRequest req, @RequestBody Map<String, Object> object) throws ResourceNotFoundException{
+	    	validateToken(req);
+	    	
+	    	String moMonth0 = object.get("moMonth0").toString();
+	    	String moMonth1 = object.get("moMonth1").toString();
+	    	String moMonth2 = object.get("moMonth2").toString();
+	    	BigDecimal versionAfterArDfRj = (BigDecimal) object.get("versionAfterArDfRj");
+
+	    	GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllMarketingOrderGroupCuring(moMonth0, moMonth1, moMonth2, versionAfterArDfRj);
+	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+	        return response;
+	    }
 
 }

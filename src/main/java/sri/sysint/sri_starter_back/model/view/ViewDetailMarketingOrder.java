@@ -228,6 +228,4 @@ public class ViewDetailMarketingOrder {
 			this.reject = reject;
 		}
 		
-		
-		
 }

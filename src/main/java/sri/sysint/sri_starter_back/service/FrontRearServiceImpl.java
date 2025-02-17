@@ -1,10 +1,7 @@
 package sri.sysint.sri_starter_back.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -26,80 +23,31 @@ public class FrontRearServiceImpl {
         this.frontRearRepo = frontRearRepo;
     }
 
-    public BigDecimal getNewId() {
-        return frontRearRepo.getNextId();
-    }
-
     public List<FrontRear> getAllFrontRear() {
-        Iterable<FrontRear> frontRears = frontRearRepo.findAll();
-        List<FrontRear> frontRearList = new ArrayList<>();
-        for (FrontRear item : frontRears) {
-            frontRearList.add(item);
-        }
-        return frontRearList;
+        return frontRearRepo.findAll();
     }
 
-    public List<FrontRear> getFrontRearById(BigDecimal id) {
-        return frontRearRepo.findListById(id);
+    public Optional<FrontRear> getFrontRearById(BigDecimal id) {
+        return frontRearRepo.findById(id);
     }
 
-    public List<FrontRear> saveFrontRearList(List<FrontRear> frontRearList) {
-        List<FrontRear> savedFrontRears = new ArrayList<>();
-        try {
-            for (FrontRear frontRear : frontRearList) {
-                if (frontRear.getID_FRONT_REAR() == null) {
-                    throw new IllegalArgumentException("ID_FRONT_REAR cannot be null");
-                }
-
-                frontRearRepo.insertNew(
-                    frontRear.getID_FRONT_REAR(),
-                    frontRear.getDETAIL_ID_MO(),
-                    BigDecimal.valueOf(1), 
-                    new Date(),            
-                    new Date()             
-                );
-
-                savedFrontRears.add(frontRear); 
-            }
-        } catch (Exception e) {
-            System.err.println("Error saving FrontRear list: " + e.getMessage());
-            throw e;
-        }
-        return savedFrontRears;
+    public List<FrontRear> getFrontRearByParallelId(BigDecimal id) {
+        return frontRearRepo.findListByIdParallel(id);
     }
 
-
-
-    public FrontRear updateFrontRear(FrontRear frontRear) {
-        try {
-            Optional<FrontRear> currentFrontRearOpt = frontRearRepo.findById(frontRear.getID_FRONT_REAR());
-            if (currentFrontRearOpt.isPresent()) {
-                FrontRear currentFrontRear = currentFrontRearOpt.get();
-
-                currentFrontRear.setDETAIL_ID_MO(frontRear.getDETAIL_ID_MO());
-                currentFrontRear.setLAST_UPDATE_DATE(new Date());
-                currentFrontRear.setLAST_UPDATED_BY(frontRear.getLAST_UPDATED_BY());
-
-                return frontRearRepo.save(currentFrontRear);
-            } else {
-                throw new RuntimeException("FrontRear with ID " + frontRear.getID_FRONT_REAR() + " not found.");
-            }
-        } catch (Exception e) {
-            System.err.println("Error updating FrontRear: " + e.getMessage());
-            throw e;
-        }
+    public List<FrontRear> getCheatingFrontRear(String moId1, String moId2, BigDecimal verCheating) {
+        return frontRearRepo.findCheatingFrontRearByMoIdAndVcheating(moId1, moId2, verCheating);
     }
 
-   
-    public List<Map<String, Object>> getAllMarketingOrders() {
-        return frontRearRepo.findAllDetailFrMarketingOrders();
+    public List<FrontRear> getCheatingFrontRearWithItemCuring(String moId1, String moId2, BigDecimal verCheating, String itemCuring) {
+        return frontRearRepo.findCheatingFrontRearByMoIdVcheatingandItemCuring(moId1, moId2, verCheating, itemCuring);
     }
 
-    public List<Map<String, Object>> getMarketingOrdersByFrontRearId(BigDecimal idFrontRear) {
-        return frontRearRepo.findMarketingOrderByFrontRearId(idFrontRear);
+    public List<FrontRear> getCheatingFrontRearWithParallelId(String moId1, String moId2, BigDecimal verCheating, BigDecimal parallelId) {
+        return frontRearRepo.findCheatingFrontRearByMoIdVcheatingandParallelId(moId1, moId2, verCheating, parallelId);
     }
 
-    public void deleteAllFrontRear() {
-        frontRearRepo.deleteAllFr();
+    public void saveFrontRear(String jsonInput) {
+        frontRearRepo.saveFrontRears(jsonInput);
     }
 }
