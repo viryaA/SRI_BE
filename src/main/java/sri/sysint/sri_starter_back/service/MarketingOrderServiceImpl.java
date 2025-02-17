@@ -1476,101 +1476,256 @@ public class MarketingOrderServiceImpl {
         // Start Save Detail Marketing Order FED
         
         MarketingOrder dataMarketingFed = mo.getMoFed();
+        System.out.println("MO_ID: " + dataMarketingFed.getMoId());
+        System.out.println("TYPE: " + dataMarketingFed.getType());
+        System.out.println("Revision PPC: " + dataMarketingFed.getRevisionPpc());
+
         List<HeaderMarketingOrder> dataHeaderFed = mo.getHeaderMoFed();
     	List<DetailMarketingOrder> dataDetailFed = mo.getDetailMoFed();
-    	for(DetailMarketingOrder data: dataDetailFed) {
-    		DetailMarketingOrder detailMo = new DetailMarketingOrder();
-    		BigDecimal detailId = getNewDetailMarketingOrderId();
+
+        for (DetailMarketingOrder detail : dataDetailFed) {
+            System.out.println(detail.getPartNumber());
+        }
+
+    	// for(DetailMarketingOrder data: dataDetailFed) {
+    	// 	DetailMarketingOrder detailMo = new DetailMarketingOrder();
+    	// 	BigDecimal detailId = getNewDetailMarketingOrderId();
     		
-            detailMo.setDetailId(detailId);
-            detailMo.setMoId(moIdFed);
-            detailMo.setDescription(data.getDescription());
-            detailMo.setCategory(data.getCategory());
-            detailMo.setMachineType(data.getMachineType());
-            detailMo.setPartNumber(data.getPartNumber());
-            detailMo.setCapacity(data.getCapacity());
-            detailMo.setQtyPerMould(data.getQtyPerMould());
-            detailMo.setQtyPerRak(data.getQtyPerRak());
-            detailMo.setMinOrder(data.getMinOrder());
-            detailMo.setMaxCapMonth0(data.getMaxCapMonth0());
-            detailMo.setMaxCapMonth1(data.getMaxCapMonth1());
-            detailMo.setMaxCapMonth2(data.getMaxCapMonth2());
-            detailMo.setInitialStock(data.getInitialStock());
-            detailMo.setSfMonth0(data.getSfMonth0());
-            detailMo.setSfMonth1(data.getSfMonth1());
-            detailMo.setSfMonth2(data.getSfMonth2());
-            detailMo.setMoMonth0(data.getMoMonth0());
-            detailMo.setMoMonth1(data.getMoMonth1());
-            detailMo.setMoMonth2(data.getMoMonth2());
-            detailMo.setLockStatusM0(data.getLockStatusM0());
-            detailMo.setLockStatusM1(data.getLockStatusM1());
-            detailMo.setLockStatusM2(data.getLockStatusM2());
-            detailMo.setTotalAr(data.getTotalAr());
-            detailMo.setAr(data.getAr());
-            detailMo.setDefect(data.getDefect());
-            detailMo.setReject(data.getReject());
+        //     detailMo.setDetailId(detailId);
+        //     detailMo.setMoId(moIdFed);
+        //     detailMo.setDescription(data.getDescription());
+        //     detailMo.setCategory(data.getCategory());
+        //     detailMo.setMachineType(data.getMachineType());
+        //     detailMo.setPartNumber(data.getPartNumber());
+        //     detailMo.setCapacity(data.getCapacity());
+        //     detailMo.setQtyPerMould(data.getQtyPerMould());
+        //     detailMo.setQtyPerRak(data.getQtyPerRak());
+        //     detailMo.setMinOrder(data.getMinOrder());
+        //     detailMo.setMaxCapMonth0(data.getMaxCapMonth0());
+        //     detailMo.setMaxCapMonth1(data.getMaxCapMonth1());
+        //     detailMo.setMaxCapMonth2(data.getMaxCapMonth2());
+        //     detailMo.setInitialStock(data.getInitialStock());
+        //     detailMo.setSfMonth0(data.getSfMonth0());
+        //     detailMo.setSfMonth1(data.getSfMonth1());
+        //     detailMo.setSfMonth2(data.getSfMonth2());
+        //     detailMo.setMoMonth0(data.getMoMonth0());
+        //     detailMo.setMoMonth1(data.getMoMonth1());
+        //     detailMo.setMoMonth2(data.getMoMonth2());
+        //     detailMo.setLockStatusM0(data.getLockStatusM0());
+        //     detailMo.setLockStatusM1(data.getLockStatusM1());
+        //     detailMo.setLockStatusM2(data.getLockStatusM2());
+        //     detailMo.setTotalAr(data.getTotalAr());
+        //     detailMo.setAr(data.getAr());
+        //     detailMo.setDefect(data.getDefect());
+        //     detailMo.setReject(data.getReject());
             
-            BigDecimal totalMO = detailMo.getMoMonth0();
-            BigDecimal prodType = BigDecimal.ZERO;
-            BigDecimal hk = BigDecimal.ZERO;
-            BigDecimal ppd = BigDecimal.ZERO;
+        //     BigDecimal totalMO = detailMo.getMoMonth0();
+        //     BigDecimal prodType = BigDecimal.ZERO;
+        //     BigDecimal hk = BigDecimal.ZERO;
+        //     BigDecimal ppd = BigDecimal.ZERO;
             
+        //     for (Product pro : prodList) {
+        //         if (pro.getPART_NUMBER().equals(detailMo.getPartNumber())) {
+        //             prodType = pro.getPRODUCT_TYPE_ID();
+        //             itemCuringFed = pro.getITEM_CURING();
+        //             break; 
+        //         }
+        //     }
+            
+        //     BigDecimal HKTT = dataHeaderFed.get(0).getTotalWdTt(); 
+        //     BigDecimal HKTL = dataHeaderFed.get(0).getTotalWdTl(); 
+            
+        // 	for (ProductType prot : prodTypeList) {
+        //         if (prot.getPRODUCT_TYPE_ID().equals(prodType)) {
+        //             if (prot.getPRODUCT_TYPE().equals("TT")) {
+        //                 hk = HKTT;
+        //                 fedttM0 = fedttM0.add(data.getMoMonth0());
+        //                 fedttM1 = fedttM1.add(data.getMoMonth1());
+        //                 fedttM2 = fedttM2.add(data.getMoMonth2());
+        //             } else if (prot.getPRODUCT_TYPE().equals("TL")) {
+        //                 hk = HKTL;
+        //                 fedtlM0 = fedtlM0.add(data.getMoMonth0());
+        //                 fedtlM1 = fedtlM1.add(data.getMoMonth1());
+        //                 fedtlM2 = fedtlM2.add(data.getMoMonth2());
+        //             }
+        //             break;
+        //         }
+        //     }
+        	
+        //     // Hitung PPD
+        //     if (hk.compareTo(BigDecimal.ZERO) != 0) {
+        //         ppd = totalMO.divide(hk, RoundingMode.HALF_UP);
+        //     } else {
+        //         System.err.println("Warning: HK is zero, setting ppd to zero.");
+        //         ppd = BigDecimal.ZERO;
+        //     }
+            
+        //     detailMo.setPpd(ppd);
+            
+        //     // Hitung Cavity
+        //     BigDecimal cav = ppd.divide(data.getCapacity(), RoundingMode.HALF_UP);
+        //     detailMo.setCav(cav.compareTo(BigDecimal.ONE) < 0 ? BigDecimal.ONE : cav);
+            
+        //     // Hitung Airbag Machine
+        //     for (ItemCuring cur : curingList) {
+        //         if (cur.getITEM_CURING().compareTo(itemCuringFed) == 0) {
+        //             if (cur.getMACHINE_TYPE().compareTo("A/B") == 0) {
+        //                 fedabM0 = fedabM0.add(data.getMoMonth0());
+        //                 fedabM1 = fedabM1.add(data.getMoMonth1());
+        //                 fedabM2 = fedabM2.add(data.getMoMonth2());
+        //             }
+        //         }
+        //     }
+            
+        //     detailTempFed.add(detailMarketingOrderRepo.save(detailMo));
+    	// }
+    	
+        Map<String, List<DetailMarketingOrder>> itemCuringMap = new HashMap<>();
+
+        // Pisahkan data berdasarkan ITEM_CURING
+        for (DetailMarketingOrder data : dataDetailFed) {
+            String itemCuring = null;
             for (Product pro : prodList) {
-                if (pro.getPART_NUMBER().equals(detailMo.getPartNumber())) {
-                    prodType = pro.getPRODUCT_TYPE_ID();
-                    itemCuringFed = pro.getITEM_CURING();
-                    break; 
-                }
-            }
-            
-            BigDecimal HKTT = dataHeaderFed.get(0).getTotalWdTt(); 
-            BigDecimal HKTL = dataHeaderFed.get(0).getTotalWdTl(); 
-            
-        	for (ProductType prot : prodTypeList) {
-                if (prot.getPRODUCT_TYPE_ID().equals(prodType)) {
-                    if (prot.getPRODUCT_TYPE().equals("TT")) {
-                        hk = HKTT;
-                        fedttM0 = fedttM0.add(data.getMoMonth0());
-                        fedttM1 = fedttM1.add(data.getMoMonth1());
-                        fedttM2 = fedttM2.add(data.getMoMonth2());
-                    } else if (prot.getPRODUCT_TYPE().equals("TL")) {
-                        hk = HKTL;
-                        fedtlM0 = fedtlM0.add(data.getMoMonth0());
-                        fedtlM1 = fedtlM1.add(data.getMoMonth1());
-                        fedtlM2 = fedtlM2.add(data.getMoMonth2());
-                    }
+                if (pro.getPART_NUMBER().equals(data.getPartNumber())) {
+                    itemCuring = pro.getITEM_CURING();
                     break;
                 }
             }
-        	
-            // Hitung PPD
-            if (hk.compareTo(BigDecimal.ZERO) != 0) {
-                ppd = totalMO.divide(hk, RoundingMode.HALF_UP);
-            } else {
-                System.err.println("Warning: HK is zero, setting ppd to zero.");
-                ppd = BigDecimal.ZERO;
+
+            System.out.println("Masuk 1");
+
+            if (itemCuring != null) {
+                itemCuringMap.computeIfAbsent(itemCuring, k -> new ArrayList<>()).add(data);
             }
+        }
+
+        for (Map.Entry<String, List<DetailMarketingOrder>> entry : itemCuringMap.entrySet()) {
+            List<DetailMarketingOrder> dataList = entry.getValue();
             
-            detailMo.setPpd(ppd);
+            System.out.println("Masuk 2");
+
+            // Cek apakah ada minimal 1 OEM dan 1 HGP
+            boolean hasOEM = dataList.stream().anyMatch(d -> d.getCategory().contains("OEM"));
+            boolean hasHGP = dataList.stream().anyMatch(d -> d.getCategory().contains("HGP"));
             
-            // Hitung Cavity
-            BigDecimal cav = ppd.divide(data.getCapacity(), RoundingMode.HALF_UP);
-            detailMo.setCav(cav.compareTo(BigDecimal.ONE) < 0 ? BigDecimal.ONE : cav);
-            
-            // Hitung Airbag Machine
-            for (ItemCuring cur : curingList) {
-                if (cur.getITEM_CURING().compareTo(itemCuringFed) == 0) {
-                    if (cur.getMACHINE_TYPE().compareTo("A/B") == 0) {
-                        fedabM0 = fedabM0.add(data.getMoMonth0());
-                        fedabM1 = fedabM1.add(data.getMoMonth1());
-                        fedabM2 = fedabM2.add(data.getMoMonth2());
+            if (hasOEM && hasHGP) {
+                BigDecimal totalDefectOEM = BigDecimal.ZERO;
+                BigDecimal totalMoMonth0HGP = BigDecimal.ZERO;
+
+                System.out.println("Masuk 3");
+
+                // Hitung Total Defect dan MO Gross
+                for (DetailMarketingOrder data : dataList) {
+                    BigDecimal totalDefect = BigDecimal.ZERO;
+                    BigDecimal moGross = BigDecimal.ZERO;
+
+                    if (data.getCategory().contains("OEM")) {
+                        totalDefect = data.getMoMonth0().multiply(data.getDefect()).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+                        totalDefectOEM = totalDefectOEM.add(totalDefect);
+                    }
+
+                    System.out.println("Masuk 4");
+                    
+                    if (data.getCategory().contains("HGP")) {
+                        totalMoMonth0HGP = totalMoMonth0HGP.add(data.getMoMonth0());
+                    }
+
+                    data.setTotalDefect(totalDefect);  // Set Total Defect
+                }
+
+                // Cek apakah total defect OEM > MO_MONTH_0 HGP
+                for (DetailMarketingOrder data : dataList) {
+                    BigDecimal moGross = BigDecimal.ZERO;
+                    
+                    System.out.println("Masuk 5");
+
+                    if (data.getCategory().contains("OEM")) {
+                        moGross = data.getTotalDefect().add(data.getMoMonth0());
+                    } else if (data.getCategory().contains("HGP")) {
+                        if (totalDefectOEM.compareTo(totalMoMonth0HGP) > 0) {
+                            moGross = BigDecimal.ZERO;
+                        } else {
+                            moGross = data.getMoMonth0().subtract(totalDefectOEM);
+                        }
+                    }
+
+                    data.setMoGross(moGross);  // Set MO Gross
+
+                    // Hitung Total AR
+                    if (data.getAr().compareTo(BigDecimal.ZERO) > 0) {
+                        BigDecimal persentase = data.getAr().divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP);
+                        BigDecimal totalAr = data.getMoGross().divide(persentase, 10, RoundingMode.HALF_UP);
+                        data.setTotalAr(totalAr);
+
+                        BigDecimal totalArRounded = totalAr.setScale(0, RoundingMode.UP);
+                        data.setTotalAr(totalArRounded);
+                    } else {
+                        data.setTotalAr(BigDecimal.ZERO);
+                    }
+
+                }
+            } else {
+                for (DetailMarketingOrder data : dataList) {
+                	BigDecimal persentase = data.getDefect().divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP);
+                    BigDecimal totalDefect = data.getMoMonth0().multiply(persentase).setScale(0, RoundingMode.HALF_UP);
+                    data.setTotalDefect(totalDefect);
+
+                    
+                    BigDecimal moGross = totalDefect.add(data.getMoMonth0());
+                    data.setMoGross(moGross);
+                    
+                    if (data.getAr().compareTo(BigDecimal.ZERO) > 0) {
+                    	BigDecimal persentase1 = data.getAr().divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP);
+                        BigDecimal totalAr = data.getMoGross().divide(persentase1, 10, RoundingMode.HALF_UP);
+                        data.setTotalAr(totalAr);
+
+                        BigDecimal totalArRounded = totalAr.setScale(0, RoundingMode.UP);
+                        data.setTotalAr(totalArRounded);
+                    } else {
+                        data.setTotalAr(BigDecimal.ZERO);
                     }
                 }
             }
-            
-            detailTempFed.add(detailMarketingOrderRepo.save(detailMo));
-    	}
-    	
+
+            for (DetailMarketingOrder data : dataList) {
+                DetailMarketingOrder detailMo = new DetailMarketingOrder();
+                BigDecimal detailId = getNewDetailMarketingOrderId();
+                
+                detailMo.setDetailId(detailId);
+                detailMo.setMoId(moIdFed);
+                detailMo.setDescription(data.getDescription());
+                detailMo.setCategory(data.getCategory());
+                detailMo.setMachineType(data.getMachineType());
+                detailMo.setPartNumber(data.getPartNumber());
+                detailMo.setCapacity(data.getCapacity());
+                detailMo.setQtyPerMould(data.getQtyPerMould());
+                detailMo.setQtyPerRak(data.getQtyPerRak());
+                detailMo.setMinOrder(data.getMinOrder());
+                detailMo.setMaxCapMonth0(data.getMaxCapMonth0());
+                detailMo.setMaxCapMonth1(data.getMaxCapMonth1());
+                detailMo.setMaxCapMonth2(data.getMaxCapMonth2());
+                detailMo.setInitialStock(data.getInitialStock());
+                detailMo.setSfMonth0(data.getSfMonth0());
+                detailMo.setSfMonth1(data.getSfMonth1());
+                detailMo.setSfMonth2(data.getSfMonth2());
+                detailMo.setMoMonth0(data.getMoMonth0());
+                detailMo.setMoMonth1(data.getMoMonth1());
+                detailMo.setMoMonth2(data.getMoMonth2());
+                detailMo.setLockStatusM0(data.getLockStatusM0());
+                detailMo.setLockStatusM1(data.getLockStatusM1());
+                detailMo.setLockStatusM2(data.getLockStatusM2());
+                detailMo.setTotalAr(data.getTotalAr());
+                detailMo.setAr(data.getAr());
+                detailMo.setDefect(data.getDefect());
+                detailMo.setReject(data.getReject());
+                detailMo.setTotalDefect(data.getTotalDefect());
+                detailMo.setMoGross(data.getMoGross());
+
+                detailTempFed.add(detailMarketingOrderRepo.save(detailMo));
+            }
+        }
+
+
     	//End Save Detail Marketing Order FED
     	
     	// Save Header Marketing Order FED
@@ -1672,6 +1827,9 @@ public class MarketingOrderServiceImpl {
         // Start Save Detail Marketing Order FDR
         
         MarketingOrder dataMarketingFdr = mo.getMoFdr();
+        System.out.println("MO_ID: " + dataMarketingFdr.getMoId());
+        System.out.println("TYPE: " + dataMarketingFdr.getType());
+        System.out.println("Revision PPC: " + dataMarketingFdr.getRevisionPpc());
         List<HeaderMarketingOrder> dataHeaderFdr = mo.getHeaderMoFdr();
     	List<DetailMarketingOrder> dataDetailFdr = mo.getDetailMoFdr();
     	for(DetailMarketingOrder data: dataDetailFdr) {
@@ -1701,7 +1859,6 @@ public class MarketingOrderServiceImpl {
             detailMo.setLockStatusM0(data.getLockStatusM0());
             detailMo.setLockStatusM1(data.getLockStatusM1());
             detailMo.setLockStatusM2(data.getLockStatusM2());
-            detailMo.setTotalAr(data.getTotalAr());
             detailMo.setAr(data.getAr());
             detailMo.setDefect(data.getDefect());
             detailMo.setReject(data.getReject());
@@ -1762,6 +1919,34 @@ public class MarketingOrderServiceImpl {
                         fdrabM2 = fdrabM2.add(data.getMoMonth2());
                     }
                 }
+            }
+            
+            BigDecimal persentase = data.getDefect().divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP);
+            BigDecimal totalDefect = data.getMoMonth0().multiply(persentase).setScale(0, RoundingMode.HALF_UP);
+            detailMo.setTotalDefect(totalDefect);
+
+            BigDecimal moGross = totalDefect.add(data.getMoMonth0());
+            detailMo.setMoGross(moGross);
+            
+            System.out.println("fdr bang");
+            
+            if (data.getAr().compareTo(BigDecimal.ZERO) > 0) {
+            	BigDecimal persentase1 = data.getAr().divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP);
+                BigDecimal totalAr = moGross.divide(persentase1, 10, RoundingMode.HALF_UP);
+                
+                detailMo.setTotalAr(totalAr);
+
+                BigDecimal totalArRounded = totalAr.setScale(0, RoundingMode.UP);
+                detailMo.setTotalAr(totalArRounded);
+                
+                System.out.println("MoGross: " + moGross);
+                System.out.println("Ar: " + data.getAr());
+                System.out.println("Persentase1: " + persentase1);
+                System.out.println("TotalAr sebelum dibulatkan: " + totalAr);
+                System.out.println("totalArRounded : " + totalArRounded);
+
+            } else {
+            	detailMo.setTotalAr(BigDecimal.ZERO);
             }
             
             detailTempFdr.add(detailMarketingOrderRepo.save(detailMo));
@@ -1841,7 +2026,7 @@ public class MarketingOrderServiceImpl {
 			    TopVAfterArRjDf1 = (TopVAfterArRjDf1 != null) ? TopVAfterArRjDf1 : BigDecimal.ZERO;            
 			    TopRevMarketing1 = (TopRevMarketing1 != null) ? TopRevMarketing1 : BigDecimal.ZERO;
 
-            dataMarketingFdr.setvBeforeArRjDf(dataMarketingFed.getvBeforeArRjDf());
+            dataMarketingFdr.setvBeforeArRjDf(dataMarketingFdr.getvBeforeArRjDf());
             dataMarketingFdr.setvAfterArRjDf(TopVAfterArRjDf.add(BigDecimal.ONE));
         
         marketingOrderRepo.save(dataMarketingFdr);
@@ -1870,9 +2055,10 @@ public class MarketingOrderServiceImpl {
     public GetAllTypeMarketingOrder getAllTypeMarketingOrder(String dateMoMonth0, String dateMoMonth1, String dateMoMonth2) {
     	
     	GetAllTypeMarketingOrder result = new GetAllTypeMarketingOrder();
-    	
-    	String moIdFed = null;
+    	    	
+        String moIdFed = null;
     	String moIdFdr = null;
+
     	List<MarketingOrder> dataMo = findMoAllTypeByMonth(dateMoMonth0, dateMoMonth1, dateMoMonth2);
     	
     	for (MarketingOrder mo : dataMo) {
@@ -1885,10 +2071,19 @@ public class MarketingOrderServiceImpl {
     	    }
     	}
     	
+        System.out.println("Masuk 1 Data MO");
+        for (MarketingOrder mo : dataMo) {
+            System.out.println(mo.getMoId());
+        }
+    	
     	//List Product Untuk Item Curing
     	List<Product> prodList = productRepo.findAll();
     	    	
-    	
+        System.out.println("Masuk 2 Data prodList");
+        for (Product pl : prodList) {
+            System.out.println(pl);
+        }
+        	
     	//Set Header & Detail FED 
         List<HeaderMarketingOrder> hmoFed = headerMarketingOrderRepo.findByMoId(moIdFed);
         List<DetailMarketingOrder> dmoFed = detailMarketingOrderRepo.findByMoId(moIdFed);
@@ -1933,6 +2128,16 @@ public class MarketingOrderServiceImpl {
             detailResponsesFed.add(detailResponse);
         }
         
+        System.out.println("Masuk 3 Data detailResponsesFed");
+        for (ViewDetailMarketingOrder drfed : detailResponsesFed) {
+            System.out.println(drfed);
+        }
+        
+        System.out.println("Masuk 4 Data hmoFed");
+        for (HeaderMarketingOrder hmfed : hmoFed) {
+            System.out.println(hmfed);
+        }
+
         result.setHeaderMarketingOrderFed(hmoFed);
     	result.setDetailMarketingOrderFed(detailResponsesFed);
         
@@ -1986,7 +2191,7 @@ public class MarketingOrderServiceImpl {
     	return result;
     }
     
- public GetAllTypeMarketingOrder getAllMarketingOrderGroupCuring(String dateMoMonth0, String dateMoMonth1, String dateMoMonth2) {
+    public GetAllTypeMarketingOrder getAllMarketingOrderGroupCuring(String dateMoMonth0, String dateMoMonth1, String dateMoMonth2) {
     	
     	GetAllTypeMarketingOrder result = new GetAllTypeMarketingOrder();
     	
@@ -2006,6 +2211,9 @@ public class MarketingOrderServiceImpl {
     	    }
     	}
     	
+        System.out.println("moIdFed : " + moIdFed);
+        System.out.println("moIdFdr : " + moIdFdr);
+        
     	//List Product Untuk Item Curing
     	List<Product> prodList = productRepo.findAll();
     	    	

@@ -248,45 +248,50 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 		List<Map<String, Object>> findOnlyMonth();
 		
 		@Query(value = "SELECT " +
-	            "MO_ID, " +
-	            "TYPE, " +
-	            "DATE_VALID, " +
-	            "REVISION_PPC, " +
-	            "REVISION_MARKETING, " +
-	            "MONTH_0, " +
-	            "MONTH_1, " +
-	            "MONTH_2, " +
-	            "STATUS_FILLED, " +
-	            "STATUS, " +
-	            "CREATION_DATE, " +
-	            "CREATED_BY, " +
-	            "LAST_UPDATE_DATE, " +
-	            "LAST_UPDATED_BY " +
-	            "FROM ( " +
-	            "    SELECT " +
-	            "        MO_ID, " +
-	            "        TYPE, " +
-	            "        DATE_VALID, " +
-	            "        REVISION_PPC, " +
-	            "        REVISION_MARKETING, " +
-	            "        MONTH_0, " +
-	            "        MONTH_1, " +
-	            "        MONTH_2, " +
-	            "        STATUS_FILLED, " +
-	            "        STATUS, " +
-	            "        CREATION_DATE, " +
-	            "        CREATED_BY, " +
-	            "        LAST_UPDATE_DATE, " +
-	            "        LAST_UPDATED_BY, " +
-	            "        ROW_NUMBER() OVER (PARTITION BY TYPE ORDER BY REVISION_PPC DESC, REVISION_MARKETING DESC) AS rn " +
-	            "    FROM SRI_IMPP_T_MARKETINGORDER " +
-	            "    WHERE TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
-	            "      AND TO_DATE(MONTH_1, 'DD-MM-YYYY') = TO_DATE(:month1, 'DD-MM-YYYY') " +
-	            "      AND TO_DATE(MONTH_2, 'DD-MM-YYYY') = TO_DATE(:month2, 'DD-MM-YYYY') " +
-	            "      AND TYPE IN ('FED', 'FDR', 'REVISION_MARKETING', 'REVISION_PPC') " +
-	            ") " +
-	            "WHERE rn = 1", nativeQuery = true)
+            "MO_ID, " +
+            "TYPE, " +
+            "DATE_VALID, " +
+            "REVISION_PPC, " +
+            "REVISION_MARKETING, " +
+            "MONTH_0, " +
+            "MONTH_1, " +
+            "MONTH_2, " +
+            "STATUS_FILLED, " +
+            "STATUS, " +
+            "CREATION_DATE, " +
+            "CREATED_BY, " +
+            "LAST_UPDATE_DATE, " +
+            "LAST_UPDATED_BY, " +
+            "V_BEFORE_AR_RJ_DF, " +
+            "V_AFTER_AR_RJ_DF " +
+            "FROM ( " +
+            "    SELECT " +
+            "        MO_ID, " +
+            "        TYPE, " +
+            "        DATE_VALID, " +
+            "        REVISION_PPC, " +
+            "        REVISION_MARKETING, " +
+            "        MONTH_0, " +
+            "        MONTH_1, " +
+            "        MONTH_2, " +
+            "        STATUS_FILLED, " +
+            "        STATUS, " +
+            "        CREATION_DATE, " +
+            "        CREATED_BY, " +
+            "        LAST_UPDATE_DATE, " +
+            "        LAST_UPDATED_BY, " +
+            "        V_BEFORE_AR_RJ_DF, " +
+            "        V_AFTER_AR_RJ_DF, " +
+            "        ROW_NUMBER() OVER (PARTITION BY TYPE ORDER BY REVISION_PPC DESC, REVISION_MARKETING DESC) AS rn " +
+            "    FROM SRI_IMPP_T_MARKETINGORDER " +
+            "    WHERE TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
+            "      AND TO_DATE(MONTH_1, 'DD-MM-YYYY') = TO_DATE(:month1, 'DD-MM-YYYY') " +
+            "      AND TO_DATE(MONTH_2, 'DD-MM-YYYY') = TO_DATE(:month2, 'DD-MM-YYYY') " +
+            "      AND TYPE IN ('FED', 'FDR', 'REVISION_MARKETING', 'REVISION_PPC') " +
+            "      AND V_AFTER_AR_RJ_DF = 0) " +
+            "WHERE rn = 1", nativeQuery = true)
 		List<MarketingOrder> findMoAllTypeByMonth(@Param("month0") String moMonth0, @Param("month1") String moMonth1, @Param("month2") String moMonth2);
+
 		
 		@Query(value = "SELECT MONTH_0, MONTH_1, MONTH_2 " +
 	               "FROM SRI_IMPP_T_MARKETINGORDER " +
@@ -341,6 +346,8 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 			    + "    RankedOrders.CREATED_BY, "
 			    + "    RankedOrders.LAST_UPDATE_DATE, "
 			    + "    RankedOrders.LAST_UPDATED_BY "
+			    + "    RankedOrders.TOTAL_DEFCT "
+			    + "    RankedOrders.MO_GROSS "
 			    + "FROM "
 			    + "    RankedOrders "
 			    + "WHERE "

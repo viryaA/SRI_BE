@@ -136,6 +136,8 @@ public interface DetailMarketingOrderRepo extends JpaRepository<DetailMarketingO
 		    + "    RankedOrders.CREATED_BY, "
 		    + "    RankedOrders.LAST_UPDATE_DATE, "
 		    + "    RankedOrders.LAST_UPDATED_BY "
+		    + "    RankedOrders.TOTAL_DEFCT "
+		    + "    RankedOrders.MO_GROSS "			
 		    + "FROM "
 		    + "    RankedOrders "
 		    + "WHERE "
