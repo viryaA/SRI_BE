@@ -1669,7 +1669,6 @@ public class MarketingOrderServiceImpl {
                 	BigDecimal persentase = data.getDefect().divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP);
                     BigDecimal totalDefect = data.getMoMonth0().multiply(persentase).setScale(0, RoundingMode.HALF_UP);
                     data.setTotalDefect(totalDefect);
-
                     
                     BigDecimal moGross = totalDefect.add(data.getMoMonth0());
                     data.setMoGross(moGross);

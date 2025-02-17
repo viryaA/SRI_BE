@@ -34,6 +34,11 @@ public class FrontRearServiceImpl {
     public List<FrontRear> getFrontRearByParallelId(BigDecimal id) {
         return frontRearRepo.findListByIdParallel(id);
     }
+    
+    public List<FrontRear> getCheatingFrontRearByMoId(String moId1, String moId2) {
+        return frontRearRepo.findCheatingFrontRearByMoId(moId1, moId2);
+    }
+    
 
     public List<FrontRear> getCheatingFrontRear(String moId1, String moId2, BigDecimal verCheating) {
         return frontRearRepo.findCheatingFrontRearByMoIdAndVcheating(moId1, moId2, verCheating);

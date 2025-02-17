@@ -25,6 +25,12 @@ public interface FrontRearRepo extends JpaRepository<FrontRear, BigDecimal>{
 	List<FrontRear> findListByIdParallel(@Param("id") BigDecimal id);
 
     @Query("SELECT f FROM FrontRear  f WHERE f.moId1 IN (:moId1, :moId2) " +
+            "AND f.moId2 IN (:moId1, :moId2) ")
+     List<FrontRear> findCheatingFrontRearByMoId(
+             @Param("moId1") String moId1,
+             @Param("moId2") String moId2);
+    
+    @Query("SELECT f FROM FrontRear  f WHERE f.moId1 IN (:moId1, :moId2) " +
             "AND f.moId2 IN (:moId1, :moId2) " +
             "AND f.versionCheating = :verCheating")
      List<FrontRear> findCheatingFrontRearByMoIdAndVcheating(

@@ -59,6 +59,13 @@ public class FrontRearController {
         List<FrontRear> frontRearList = frontRearService.getFrontRearByParallelId(id);
         return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
     }
+    
+    @GetMapping("/getCheatingfrontRearbyMoId")
+    public ResponseEntity<Response> getCheatingFrontRear(HttpServletRequest req, @RequestParam String moId1, @RequestParam String moId2) throws ResourceNotFoundException {
+        validateToken(req);
+        List<FrontRear> frontRearList = frontRearService.getCheatingFrontRearByMoId(moId1, moId2);
+        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
+    }
 
     @GetMapping("/getCheatingfrontRearbyMoIdandVcheating")
     public ResponseEntity<Response> getCheatingFrontRear(HttpServletRequest req, @RequestParam String moId1, @RequestParam String moId2, @RequestParam BigDecimal verCheating) throws ResourceNotFoundException {
