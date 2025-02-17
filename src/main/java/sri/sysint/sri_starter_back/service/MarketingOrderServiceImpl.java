@@ -1927,9 +1927,7 @@ public class MarketingOrderServiceImpl {
 
             BigDecimal moGross = totalDefect.add(data.getMoMonth0());
             detailMo.setMoGross(moGross);
-            
-            System.out.println("fdr bang");
-            
+                        
             if (data.getAr().compareTo(BigDecimal.ZERO) > 0) {
             	BigDecimal persentase1 = data.getAr().divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP);
                 BigDecimal totalAr = moGross.divide(persentase1, 10, RoundingMode.HALF_UP);
@@ -1939,12 +1937,6 @@ public class MarketingOrderServiceImpl {
                 BigDecimal totalArRounded = totalAr.setScale(0, RoundingMode.UP);
                 detailMo.setTotalAr(totalArRounded);
                 
-                System.out.println("MoGross: " + moGross);
-                System.out.println("Ar: " + data.getAr());
-                System.out.println("Persentase1: " + persentase1);
-                System.out.println("TotalAr sebelum dibulatkan: " + totalAr);
-                System.out.println("totalArRounded : " + totalArRounded);
-
             } else {
             	detailMo.setTotalAr(BigDecimal.ZERO);
             }
@@ -2191,14 +2183,14 @@ public class MarketingOrderServiceImpl {
     	return result;
     }
     
-    public GetAllTypeMarketingOrder getAllMarketingOrderGroupCuring(String dateMoMonth0, String dateMoMonth1, String dateMoMonth2) {
+    public GetAllTypeMarketingOrder getAllMarketingOrderGroupCuring(String dateMoMonth0, String dateMoMonth1, String dateMoMonth2, BigDecimal versionAfterArDfRj) {
     	
     	GetAllTypeMarketingOrder result = new GetAllTypeMarketingOrder();
     	
     	//Search data MO FED FDR
     	String moIdFed = null;
     	String moIdFdr = null;
-    	List<MarketingOrder> dataMo = findMoAllTypeByMonth(dateMoMonth0, dateMoMonth1, dateMoMonth2);
+    	List<MarketingOrder> dataMo = findMoAllTypeByMonthAfterAr(dateMoMonth0, dateMoMonth1, dateMoMonth2, versionAfterArDfRj);
     	
     	//Loop cek berdasarkan type dan set marketing ordernya
     	for (MarketingOrder mo : dataMo) {
@@ -2311,7 +2303,14 @@ public class MarketingOrderServiceImpl {
     	return result;
     }
     
-    public List<MarketingOrder> findMoAllTypeByMonth(String dateMoMonth0, String dateMoMonth1, String dateMoMonth2){
+    private List<MarketingOrder> findMoAllTypeByMonthAfterAr(String dateMoMonth0, String dateMoMonth1,
+			String dateMoMonth2, BigDecimal versionAfterArDfRj) {
+    	List<MarketingOrder> data = marketingOrderRepo.findMoAllTypeByMonthAfterAr(dateMoMonth0, dateMoMonth1, dateMoMonth2, versionAfterArDfRj);
+    	return data;
+	}
+
+
+	public List<MarketingOrder> findMoAllTypeByMonth(String dateMoMonth0, String dateMoMonth1, String dateMoMonth2){
     	List<MarketingOrder> data = marketingOrderRepo.findMoAllTypeByMonth(dateMoMonth0, dateMoMonth1, dateMoMonth2);
     	return data;
     }

@@ -553,7 +553,9 @@ public class MarketingOrderController {
 	    	String moMonth0 = object.get("moMonth0").toString();
 	    	String moMonth1 = object.get("moMonth1").toString();
 	    	String moMonth2 = object.get("moMonth2").toString();
-	    	GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllMarketingOrderGroupCuring(moMonth0, moMonth1, moMonth2);
+	    	BigDecimal versionAfterArDfRj = (BigDecimal) object.get("versionAfterArDfRj");
+
+	    	GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllMarketingOrderGroupCuring(moMonth0, moMonth1, moMonth2, versionAfterArDfRj);
 	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	        return response;
 	    }
