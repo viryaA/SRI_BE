@@ -72,6 +72,25 @@ public class MachineProductController {
         );
     }
 
+    @GetMapping("/getMachineProductsmoByIdMo")
+    public Response getMachineProductsByVersion(
+            HttpServletRequest req,
+            @RequestParam("moId1") String moId1,
+            @RequestParam("moId2") String moId2) {
+        
+        List<MachineProduct> filteredProducts = machineProductServiceImpl
+                .findCheatingMacProdByMoId(moId1, moId2);
+
+        return new Response(
+                new Date(),
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                filteredProducts
+        );
+    }    
+
     @GetMapping("/getMachineProductsmoByCuring")
     public Response getMachineProductsByCuring(
             HttpServletRequest req, 

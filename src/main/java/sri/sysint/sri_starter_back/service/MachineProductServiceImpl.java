@@ -30,6 +30,10 @@ public class MachineProductServiceImpl {
     public List<MachineProduct> findCheatingMacProdByMoIdAndVcheating(String moId1, String moId2, BigDecimal verCheating) {
         return machineProductRepo.findCheatingMacProdByMoIdAndVcheating(moId1, moId2, verCheating);
     }
+
+    public List<MachineProduct> findCheatingMacProdByMoId(String moId1, String moId2) {
+        return machineProductRepo.findCheatingMacProdByMoId(moId1, moId2);
+    }    
     
     public List<MachineProduct> findCheatingMacProdByMoIdVcheatingAndItemCuring(String moId1, String moId2, BigDecimal verCheating, String itemCuring) {
         return machineProductRepo.findCheatingMacProdByMoIdVcheatingandItemCuring(moId1, moId2, verCheating, itemCuring);
