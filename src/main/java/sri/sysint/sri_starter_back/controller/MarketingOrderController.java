@@ -553,7 +553,17 @@ public class MarketingOrderController {
 	    	String moMonth0 = object.get("moMonth0").toString();
 	    	String moMonth1 = object.get("moMonth1").toString();
 	    	String moMonth2 = object.get("moMonth2").toString();
-	    	BigDecimal versionAfterArDfRj = (BigDecimal) object.get("versionAfterArDfRj");
+
+			Object versionAfterArDfRjObject = object.get("versionAfterArDfRj");
+
+			BigDecimal versionAfterArDfRj;
+			if (versionAfterArDfRjObject instanceof Integer) {
+				versionAfterArDfRj = new BigDecimal((Integer) versionAfterArDfRjObject);
+			} else if (versionAfterArDfRjObject instanceof BigDecimal) {
+				versionAfterArDfRj = (BigDecimal) versionAfterArDfRjObject;
+			} else {
+				throw new IllegalArgumentException("Invalid type for versionAfterArDfRj");
+			}
 
 	    	GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllMarketingOrderGroupCuring(moMonth0, moMonth1, moMonth2, versionAfterArDfRj);
 	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);

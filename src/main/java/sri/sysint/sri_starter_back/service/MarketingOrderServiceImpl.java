@@ -2191,7 +2191,6 @@ public class MarketingOrderServiceImpl {
     	String moIdFdr = null;
     	List<MarketingOrder> dataMo = findMoAllTypeByMonthAfterAr(dateMoMonth0, dateMoMonth1, dateMoMonth2, versionAfterArDfRj);
     	
-    	//Loop cek berdasarkan type dan set marketing ordernya
     	for (MarketingOrder mo : dataMo) {
     	    if ("FDR".equals(mo.getType())) {
     	    	moIdFdr = mo.getMoId();
@@ -2211,8 +2210,14 @@ public class MarketingOrderServiceImpl {
     	
     	//Set Header & Detail FED 
         List<HeaderMarketingOrder> hmoFed = headerMarketingOrderRepo.findByMoId(moIdFed);
+        System.out.println("masuk 1");
+
         List<DetailMarketingOrder> dmoFed = detailMarketingOrderRepo.findByMoIdGroupCuring(moIdFed);
+        System.out.println("masuk 2");
+
         List<ViewDetailMarketingOrder> detailResponsesFed = new ArrayList<>();
+        System.out.println("masuk 3");
+
         for (DetailMarketingOrder detail : dmoFed) {
         	ViewDetailMarketingOrder detailResponse = new ViewDetailMarketingOrder();
         	detailResponse.setDetailId(detail.getDetailId());
@@ -2256,7 +2261,11 @@ public class MarketingOrderServiceImpl {
         
     	//Set header & Detail FDR
         List<HeaderMarketingOrder> hmoFdr = headerMarketingOrderRepo.findByMoId(moIdFdr);
+        System.out.println("masuk 4");
+
         List<DetailMarketingOrder> dmoFdr = detailMarketingOrderRepo.findByMoIdGroupCuring(moIdFdr);
+        System.out.println("masuk 5");
+
         List<ViewDetailMarketingOrder> detailResponsesFdr = new ArrayList<>();
         for (DetailMarketingOrder detail : dmoFdr) {
         	ViewDetailMarketingOrder detailResponse = new ViewDetailMarketingOrder();

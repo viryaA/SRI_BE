@@ -878,15 +878,6 @@ public class MonthlyPlanServiceImpl {
 	    return BigDecimal.ZERO;
 	}
 	
-	public boolean checkMo() {
-		for(DetailMo dtMo : detailMarketingOrderList) {
-			if (dtMo.getTotalAR().compareTo(dtMo.getProductionLimit()) > 0) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	public boolean validateChangeMould(Date dateChange, int shift) {
 		int i = 0;
 		for(ChangeMould obj : endProductList) {
@@ -1150,49 +1141,6 @@ public class MonthlyPlanServiceImpl {
 		endProductList.add(obj);
 	}
 	
-	public void clearDetailMarketingBatch1() {
-	    Iterator<Map<String, Object>> iterator = detailMarkOrderList.iterator();
-
-	    while (iterator.hasNext()) {
-	        Map<String, Object> dtMo = iterator.next();
-	        BigDecimal partNumber = new BigDecimal(dtMo.get("PART_NUMBER").toString());
-
-	        for (TempOrder tempO : tempOrderList) {
-	            if (partNumber.equals(tempO.getPratNum()) && tempO.getMarketingOrder().intValue() < 0) {
-	                iterator.remove(); // Menghapus elemen dengan aman
-	                break; // Hentikan iterasi tempOrderList setelah ditemukan
-	            }
-	        }
-	    }
-	}
-	
-	public BigDecimal getMarkOrderExist(BigDecimal partNum) {
-		for (TempOrder tempO : tempOrderList) {
-			if(tempO.getPratNum().equals(partNum)){
-				return tempO.getMarketingOrder();
-			}
-		}
-		return BigDecimal.ZERO;
-	}
-	
-	public boolean checkActiveMachine(String wct) {
-		for(MachineCuring mc : machineCuringUsedList) {
-			if(mc.getWORK_CENTER_TEXT().equals(wct) && mc.getSTATUS_USAGE().equals(BigDecimal.ZERO)) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	public void getShiftByPartnumber(BigDecimal partnum){
-		newShiftListPartNum.clear();
-		for(ShiftMonthlyPlan sf : newShiftList) {
-			if(sf.getPART_NUMBER().equals(partnum)) {
-				newShiftListPartNum.add(sf);
-			}
-		}
-	}
-	
 	public boolean checkAllActiveMachine() {
 		for(MachineCuring mc : machineCuringList) {
 			if(mc.getSTATUS().equals(BigDecimal.ONE)) {
@@ -1217,36 +1165,36 @@ public class MonthlyPlanServiceImpl {
     	
     	List<MarketingOrder> marketingOrderList = marketingOrderRepo.findByMonthYear(month, year); //flowchart 4
 
-    	 //flowchart 5 6 7 8
+    	//flowchart 5 6 7 8
     	System.out.println("Done flow 5");
     	System.out.println(marketingOrderList.get(0).getMoId() + " " + marketingOrderList.get(1).getMoId());
     	
-    System.out.println("check");
+    	System.out.println("check");
     	List<Map<String, Object>> detailMarkOrderListAB = new ArrayList<>();
-    System.out.println("check1");
+    	System.out.println("check1");
     	List<Map<String, Object>> detailMarkOrderListBOM = new ArrayList<>();
-    System.out.println("check2");
+    	System.out.println("check2");
     	List<Map<String, Object>> detailMarkOrderListDual = new ArrayList<>();
-    System.out.println("check3");
+    	System.out.println("check3");
     	List<Map<String, Object>> detailMarkOrderListABFrontRear = new ArrayList<>();
-    System.out.println("check1");
+    	System.out.println("check1");
     	List<Map<String, Object>> detailMarkOrderListBOMFrontRear = new ArrayList<>();
-    System.out.println("check2");
+    	System.out.println("check2");
     	List<Map<String, Object>> detailMarkOrderListDualFrontRear = new ArrayList<>();
 
     	detailMarkOrderListAB = detailMarketingOrderRepo.findByMoIdSortProductTypeAbNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    System.out.println("check4");
+    	System.out.println("check4");
     	detailMarkOrderListBOM = detailMarketingOrderRepo.findByMoIdSortProductTypeBomNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    System.out.println("check5.1");
+    	System.out.println("check5.1");
     	detailMarkOrderListDual = detailMarketingOrderRepo.findByMoIdSortProductTypeBomAbNotFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
     	
     	detailMarkOrderListABFrontRear = detailMarketingOrderRepo.findByMoIdSortProductTypeAbFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
         System.out.println("check4.2");
     	detailMarkOrderListBOMFrontRear = detailMarketingOrderRepo.findByMoIdSortProductTypeBomAbFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    System.out.println("check5");
+    	System.out.println("check5");
     	detailMarkOrderListDualFrontRear = detailMarketingOrderRepo.findByMoIdSortProductTypeBomFrontRear(marketingOrderList.get(0).getMoId(), marketingOrderList.get(1).getMoId());
-    System.out.println("check6");
-    System.out.println("ukuran  " + detailMarkOrderListAB.size() + " " + detailMarkOrderListBOM.size() + " " + detailMarkOrderListDual.size()+ " " + detailMarkOrderListABFrontRear.size() + " " + detailMarkOrderListBOMFrontRear.size() + " " + detailMarkOrderListDualFrontRear.size());
+    	System.out.println("check6");
+    	System.out.println("ukuran  " + detailMarkOrderListAB.size() + " " + detailMarkOrderListBOM.size() + " " + detailMarkOrderListDual.size()+ " " + detailMarkOrderListABFrontRear.size() + " " + detailMarkOrderListBOMFrontRear.size() + " " + detailMarkOrderListDualFrontRear.size());
     	System.out.println("Done flow 6");
         for (Map<String, Object> map : detailMarkOrderListAB) {
         	DetailMo obj = new DetailMo();
