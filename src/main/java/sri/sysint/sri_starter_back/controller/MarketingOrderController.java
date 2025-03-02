@@ -421,7 +421,23 @@ public class MarketingOrderController {
 
 	        return response;
 	    }
+		
+		 @PostMapping("/getMOByTypeCategory")
+		    public ResponseEntity<?> getMoByTypeCategory(
+		            @RequestBody Map<String, Object> requestBody, // Menangkap JSON sebagai Map
+		            HttpServletRequest req) throws ResourceNotFoundException {
 
+		        validateToken(req);
+
+		        // Ambil data dari request body menggunakan kunci (key)
+		        String month = (String) requestBody.get("month");
+		        String type = (String) requestBody.get("type");
+		        String category = (String) requestBody.get("category");
+
+		        List<Map<String, Object>> marketingOrder = marketingOrderServiceImpl.getMarketingOrderGroupDescription(month, type, category);
+
+		        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), marketingOrder));
+		    }
 		
 		@PostMapping("/getWorkDayAllMonth")
 	    public Response getMonthlyWorkDataAll(@RequestBody Map<String, Object> requestBody, final HttpServletRequest req) throws ResourceNotFoundException {

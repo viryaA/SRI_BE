@@ -2329,6 +2329,21 @@ public class MarketingOrderServiceImpl {
     public List<MarketingOrder> getAllMarketingOrder(String month0, String month1, String month2, String type) {
         return marketingOrderRepo.findtMarketingOrders(month0, month1, month2, type);
     }
+
+    public List<Map<String, Object>> getMarketingOrderGroupDescription(String month, String type, String category) {
+        List<Object[]> result = marketingOrderRepo.getMarketingOrderGroupDescription(month, type, category);
+
+        List<Map<String, Object>> marketingOrders = new ArrayList<>();
+        for (Object[] row : result) {
+            Map<String, Object> mo = new HashMap<>();
+            mo.put("moId", (String) row[0]); // MO_ID
+            mo.put("totalMoMonth0", (BigDecimal) row[1]); // TOTAL_MO_MONTH_0
+            mo.put("description", (String) row[2]); // DESCRIPTION
+            marketingOrders.add(mo);
+        }
+
+        return marketingOrders;
+    }
     
     //CHECK MONTH AVAILABLE
     public int checkMonthsAvailability(String month1, String month2, String month3, String year1, String year2, String year3, String type) {
