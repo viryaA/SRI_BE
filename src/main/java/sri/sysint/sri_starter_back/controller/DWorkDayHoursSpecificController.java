@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -195,10 +196,11 @@ public class DWorkDayHoursSpecificController {
         return response;
     }
     
-    @GetMapping("/getDWorkDayHoursSpecificByDateDesc/{date}/{description}")
-    public Response getWorkDayByDateDesc(final HttpServletRequest req, 
-                                          @PathVariable String date, 
-                                          @PathVariable String description) throws ResourceNotFoundException {
+    @PostMapping("/getDWDSpec")
+    public Response getWorkDayByDateDesc(
+            final HttpServletRequest req,
+            @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
+        
         String header = req.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
@@ -215,34 +217,43 @@ public class DWorkDayHoursSpecificController {
                 .getSubject();
 
             if (user != null) {
+                String dateStr = requestBody.get("date");
+                String description = requestBody.get("description");
+
+                if (dateStr == null || description == null) {
+                    throw new ResourceNotFoundException("Missing required fields: 'date' or 'description'");
+                }
+
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 Date parsedDate;
                 try {
-                    parsedDate = dateFormat.parse(date);
+                    parsedDate = dateFormat.parse(dateStr);
                 } catch (ParseException e) {
                     throw new ResourceNotFoundException("Invalid date format, expected format is dd-MM-yyyy");
                 }
 
-                Optional<DWorkDayHoursSpesific> workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificByDateDesc(parsedDate, description);
+                Optional<DWorkDayHoursSpesific> workDayHoursSpecific = 
+                    dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificByDateDesc(parsedDate, description);
 
-              response = new Response(
+                response = new Response(
                         new Date(),
                         HttpStatus.OK.value(),
                         null,
                         HttpStatus.OK.getReasonPhrase(),
                         req.getRequestURI(),
                         workDayHoursSpecific
-                    );
-                
+                );
+
             } else {
                 throw new ResourceNotFoundException("User not found");
             }
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
-        } 
+        }
 
         return response;
     }
+
     
     @GetMapping("/getWorkDayHoursByMonthYear/{month}/{year}")
     public Response getWorkDayHoursByMonthYear(final HttpServletRequest req, 

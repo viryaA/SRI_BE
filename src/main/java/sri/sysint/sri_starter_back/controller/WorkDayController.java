@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -101,12 +102,11 @@ public class WorkDayController {
         return response;
     }
     
-    @GetMapping("/getAllWorkDaysByDateRange/{startDate}/{endDate}")
+    @PostMapping("/getAllWorkDaysByDateRange")
     public Response getAllWorkDaysByDateRange(final HttpServletRequest req, 
-                                              @PathVariable String startDate, 
-                                              @PathVariable String endDate) throws ResourceNotFoundException {
+                                            @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
+        // Validate JWT token
         String header = req.getHeader("Authorization");
-
         if (header == null || !header.startsWith("Bearer ")) {
             throw new ResourceNotFoundException("JWT token not found or maybe not valid");
         }
@@ -119,30 +119,43 @@ public class WorkDayController {
                     .verify(token)
                     .getSubject();
 
-            if (user != null) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                Date parsedStartDate = dateFormat.parse(startDate);
-                Date parsedEndDate = dateFormat.parse(endDate);
-
-                List<WorkDay> workDays = workDayServiceImpl.getAllWorkDaysByDateRange(parsedStartDate, parsedEndDate);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    workDays
-                );
-            } else {
+            if (user == null) {
                 throw new ResourceNotFoundException("User not found");
             }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
 
-        return response;
+            String startDateStr = requestBody.get("startDate");
+            String endDateStr = requestBody.get("endDate");
+
+            if (startDateStr == null || endDateStr == null) {
+                throw new ResourceNotFoundException("Missing required fields: 'startDate' and 'endDate'");
+            }
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            Date parsedStartDate;
+            Date parsedEndDate;
+            try {
+                parsedStartDate = dateFormat.parse(startDateStr);
+                parsedEndDate = dateFormat.parse(endDateStr);
+            } catch (ParseException e) {
+                throw new ResourceNotFoundException("Invalid date format, expected format is dd-MM-yyyy");
+            }
+
+            List<WorkDay> workDays = workDayServiceImpl.getAllWorkDaysByDateRange(parsedStartDate, parsedEndDate);
+
+            return new Response(
+                new Date(),
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                workDays
+            );
+
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error processing request: " + e.getMessage());
+        }
     }
+
 
 
     @GetMapping("/getWorkDayByDate/{date}")

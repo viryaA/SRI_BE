@@ -30,6 +30,10 @@ public interface ShiftMonthlyPlanRepo extends JpaRepository<ShiftMonthlyPlan, Bi
 	@Query(value = "SELECT DESCRIPTION FROM SRI_IMPP_M_PRODUCT WHERE PART_NUMBER = :partNum", nativeQuery = true)
 	String findDescriptionByPartNum(@Param("partNum") BigDecimal partNum);
 
+	@Query(value = "SELECT DESCRIPTION FROM SRI_IMPP_M_PRODUCT WHERE ITEM_CURING = :data FETCH FIRST 1 ROW ONLY", nativeQuery = true)
+	String findDescriptionByItemCuring(@Param("data") String data);
+
+
 	@Query(value = "SELECT "
 			+ "    TO_CHAR(DATE_WD, 'DD-MM-YYYY') AS DATE_WD, "
 			+ "    --SHIFT1 HOUR "
