@@ -449,13 +449,8 @@ public class DWorkDayHoursSpecificController {
         return response;
     }
     
-    @PostMapping("/updateShiftTimes/{startTime}/{endTime}/{parsedDate}/{description}/{shift}")
-    public Response updateShiftTimes(final HttpServletRequest req,
-                                      @PathVariable("startTime") String startTime,
-                                      @PathVariable("endTime") String endTime,
-                                      @PathVariable("parsedDate") String parsedDate,
-                                      @PathVariable("description") String description,
-                                      @PathVariable("shift") int shift) throws ResourceNotFoundException {
+    @PostMapping("/updateShiftTimes")
+    public Response updateShiftTimes(final HttpServletRequest req, @RequestBody Map<String, Object> request) throws ResourceNotFoundException {
         String header = req.getHeader("Authorization");
 
         // Check if Authorization header is present and valid
@@ -473,28 +468,30 @@ public class DWorkDayHoursSpecificController {
                 .getSubject();
 
             if (user != null) {
+                // Extract values from the request map
+                String startTime = (String) request.get("startTime");
+                String endTime = (String) request.get("endTime");
+                String parsedDate = (String) request.get("parsedDate");
+                String description = (String) request.get("description");
+                int shift = (int) request.get("shift"); // Ensure this is passed as an Integer
+
                 // Call service method to update shift times
                 Optional<DWorkDayHoursSpesific> updatedWorkDayHours = dWorkDayHoursSpecificServiceImpl.updateShiftTimes(
-                    startTime,
-                    endTime,
-                    parsedDate,
-                    description,
-                    shift
+                    startTime, endTime, parsedDate, description, shift
                 );
 
                 // Return response based on the result
                 if (updatedWorkDayHours.isPresent()) {
-                    DWorkDayHoursSpesific workDayHoursSpecific = updatedWorkDayHours.get();
-                    response = new Response(
+                    return new Response(
                         new Date(),
                         HttpStatus.OK.value(),
                         null,
                         HttpStatus.OK.getReasonPhrase(),
                         req.getRequestURI(),
-                        workDayHoursSpecific
+                        updatedWorkDayHours.get()
                     );
                 } else {
-                    response = new Response(
+                    return new Response(
                         new Date(),
                         HttpStatus.NOT_FOUND.value(),
                         null,
@@ -509,11 +506,8 @@ public class DWorkDayHoursSpecificController {
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
-
-        
-        
-        return response;
     }
+
     
     @PostMapping("/saveDWorkDayHoursSpecificExcel")
     public Response saveDWorkDayHoursSpecificExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {

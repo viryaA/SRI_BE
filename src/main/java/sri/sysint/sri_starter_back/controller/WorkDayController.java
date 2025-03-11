@@ -158,8 +158,8 @@ public class WorkDayController {
 
 
 
-    @GetMapping("/getWorkDayByDate/{date}")
-    public Response getWorkDayByDate(final HttpServletRequest req, @PathVariable String date) throws ResourceNotFoundException {
+    @PostMapping("/getWorkDayByDate")
+    public Response getWorkDayByDate(final HttpServletRequest req, @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
         String header = req.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
@@ -175,13 +175,14 @@ public class WorkDayController {
                 .getSubject();
 
             if (user != null) {
-            	
+                String date = requestBody.get("date"); // Extract date from body
+
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                Date parsedDate = dateFormat.parse(date); 
-                
+                Date parsedDate = dateFormat.parse(date);
+
                 Optional<WorkDay> workDay = workDayServiceImpl.getWorkDayByDate(parsedDate);
 
-                response = new Response(
+                return new Response(
                     new Date(),
                     HttpStatus.OK.value(),
                     null,
@@ -195,9 +196,8 @@ public class WorkDayController {
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
-
-        return response;
     }
+
 
     @PostMapping("/saveWorkDay")
     public Response saveWorkDay(final HttpServletRequest req, @RequestBody WorkDay workDay) throws ResourceNotFoundException {
@@ -654,8 +654,8 @@ public class WorkDayController {
                 .body(file);
     }
     
-    @PostMapping("/turnOnOvertime/{dateWd}")
-    public Response turnOnOvertime(final HttpServletRequest req, @PathVariable String dateWd) throws ResourceNotFoundException {
+   @PostMapping("/turnOnOvertime")
+    public Response turnOnOvertime(final HttpServletRequest req, @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
         String header = req.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
@@ -663,7 +663,6 @@ public class WorkDayController {
         }
 
         String token = header.replace("Bearer ", "");
-        Response response;
 
         try {
             String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
@@ -672,9 +671,11 @@ public class WorkDayController {
                 .getSubject();
 
             if (user != null) {
+                String dateWd = requestBody.get("dateWd"); // Extract dateWd from JSON request body
+
                 WorkDay updatedWorkDay = workDayServiceImpl.turnOnOvertime(dateWd);
 
-                response = new Response(
+                return new Response(
                     new Date(),
                     HttpStatus.OK.value(),
                     null,
@@ -688,9 +689,8 @@ public class WorkDayController {
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
-
-        return response;
     }
+
     
     @PostMapping("/turnOnShift/{dateWd}/{shift}")
     public Response turnOnShift(final HttpServletRequest req, @PathVariable String dateWd, @PathVariable String shift) throws ResourceNotFoundException {
