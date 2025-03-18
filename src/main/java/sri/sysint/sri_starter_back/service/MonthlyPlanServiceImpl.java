@@ -17,7 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.Iterator;
 
 import javax.transaction.Transactional;
@@ -42,6 +44,7 @@ import sri.sysint.sri_starter_back.model.CTCuring;
 import sri.sysint.sri_starter_back.model.DetailDailyMonthlyPlanCuring;
 import sri.sysint.sri_starter_back.model.DetailMonthlyPlanCuring;
 import sri.sysint.sri_starter_back.model.MachineCuring;
+import sri.sysint.sri_starter_back.model.TotalPlan;
 import sri.sysint.sri_starter_back.model.MachineProduct;
 import sri.sysint.sri_starter_back.model.MarketingOrder;
 import sri.sysint.sri_starter_back.model.ShiftMonthlyPlan;
@@ -56,6 +59,7 @@ import sri.sysint.sri_starter_back.repository.MachineProductRepo;
 import sri.sysint.sri_starter_back.repository.MarketingOrderRepo;
 import sri.sysint.sri_starter_back.repository.MonthlyPlanRepo;
 import sri.sysint.sri_starter_back.repository.SettingRepo;
+import sri.sysint.sri_starter_back.repository.TotalPlanRepo;
 import sri.sysint.sri_starter_back.repository.MonthlyPlanNewRepo;
 import sri.sysint.sri_starter_back.repository.ShiftMonthlyPlanRepo;
 import sri.sysint.sri_starter_back.repository.WorkDayRepo;
@@ -91,6 +95,9 @@ public class MonthlyPlanServiceImpl {
 	
 	@Autowired
     private MonthlyPlanNewRepo monthlyPlanNewRepo;
+
+	@Autowired
+    private TotalPlanRepo totalPlanRepo;
 	
 	@Autowired 
 	private MachineProductRepo machineProductRepo;
@@ -1849,22 +1856,57 @@ public class MonthlyPlanServiceImpl {
 	    
     public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) throws IOException {
 //    	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
-    	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findAll();
-    	System.out.println(shiftMonthlyPlan.size());
-    	List<String> productDescription = new ArrayList<>();
-    	
-    	for (int i = 0; i < shiftMonthlyPlan.size(); i++) {
-    	    String partNumber = shiftMonthlyPlan.get(i).getItemCuring();
-    	    System.out.println("Item Curing: " + partNumber);
-    	    
-    	    String description = shiftMonthlyRepo.findDescriptionByItemCuring(partNumber);
-    	    System.out.println("Description: " + description);
+	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findAll();
+	   	System.out.println(shiftMonthlyPlan.size());
+	   	// List<String> productDescription = new ArrayList<>();
+		List<TotalPlan> totalPlanList = totalPlanRepo.findAll();
+		List<String> uniqueItemCuring = shiftMonthlyPlan.stream()
+			.map(MonthlyPlanningNew::getItemCuring) // Extract itemCuring values
+			.distinct() // Remove duplicates
+			.collect(Collectors.toList());
+		// List<MonthlyPlanningNew> shiftMonthlyPlan = null;
+		// List<String> productDescription = null;
+		// List<TotalPlan> totalPlanList = null;
 
-    	    if (description == null) {
-    	        description = "N/A";
-    	    }
-    	    productDescription.add(description);
-    	}
+    	if (uniqueItemCuring.isEmpty()) {
+			System.out.println("Tidak ada data pada itemcuirn unik");
+			return null;
+		
+		}
+		List<Object[]> results = shiftMonthlyRepo.findDescriptionsByItemCuring(new ArrayList<>(uniqueItemCuring));
+		// Map ITEM_CURING to DESCRIPTION
+		Map<String, String> itemCuringToDescription = results.stream()
+				.collect(Collectors.toMap(
+						result -> (String) result[0], // ITEM_CURING
+						result -> (String) result[1], // DESCRIPTION
+						(existing, replacement) -> existing // In case of duplicates, keep the first one
+				));
+
+		// Prepare product descriptions
+		List<String> productDescription = shiftMonthlyPlan.stream()
+				.map(plan -> {
+					String partNumber = plan.getItemCuring();
+					System.out.println("Item Curing: " + partNumber);
+
+					String description = itemCuringToDescription.getOrDefault(partNumber, "N/A");
+					System.out.println("Description: " + description);
+					return description;
+				})
+				.collect(Collectors.toList());
+
+				
+		// for (int i = 0; i < shiftMonthlyPlan.size(); i++) {
+		// 	String partNumber = shiftMonthlyPlan.get(i).getItemCuring();
+		// 	System.out.println("Item Curing: " + partNumber);
+			
+		// 	String description = shiftMonthlyRepo.findDescriptionByItemCuring(partNumber);
+		// 	System.out.println("Description: " + description);
+
+		// 	if (description == null) {
+		// 		description = "N/A";
+		// 	}
+		// 	productDescription.add(description);
+		// }
 
 
 
@@ -2128,14 +2170,23 @@ public class MonthlyPlanServiceImpl {
             }
 
             // Menambahkan kolom "TOTAL" setelah jumlah hari dalam bulan
-            int totalCol = i + 6;
-            tableHeadMpCell = tableHeadMpRow1.createCell(totalCol);
+            tableHeadMpCell = tableHeadMpRow1.createCell(i + 6);
             tableHeadMpCell.setCellStyle(calibriBold11CenterBorder);
             tableHeadMpCell.setCellValue("TOTAL");
-            tableHeadMpCell = tableHeadMpRow2.createCell(totalCol);
+            tableHeadMpCell = tableHeadMpRow2.createCell(i + 6);
             tableHeadMpCell.setCellStyle(calibri11CenterBorder);
             tableHeadMpCell.setCellValue(i);
             
+            prepareProdSheet.addMergedRegion(new CellRangeAddress(16, 17, i + 7, i + 7));
+            
+            tableHeadMpCell = tableHeadMpRow1.createCell(i + 7);
+            tableHeadMpCell.setCellStyle(calibriBold11CenterBorder);
+            tableHeadMpCell.setCellValue("TOTAL PLAN");
+            tableHeadMpCell = tableHeadMpRow2.createCell(i + 7);
+            tableHeadMpCell.setCellStyle(calibri11CenterBorder);
+            tableHeadMpCell = tableHeadMpRow2.createCell(i + 7);
+            tableHeadMpCell.setCellStyle(calibri11CenterBorder);
+
             int mpDatarow = 18;
             Row mpDataRow;
             Cell mpDataCell;
@@ -2143,7 +2194,7 @@ public class MonthlyPlanServiceImpl {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
             for (int j = 0; j < shiftMonthlyPlan.size(); j++) {
-            	//String partNumber = String.valueOf(shiftMonthlyPlan.get(j).getPART_NUMBER());
+//            	String partNumber = String.valueOf(shiftMonthlyPlan.get(j).getPART_NUMBER());
             	String itemCuring = String.valueOf(shiftMonthlyPlan.get(j).getItemCuring());
                 String description = productDescription.get(j);
                 int intCapacity = 0;
@@ -2160,7 +2211,7 @@ public class MonthlyPlanServiceImpl {
                     // Buat baris dan tambahkan data
                     mpDataRow = prepareProdSheet.createRow(mpDatarow);
                     mpDataCell = mpDataRow.createCell(0);
-                    //mpDataCell.setCellValue("");
+                    mpDataCell.setCellValue("");
                     mpDataCell.setCellStyle(calibri11LeftBorder);
                     
                     mpDataCell = mpDataRow.createCell(1);
@@ -2168,7 +2219,7 @@ public class MonthlyPlanServiceImpl {
                     mpDataCell.setCellStyle(calibri11CenterBorder);
                     
                     mpDataCell = mpDataRow.createCell(2);
-                    //mpDataCell.setCellValue("");
+                    mpDataCell.setCellValue("");
                     mpDataCell.setCellStyle(calibri11LeftBorder);
                     
                     mpDataCell = mpDataRow.createCell(3);
@@ -2206,6 +2257,8 @@ public class MonthlyPlanServiceImpl {
                         totalCapacity += intCapacity;
 
                         mpDataCell = mpDataRow.createCell(day + 5);
+                        
+//						totalPlanList
                         if (intCapacity > 0) {
                             mpDataCell.setCellValue((double) intCapacity);
                         } else {
@@ -2217,11 +2270,63 @@ public class MonthlyPlanServiceImpl {
                     mpDataCell = mpDataRow.createCell(jumlahHariBulanIni + 6);
                     mpDataCell.setCellValue((double) totalCapacity);
                     mpDataCell.setCellStyle(calibri11RightBorder);
+                    Optional<TotalPlan> totalPlanData = totalPlanList.stream()
+                            .filter(tp -> tp.getITEM_CURING().equals(itemCuring))
+                            .findFirst();
+                    mpDataCell = mpDataRow.createCell(jumlahHariBulanIni + 7);
+                    if (totalPlanData.isPresent()) {
+                        mpDataCell = mpDataRow.createCell(jumlahHariBulanIni + 7);
+                        
+                        BigDecimal totalPlan = totalPlanData.get().getTOTAL_PLAN();
+                        
+                        if (totalPlan != null) {
+                            mpDataCell.setCellValue(totalPlan.doubleValue()); // Convert BigDecimal to double
+                        } else {
+                            mpDataCell.setCellValue(""); // Set empty value if null
+                        }
+                        
+                    }
                     
+                    mpDataCell.setCellStyle(calibri11RightBorder);
+
                     totalCapacity = 0;
                     mpDatarow++; // Naikkan index baris
                 }
             }
+	        List<Map<String, Object>> dataListDetail = totalPlanRepo.getDetailTotalPlan("MO-035","MO-036");
+			String[] headerObjName = {"TOTAL_MOULD_USE_HARIAN", "TOTAL_HARIAN_PER_TANGGAL", 
+									"TOTAL_HARIAN_TT", "TOTAL_HARIAN_TL", "PERSENTASE_TT", "PERSENTASE_TL","JUMLAH_CHANGE_MOULD"};
+			String[] headersName = {"Total Mould Used per Day", "Total Day per Date", 
+									"Total Day TT", "Total Day TL", "Percentage TT", "Percentage TL","Change Mould"};
+			// Write Headers
+			int headerRowIndex = mpDatarow;
+			for (int j = 0; j < headersName.length; j++) {
+				mpDataRow = prepareProdSheet.createRow(mpDatarow++);
+				mpDataCell = mpDataRow.createCell(5);
+				mpDataCell.setCellValue(headersName[j]);
+				mpDataCell.setCellStyle(calibri11RightBorder);
+			}
+
+			// Write Data (Start below headers)
+			int dataStartRow = headerRowIndex;
+			int colOffset = 6; // Start writing from column 6
+
+			for (Map<String, Object> row : dataListDetail) {
+				int currentRow = dataStartRow;
+				for (String header : headerObjName) {
+					mpDataRow = prepareProdSheet.getRow(currentRow); // Get the existing row
+					if (mpDataRow == null) {
+						mpDataRow = prepareProdSheet.createRow(currentRow);
+					}
+					Object value = row.get(header);
+					mpDataCell = mpDataRow.createCell(colOffset);
+					mpDataCell.setCellValue(value != null ? value.toString() : "");
+					mpDataCell.setCellStyle(calibri11RightBorder);
+					currentRow++; // Move to the next row for each header
+				}
+				colOffset++; // Move to the next column for the next Map
+			}
+
             //end prepare prod sheet
             
             //change mould sheet
