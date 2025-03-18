@@ -434,7 +434,7 @@ public class MarketingOrderController {
 		        String type = (String) requestBody.get("type");
 		        String category = (String) requestBody.get("category");
 
-		        List<Map<String, Object>> marketingOrder = marketingOrderServiceImpl.getMarketingOrderGroupDescription(month, type, category);
+		        List<Map<String, Object>> marketingOrder = marketingOrderServiceImpl.getMarketingOrderAndPlaning(month, type, category);
 
 		        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), marketingOrder));
 		    }

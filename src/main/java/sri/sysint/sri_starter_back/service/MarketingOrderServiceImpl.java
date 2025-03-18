@@ -2330,15 +2330,19 @@ public class MarketingOrderServiceImpl {
         return marketingOrderRepo.findtMarketingOrders(month0, month1, month2, type);
     }
 
-    public List<Map<String, Object>> getMarketingOrderGroupDescription(String month, String type, String category) {
-        List<Object[]> result = marketingOrderRepo.getMarketingOrderGroupDescription(month, type, category);
+    public List<Map<String, Object>> getMarketingOrderAndPlaning(String month, String type, String category) {
+        List<Object[]> result = marketingOrderRepo.getMarketingOrderAndPlaning(month, type, category);
 
+        System.out.println("tes"+ month+type+category);
         List<Map<String, Object>> marketingOrders = new ArrayList<>();
         for (Object[] row : result) {
             Map<String, Object> mo = new HashMap<>();
             mo.put("moId", (String) row[0]); // MO_ID
             mo.put("totalMoMonth0", (BigDecimal) row[1]); // TOTAL_MO_MONTH_0
             mo.put("description", (String) row[2]); // DESCRIPTION
+            mo.put("itemCuring", (String) row[3]);
+            mo.put("totalHarianPlaning", (BigDecimal) row[4]);
+            mo.put("persentaseMoMp", (BigDecimal) row[5]);
             marketingOrders.add(mo);
         }
 

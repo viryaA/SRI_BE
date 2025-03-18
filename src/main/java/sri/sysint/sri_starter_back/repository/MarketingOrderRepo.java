@@ -151,26 +151,44 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	                                          @Param("month2") String month2, 
 	                                          @Param("type") String type);
 
-	@Query(value = "SELECT A.MO_ID, "
-	        + "       SUM(D.MO_MONTH_0) AS TOTAL_MO_MONTH_0, "
-	        + "       D.DESCRIPTION "
-	        + "FROM ( "
-	        + "    SELECT MO_ID "
-	        + "    FROM SRI_IMPP_T_MARKETINGORDER "
-	        + "    WHERE TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') "
-	        + "    AND V_AFTER_AR_RJ_DF = 0 "
-	        + "    AND TYPE = :type "
-	        + "    ORDER BY MO_ID DESC"
-	        + "    FETCH FIRST 1 ROW ONLY "
-	        + ") A "
-	        + "JOIN SRI_IMPP_D_MARKETINGORDER D "
-	        + "    ON A.MO_ID = D.MO_ID "
-	        + "    AND D.CATEGORY = :category "
-	        + "GROUP BY A.MO_ID, D.DESCRIPTION",
-	        nativeQuery = true)
-	List<Object[]> getMarketingOrderGroupDescription(@Param("month0") String month0, 
-	                                                 @Param("type") String type, 
-	                                                 @Param("category") String category);
+	@Query(value = "SELECT A.MO_ID, " +
+		       "SUM(D.MO_MONTH_0) AS TOTAL_MO_MONTH_0, " +
+		       "D.DESCRIPTION, " +
+		       "P.ITEM_CURING, " +
+		       "(SELECT SUM(MP.TOTAL_HARIAN) " +
+		       " FROM SRI_IMPP_T_MONTHLYPLAN MP " +
+		       " WHERE MP.ITEM_CURING = P.ITEM_CURING) AS TOTAL_HARIAN_SUM, " +
+		       "CASE " +
+		       "    WHEN (SELECT SUM(MP.TOTAL_HARIAN) " +
+		       "          FROM SRI_IMPP_T_MONTHLYPLAN MP " +
+		       "          WHERE MP.ITEM_CURING = P.ITEM_CURING) = 0 " +
+		       "    THEN 0 " +
+		       "    ELSE ROUND((SUM(D.MO_MONTH_0) / " +
+		       "               (SELECT SUM(MP.TOTAL_HARIAN) " +
+		       "                FROM SRI_IMPP_T_MONTHLYPLAN MP " +
+		       "                WHERE MP.ITEM_CURING = P.ITEM_CURING)) * 100, 2) " +
+		       "END AS PERSENTASE " +
+		       "FROM ( " +
+		       "    SELECT MO_ID " +
+		       "    FROM SRI_IMPP_T_MARKETINGORDER " +
+		       "    WHERE TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
+		       "    AND V_AFTER_AR_RJ_DF = 0 " +
+		       "    AND TYPE = :type " +
+		       "    ORDER BY MO_ID DESC " +
+		       "    FETCH FIRST 1 ROW ONLY " +
+		       ") A " +
+		       "JOIN SRI_IMPP_D_MARKETINGORDER D " +
+		       "ON A.MO_ID = D.MO_ID " +
+		       "AND D.CATEGORY = :category " +
+		       "JOIN SRI_IMPP_M_PRODUCT P " +
+		       "ON D.DESCRIPTION = P.DESCRIPTION " +
+		       "GROUP BY A.MO_ID, D.DESCRIPTION, P.ITEM_CURING",
+		       nativeQuery = true)
+		List<Object[]> getMarketingOrderAndPlaning(
+		       @Param("month0") String month0, 
+		       @Param("type") String type, 
+		       @Param("category") String category);
+
 
 
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER \r\n"
