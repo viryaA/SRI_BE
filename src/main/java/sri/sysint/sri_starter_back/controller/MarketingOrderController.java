@@ -507,6 +507,15 @@ public class MarketingOrderController {
 //	        return response;
 //	    }
 //	    
+	    @PostMapping("/generate")
+	    public String generate(@RequestBody String inputJson) {
+	        try {
+	        	monthlyPlanServiceImpl.generateMp(inputJson);
+	            return "Procedure executed sequentially for each MO_ID!";
+	        } catch (Exception e) {
+	            return "Error: " + e.getMessage();
+	        }
+	    }
 	    
 	    @GetMapping("/generateDetailMp")
 	    public Response getMonthlyPlan( 

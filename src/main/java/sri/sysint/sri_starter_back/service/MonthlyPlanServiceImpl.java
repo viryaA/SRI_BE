@@ -40,6 +40,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import sri.sysint.sri_starter_back.model.CTCuring;
 import sri.sysint.sri_starter_back.model.DetailDailyMonthlyPlanCuring;
 import sri.sysint.sri_starter_back.model.DetailMonthlyPlanCuring;
@@ -108,6 +111,9 @@ public class MonthlyPlanServiceImpl {
 	
 	@Autowired
     private DWorkDayHoursSpecificRepo dWorkDayHourSpecificRepo;
+	
+    @Autowired
+    private ObjectMapper objectMapper;
 	
     public MonthlyPlanServiceImpl(MonthlyPlanRepo monthlyPlanRepo){
     	
@@ -1853,6 +1859,19 @@ public class MonthlyPlanServiceImpl {
                     ", totalAR='" + totalAR + '\'' +
                     ", maxCapMonth0=" + maxCapMonth0 +
                     '}';
+        }
+    }
+    
+    public void generateMp(String inputJson) throws Exception {
+        JsonNode root = objectMapper.readTree(inputJson);
+
+        int cheatingId = root.path("CHEATING_ID").asInt();
+
+        // Loop over MO_IDs
+        for (JsonNode moIdNode : root.path("MO_IDS")) {
+            String moId = moIdNode.asText();
+            String singleInputJson = String.format("{\"MO_ID\":\"%s\", \"CHEATING_ID\":%d}", moId, cheatingId);
+            monthlyPlanNewRepo.callGenerateMp8(singleInputJson);
         }
     }
 
