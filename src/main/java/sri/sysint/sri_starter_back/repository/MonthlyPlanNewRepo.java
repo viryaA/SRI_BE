@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import sri.sysint.sri_starter_back.model.DetailDailyMonthlyPlanCuring;
 import sri.sysint.sri_starter_back.model.DetailMonthlyPlanCuring;
@@ -21,4 +22,7 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
 	
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MONTHLYPLAN WHERE MO_ID = :id", nativeQuery = true)
     List<MonthlyPlanningNew> findByMpCuringId(@Param("id") String id);
+    @Transactional
+    @Query(value = "BEGIN SP_GENERATE_MP_8(:jsonInput); END;", nativeQuery = true)
+    void callGenerateMp8(@Param("jsonInput") String jsonInput);
 }
