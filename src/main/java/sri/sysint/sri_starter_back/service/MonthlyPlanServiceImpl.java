@@ -1865,13 +1865,29 @@ public class MonthlyPlanServiceImpl {
     public void generateMp(String inputJson) throws Exception {
         JsonNode root = objectMapper.readTree(inputJson);
 
+		monthlyPlanNewRepo.deleteFromTotalPlan();
+		monthlyPlanNewRepo.deleteFromMonthlyPlan1();
+
+
+		for (JsonNode moIdNode : root.path("MO_ID")) {
+            String moId = moIdNode.asText();
+            String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
+            monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
+        }
+
+		for (JsonNode moIdNode : root.path("MO_ID")) {
+            String moId = moIdNode.asText();
+            String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
+            monthlyPlanNewRepo.hitungMould(singleInputJson);
+        }
+
         int cheatingId = root.path("CHEATING_ID").asInt();
 
         // Loop over MO_IDs
-        for (JsonNode moIdNode : root.path("MO_IDS")) {
+        for (JsonNode moIdNode : root.path("MO_ID")) {
             String moId = moIdNode.asText();
             String singleInputJson = String.format("{\"MO_ID\":\"%s\", \"CHEATING_ID\":%d}", moId, cheatingId);
-            monthlyPlanNewRepo.callGenerateMp8(singleInputJson);
+            monthlyPlanNewRepo.callGenerateMp(singleInputJson);
         }
     }
 
@@ -1879,10 +1895,10 @@ public class MonthlyPlanServiceImpl {
 	    
     public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) throws IOException {
 //    	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
-        if (!"Tidak Aktif".equals(statusMPRepo.findLatestStatusMP())) {
-            return null; // or throw new IllegalStateException("Status is not active");
-        }
-    	
+//        if (!"Tidak Aktif".equals(statusMPRepo.findLatestStatusMP())) {
+//            return null; // or throw new IllegalStateException("Status is not active");
+//        }
+//    	
 	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findAll();
 		
 	   	System.out.println(shiftMonthlyPlan.size());

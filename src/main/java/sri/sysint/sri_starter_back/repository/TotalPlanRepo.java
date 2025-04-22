@@ -26,7 +26,7 @@ public interface TotalPlanRepo extends JpaRepository<TotalPlan, BigDecimal>{
         "        LISTAGG(WCT, ',') WITHIN GROUP (ORDER BY WCT) AS WCT_OLD_LIST, " +
         "        MAX(MOULD_USE) AS MOULD_USE_OLD, " +
         "        DATE_VALID + 1 AS NEXT_DATE " +
-        "    FROM SRI_IMPP_T_MONTHLYPLAN " +
+        "    FROM SRI_IMPP_T_MONTHLYPLAN1 " +
         "    WHERE MO_ID IN (:moid1, :moid2) " +
         "    GROUP BY ITEM_CURING, DATE_VALID " +
         "), " +
@@ -36,7 +36,7 @@ public interface TotalPlanRepo extends JpaRepository<TotalPlan, BigDecimal>{
         "        DATE_VALID, " +
         "        LISTAGG(WCT, ',') WITHIN GROUP (ORDER BY WCT) AS WCT_NEW_LIST, " +
         "        MAX(MOULD_USE) AS MOULD_USE_NEW " +
-        "    FROM SRI_IMPP_T_MONTHLYPLAN " +
+        "    FROM SRI_IMPP_T_MONTHLYPLAN1 " +
         "    WHERE MO_ID IN (:moid1, :moid2) " +
         "    GROUP BY ITEM_CURING, DATE_VALID " +
         "), " +
@@ -83,26 +83,26 @@ public interface TotalPlanRepo extends JpaRepository<TotalPlan, BigDecimal>{
         "    COALESCE(m.JUMLAH_CHANGE_MOULD, 0) AS JUMLAH_CHANGE_MOULD " +
         "FROM " +
         "    (SELECT DATE_VALID, SUM(TOTAL_HARIAN) AS TOTAL_HARIAN_CM " +
-        "    FROM SRI_IMPP_T_MONTHLYPLAN " +
+        "    FROM SRI_IMPP_T_MONTHLYPLAN1 " +
         "    WHERE MO_ID BETWEEN :moid1 AND :moid2 " +
         "    AND ITEM_CURING LIKE '%CM%' " +
         "    GROUP BY DATE_VALID) a " +
         "FULL JOIN " +
         "    (SELECT DATE_VALID, SUM(TOTAL_HARIAN) AS TOTAL_HARIAN_CN " +
-        "    FROM SRI_IMPP_T_MONTHLYPLAN " +
+        "    FROM SRI_IMPP_T_MONTHLYPLAN1 " +
         "    WHERE MO_ID BETWEEN :moid1 AND :moid2 " +
         "    AND ITEM_CURING LIKE '%CN%' " +
         "    GROUP BY DATE_VALID) c " +
         "ON a.DATE_VALID = c.DATE_VALID " +
         "FULL JOIN " +
         "    (SELECT DATE_VALID, SUM(TOTAL_HARIAN) AS TOTAL_HARIAN_PER_TANGGAL " +
-        "    FROM SRI_IMPP_T_MONTHLYPLAN " +
+        "    FROM SRI_IMPP_T_MONTHLYPLAN1 " +
         "    WHERE MO_ID BETWEEN :moid1 AND :moid2 " +
         "    GROUP BY DATE_VALID) b " +
         "ON a.DATE_VALID = b.DATE_VALID OR c.DATE_VALID = b.DATE_VALID " +
         "FULL JOIN " +
         "    (SELECT DATE_VALID, SUM(MOULD_USE) AS MOULD_USE " +
-        "    FROM SRI_IMPP_T_MONTHLYPLAN " +
+        "    FROM SRI_IMPP_T_MONTHLYPLAN1 " +
         "    WHERE MO_ID BETWEEN :moid1 AND :moid2 " +
         "    GROUP BY DATE_VALID) d " +
         "ON b.DATE_VALID = d.DATE_VALID " +
