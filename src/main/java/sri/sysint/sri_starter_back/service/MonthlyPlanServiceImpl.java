@@ -1863,33 +1863,38 @@ public class MonthlyPlanServiceImpl {
     }
     
     public void generateMp(String inputJson) throws Exception {
-        JsonNode root = objectMapper.readTree(inputJson);
+        try {
+            JsonNode root = objectMapper.readTree(inputJson);
+            System.out.println("Parsed JSON: " + inputJson);
 
-		monthlyPlanNewRepo.deleteFromTotalPlan();
-		monthlyPlanNewRepo.deleteFromMonthlyPlan1();
+            for (JsonNode moIdNode : root.path("MO_ID")) {
+                String moId = moIdNode.asText();
+                System.out.println(moId);
+                String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
+                monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
+            }
 
+            for (JsonNode moIdNode : root.path("MO_ID")) {
+                String moId = moIdNode.asText();
+                System.out.println(moId);
+                String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
+                monthlyPlanNewRepo.hitungMould(singleInputJson);
+            }
 
-		for (JsonNode moIdNode : root.path("MO_ID")) {
-            String moId = moIdNode.asText();
-            String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
-            monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
-        }
+            int cheatingId = root.path("CHEATING_ID").asInt();
 
-		for (JsonNode moIdNode : root.path("MO_ID")) {
-            String moId = moIdNode.asText();
-            String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
-            monthlyPlanNewRepo.hitungMould(singleInputJson);
-        }
-
-        int cheatingId = root.path("CHEATING_ID").asInt();
-
-        // Loop over MO_IDs
-        for (JsonNode moIdNode : root.path("MO_ID")) {
-            String moId = moIdNode.asText();
-            String singleInputJson = String.format("{\"MO_ID\":\"%s\", \"CHEATING_ID\":%d}", moId, cheatingId);
-            monthlyPlanNewRepo.callGenerateMp(singleInputJson);
+            for (JsonNode moIdNode : root.path("MO_ID")) {
+                String moId = moIdNode.asText();
+                System.out.println(moId);
+                String singleInputJson = String.format("{\"MO_ID\":\"%s\", \"CHEATING_ID\":%d}", moId, cheatingId);
+                monthlyPlanNewRepo.callGenerateMp(singleInputJson);
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // This will show the error in the console
+            throw e;
         }
     }
+
 
 
 	    

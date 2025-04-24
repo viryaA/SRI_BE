@@ -23,13 +23,16 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
 	
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MONTHLYPLAN WHERE MO_ID = :id", nativeQuery = true)
     List<MonthlyPlanningNew> findByMpCuringId(@Param("id") String id);
-    @Transactional
+
+    @Modifying
     @Query(value = "BEGIN SP_GENERATE_MP_10(:jsonInput); END;", nativeQuery = true)
     void callGenerateMp(@Param("jsonInput") String jsonInput);
-
+    
+    @Modifying
     @Query(value = "BEGIN SP_SAVETOTALPLAN(:jsonInput); END;", nativeQuery = true)
     void saveTotalPlan(@Param("jsonInput") String jsonInput);
-
+    
+    @Modifying
     @Query(value = "BEGIN SP_HITUNGMOULD(:jsonInput); END;", nativeQuery = true)
     void hitungMould(@Param("jsonInput") String jsonInput);
 
