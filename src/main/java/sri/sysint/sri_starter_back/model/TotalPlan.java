@@ -20,7 +20,7 @@ public class TotalPlan {
     private BigDecimal ID_PLAN;
 	
 	@Column(name = "ID_MO")
-    private String ID_MO;
+    private String MOID;
 	
 	@Column(name = "ITEM_CURING")
 	private String ITEM_CURING;
@@ -33,29 +33,80 @@ public class TotalPlan {
 	
 	@Column(name = "MOULD_NEEDED")
 	private BigDecimal MOULD_NEEDED;
+	
+	@Column(name = "STATUS")
+	private BigDecimal STATUS;
+	
+	@Column(name = "TOTAL_GROSS")
+	private BigDecimal TOTAL_GROSS;
 
 	public TotalPlan() {
 		
 	}
-
-	public TotalPlan(BigDecimal iD_PLAN, String iD_MO, String iTEM_CURING, BigDecimal tOTAL_PLAN, BigDecimal pPD,
-			BigDecimal mOULD_NEEDED) {
-		ID_PLAN = iD_PLAN;
-		ID_MO = iD_MO;
-		ITEM_CURING = iTEM_CURING;
-		TOTAL_PLAN = tOTAL_PLAN;
-		PPD = pPD;
-		MOULD_NEEDED = mOULD_NEEDED;
-	}
 	
 	public TotalPlan(TotalPlan TotalPlan) {
 		ID_PLAN = TotalPlan.ID_PLAN;
-		ID_MO = TotalPlan.ID_MO;
+		MOID = TotalPlan.MOID;
 		ITEM_CURING = TotalPlan.ITEM_CURING;
 		TOTAL_PLAN = TotalPlan.TOTAL_PLAN;
 		PPD = TotalPlan.PPD;
 		MOULD_NEEDED = TotalPlan.MOULD_NEEDED;
+		STATUS = TotalPlan.STATUS;
+		TOTAL_GROSS = TotalPlan.TOTAL_GROSS;
 	}
+	
+	
+	
+	public TotalPlan(BigDecimal iD_PLAN, String mOID, String iTEM_CURING, BigDecimal tOTAL_PLAN, BigDecimal pPD,
+			BigDecimal mOULD_NEEDED, BigDecimal sTATUS, BigDecimal tOTAL_GROSS) {
+		super();
+		ID_PLAN = iD_PLAN;
+		MOID = mOID;
+		ITEM_CURING = iTEM_CURING;
+		TOTAL_PLAN = tOTAL_PLAN;
+		PPD = pPD;
+		MOULD_NEEDED = mOULD_NEEDED;
+		STATUS = sTATUS;
+		TOTAL_GROSS = tOTAL_GROSS;
+	}
+
+
+
+	public String getMOID() {
+		return MOID;
+	}
+
+
+
+	public void setMOID(String mOID) {
+		MOID = mOID;
+	}
+
+
+
+	public BigDecimal getSTATUS() {
+		return STATUS;
+	}
+
+
+
+	public void setSTATUS(BigDecimal sTATUS) {
+		STATUS = sTATUS;
+	}
+
+
+
+	public BigDecimal getTOTAL_GROSS() {
+		return TOTAL_GROSS;
+	}
+
+
+
+	public void setTOTAL_GROSS(BigDecimal tOTAL_GROSS) {
+		TOTAL_GROSS = tOTAL_GROSS;
+	}
+
+
 
 	public BigDecimal getID_PLAN() {
 		return ID_PLAN;
@@ -66,11 +117,11 @@ public class TotalPlan {
 	}
 
 	public String getID_MO() {
-		return ID_MO;
+		return MOID;
 	}
 
 	public void setID_MO(String iD_MO) {
-		ID_MO = iD_MO;
+		MOID = iD_MO;
 	}
 
 	public String getITEM_CURING() {

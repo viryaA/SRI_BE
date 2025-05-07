@@ -47,6 +47,7 @@ import sri.sysint.sri_starter_back.model.MarketingOrder;
 import sri.sysint.sri_starter_back.model.MonthlyPlan;
 import sri.sysint.sri_starter_back.model.Response;
 import sri.sysint.sri_starter_back.model.WorkDay;
+import sri.sysint.sri_starter_back.model.req.MoIdRequest;
 import sri.sysint.sri_starter_back.model.transaksi.EditMarketingOrderMarketing;
 import sri.sysint.sri_starter_back.model.transaksi.GetAllTypeMarketingOrder;
 import sri.sysint.sri_starter_back.model.transaksi.SaveFinalMarketingOrder;
@@ -535,6 +536,15 @@ public class MarketingOrderController {
 	        return response;
 	    }
 	    
+	    @PostMapping("/getDetailMp")
+	    public Response generateMonthlyPlan(@RequestBody MoIdRequest request) {
+	    	List<String> data = request.getMoIds();
+	    	System.out.println(data.get(0) + " " + data.get(1));
+	        List<Map<String, Object>> result = monthlyPlanServiceImpl.getSummaryByMoIds(request.getMoIds());
+	        response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
+	        return response;
+	    }
+	    
 	    @RequestMapping("/exportMPExcel")
 		public ResponseEntity<InputStreamResource> exportPLantsExcel(@RequestParam int month,
 	            @RequestParam int year,
@@ -542,10 +552,11 @@ public class MarketingOrderController {
 	            @RequestParam BigDecimal minA, @RequestParam BigDecimal maxA,
 	            @RequestParam BigDecimal minB, @RequestParam BigDecimal maxB,
 	            @RequestParam BigDecimal minC, @RequestParam BigDecimal maxC,
-	            @RequestParam BigDecimal minD, @RequestParam BigDecimal maxD) throws IOException {
+	            @RequestParam BigDecimal minD, @RequestParam BigDecimal maxD,
+	            @RequestParam BigDecimal version) throws IOException {
 		    String filename = "PREPARE PROD NOV 2024.xlsx";
 		    
-		    ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
+		    ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD,version);
 			//ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel();
 		    InputStreamResource file = new InputStreamResource(data);
 		    

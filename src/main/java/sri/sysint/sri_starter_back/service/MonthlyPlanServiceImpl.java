@@ -1867,19 +1867,51 @@ public class MonthlyPlanServiceImpl {
             JsonNode root = objectMapper.readTree(inputJson);
             System.out.println("Parsed JSON: " + inputJson);
 
-            for (JsonNode moIdNode : root.path("MO_ID")) {
-                String moId = moIdNode.asText();
-                System.out.println(moId);
-                String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
-                monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
-            }
+			for (JsonNode moIdNode : root.path("MO_ID")) {
+				if (moIdNode == null || moIdNode.isNull()) {
+					System.out.println("Skipping null or missing MO_ID entry.");
+					continue;
+				}
+
+				String moId = moIdNode.asText();
+
+				if (totalPlanRepo.existsTotalPlanByMOID(moId)) {
+					System.out.println("MO_ID " + moId + " already exists. Skipping.");
+					continue;
+				}
+				
+				System.out.println("Processing Save Total Plan MO_ID: " + moId);
+				String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
+				monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
+				System.out.println("Finish MO_ID: " + moId);
+			}
+
 
             for (JsonNode moIdNode : root.path("MO_ID")) {
-                String moId = moIdNode.asText();
-                System.out.println(moId);
+				if (moIdNode == null || moIdNode.isNull()) {
+					System.out.println("Skipping null or missing MO_ID entry.");
+					continue;
+				}
+
+				String moId = moIdNode.asText();
+				System.out.println("Processing Calculate Mould Needed MO_ID: " + moId);
+
+//				if (totalPlanRepo.existsTotalPlanByMOID(moId)) {
+//					System.out.println("MO_ID " + moId + " already exists. Skipping.");
+//					continue;
+//				}
                 String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
                 monthlyPlanNewRepo.hitungMould(singleInputJson);
             }
+            
+            List<String> moIds = new ArrayList<>();
+            for (JsonNode moIdNode : root.path("MO_ID")) {
+                moIds.add(moIdNode.asText());
+            }
+            
+            List<TotalPlan> totalPlans = totalPlanRepo.findAllByMOIDIn(moIds);
+            
+            //mengambil data seluruh total plan dari 2 moid
 
             int cheatingId = root.path("CHEATING_ID").asInt();
 
@@ -1889,22 +1921,66 @@ public class MonthlyPlanServiceImpl {
                 String singleInputJson = String.format("{\"MO_ID\":\"%s\", \"CHEATING_ID\":%d}", moId, cheatingId);
                 monthlyPlanNewRepo.callGenerateMp(singleInputJson);
             }
+            
+            for (JsonNode moIdNode : root.path("MO_ID")) {
+                String moId = moIdNode.asText();
+                System.out.println("Proccessing After Generate :"+moId);
+                
+                monthlyPlanNewRepo.callAfterGenerate(moId,BigDecimal.valueOf(cheatingId));
+            }
+            
+            
+            
+            // mengambil data mp sesuai dengan versi terbaru serta sudah di kalkulasi seperti yang di excel
+            
+            
+            
+			for (JsonNode moIdNode : root.path("MO_ID")) {
+				if (moIdNode == null || moIdNode.isNull()) {
+					System.out.println("Skipping null or missing MO_ID entry.");
+					continue;
+				}
+				String moId = moIdNode.asText();
+				System.out.println("Deleting Total Plan by MO_ID: " + moId);
+				totalPlanRepo.deleteByMOID(moId);
+
+			}
+			
+            
         } catch (Exception e) {
             e.printStackTrace(); // This will show the error in the console
             throw e;
         }
     }
-
-
-
+    
+    
+    public List<Map<String, Object>> getSummaryByMoIds(List<String> moIds) {
+        return monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIds);
+    }
 	    
-    public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD) throws IOException {
+    public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD, BigDecimal version) throws IOException {
 //    	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
 //        if (!"Tidak Aktif".equals(statusMPRepo.findLatestStatusMP())) {
 //            return null; // or throw new IllegalStateException("Status is not active");
 //        }
 //    	
-	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findAll();
+    	YearMonth yearMonth = YearMonth.of(year,month);
+    	LocalDate startLocal = yearMonth.atDay(1);
+    	LocalDate endLocal = yearMonth.atEndOfMonth();
+
+        String yearMonthStr = String.format("%04d%02d", year, month);
+    	List<MarketingOrder> top2 = marketingOrderRepo
+    	        .findTop2ByYearMonth(yearMonthStr);
+
+    	List<String> moids = new ArrayList<>(); 
+
+    	for (MarketingOrder buffer : top2) {
+    	    System.out.println(buffer.getMoId());	
+    	    moids.add(buffer.getMoId());
+    	}
+
+//	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdInAndVersion(moids, version);
+	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdIn(moids);
 		
 	   	System.out.println(shiftMonthlyPlan.size());
 	   	// List<String> productDescription = new ArrayList<>();
@@ -2118,17 +2194,20 @@ public class MonthlyPlanServiceImpl {
         		curingDataCell.setCellStyle(calibri11LeftBorder);
         		curingDataCell.setCellValue(productDescription.get(j));
         		
+        		BigDecimal shift1 = shiftMonthlyPlan.get(j).getShift1();
         		curingDataCell = curingDataRow.createCell(7);
         		curingDataCell.setCellStyle(calibri11RightBorder);
-        		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getShift1().doubleValue());
-        		
+        		curingDataCell.setCellValue(shift1 != null ? shift1.doubleValue() : 0.0);
+
+        		BigDecimal shift2 = shiftMonthlyPlan.get(j).getShift2();
         		curingDataCell = curingDataRow.createCell(8);
         		curingDataCell.setCellStyle(calibri11RightBorder);
-        		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getShift2().doubleValue());
-        		
+        		curingDataCell.setCellValue(shift2 != null ? shift2.doubleValue() : 0.0);
+
+        		BigDecimal shift3 = shiftMonthlyPlan.get(j).getShift3();
         		curingDataCell = curingDataRow.createCell(9);
         		curingDataCell.setCellStyle(calibri11RightBorder);
-        		curingDataCell.setCellValue(shiftMonthlyPlan.get(j).getShift3().doubleValue());
+        		curingDataCell.setCellValue(shift3 != null ? shift3.doubleValue() : 0.0);
         		
         		curingDataCell = curingDataRow.createCell(10);
         		curingDataCell.setCellStyle(calibri11RightBorder);
@@ -2202,7 +2281,7 @@ public class MonthlyPlanServiceImpl {
             }
 
             // Mendapatkan jumlah hari di bulan ini
-            YearMonth yearMonth = YearMonth.of(year, month);
+//            YearMonth yearMonth = YearMonth.of(year, month);
             int jumlahHariBulanIni = yearMonth.lengthOfMonth();
             LocalDate localDate;
             Date date = new Date();
@@ -2250,8 +2329,11 @@ public class MonthlyPlanServiceImpl {
             for (MonthlyPlanningNew plan : shiftMonthlyPlan) {
                 String itemCuring = String.valueOf(plan.getItemCuring());
                 LocalDate planDate = plan.getDateMp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                int capacity = plan.getShift1().intValue() + plan.getShift2().intValue() + plan.getShift3().intValue();
+                int shift1 = plan.getShift1() != null ? plan.getShift1().intValue() : 0;
+                int shift2 = plan.getShift2() != null ? plan.getShift2().intValue() : 0;
+                int shift3 = plan.getShift3() != null ? plan.getShift3().intValue() : 0;
 
+                int capacity = shift1 + shift2 + shift3;
                 capacityMap.computeIfAbsent(itemCuring, k -> new HashMap<>())
                            .merge(planDate, capacity, Integer::sum);
             }
@@ -2329,7 +2411,7 @@ public class MonthlyPlanServiceImpl {
                     mpDatarow++;
                 }
             }
-	        List<Map<String, Object>> dataListDetail = totalPlanRepo.getDetailTotalPlan("MO-035","MO-036");
+	        List<Map<String, Object>> dataListDetail = totalPlanRepo.getDetailTotalPlan(moids.get(1).toString(),moids.get(0).toString());
 			String[] headerObjName = {"TOTAL_MOULD_USE_HARIAN", "TOTAL_HARIAN_PER_TANGGAL", 
 									"TOTAL_HARIAN_TT", "TOTAL_HARIAN_TL", "PERSENTASE_TT", "PERSENTASE_TL","JUMLAH_CHANGE_MOULD"};
 			String[] headersName = {"Total Mould Used per Day", "Total Day per Date", 

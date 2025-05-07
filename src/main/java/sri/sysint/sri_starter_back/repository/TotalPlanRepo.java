@@ -15,7 +15,14 @@ import sri.sysint.sri_starter_back.model.Building;
 import sri.sysint.sri_starter_back.model.TotalPlan;
 
 public interface TotalPlanRepo extends JpaRepository<TotalPlan, BigDecimal>{
-	
+
+    boolean existsTotalPlanByMOID(String idMo);
+    
+    List<TotalPlan> findAllByMOIDIn(List<String> moids);
+
+    
+    void deleteByMOID(String idMo);
+
     @Modifying
     @Query(value = "CALL SP_SaveTotalPlan(:jsonInput)", nativeQuery = true)
     void GenerateTotalPlan(@Param("jsonInput") String jsonInput);

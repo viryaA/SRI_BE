@@ -43,6 +43,14 @@ public class MonthlyPlanningNew {
 
     @Column(name = "KAPA_PERMOULD")
     private BigDecimal kapaPermould;
+    
+    @Column(name = "STATUS_MP")
+    private String statusMP;
+    
+    @Column(name = "VERSION")
+    private BigDecimal version;
+    
+//    @Column(name )
 
     // Default constructor
     public MonthlyPlanningNew() {}
@@ -61,12 +69,14 @@ public class MonthlyPlanningNew {
         this.shift2 = monthlyPlanningNew.getShift2();
         this.shift3 = monthlyPlanningNew.getShift3();
         this.kapaPermould = monthlyPlanningNew.getKapaPermould();
+        this.statusMP = monthlyPlanningNew.getStatusMP();
+        this.version = monthlyPlanningNew.getVersion();
     }
 
 
-
 	public MonthlyPlanningNew(String mpId, String moId, Date dateMp, String itemCuring, String wct, BigDecimal mouldUse,
-			BigDecimal totalHarian, BigDecimal shift1, BigDecimal shift2, BigDecimal shift3, BigDecimal kapaPermould) {
+			BigDecimal totalHarian, BigDecimal shift1, BigDecimal shift2, BigDecimal shift3, BigDecimal kapaPermould,
+			String statusMP, BigDecimal version) {
 		super();
 		this.mpId = mpId;
 		this.moId = moId;
@@ -79,8 +89,31 @@ public class MonthlyPlanningNew {
 		this.shift2 = shift2;
 		this.shift3 = shift3;
 		this.kapaPermould = kapaPermould;
+		this.statusMP = statusMP;
+		this.version = version;
+	}
+	
+	
+
+
+	public String getStatusMP() {
+		return statusMP;
 	}
 
+
+	public void setStatusMP(String statusMP) {
+		this.statusMP = statusMP;
+	}
+
+
+	public BigDecimal getVersion() {
+		return version;
+	}
+
+
+	public void setVersion(BigDecimal version) {
+		this.version = version;
+	}
 
 
 	public String getMpId() {
@@ -213,3 +246,5 @@ public class MonthlyPlanningNew {
 
     
 }
+
+
