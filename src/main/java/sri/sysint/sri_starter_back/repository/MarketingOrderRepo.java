@@ -19,8 +19,8 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	
 	List<MarketingOrder> findTop2ByMonth0BetweenOrderByMonth0Desc(Date startDate, Date endDate);
 	
-	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER WHERE TO_CHAR(MONTH_0, 'YYYYMM') = :yearMonth ORDER BY MO_ID DESC FETCH FIRST 2 ROWS ONLY", nativeQuery = true)
-	List<MarketingOrder> findTop2ByYearMonth(@Param("yearMonth") String yearMonth);
+	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER WHERE TO_CHAR(MONTH_0, 'YYYYMM') = :yearMonth AND V_AFTER_AR_RJ_DF = :version ORDER BY MO_ID DESC FETCH FIRST 2 ROWS ONLY", nativeQuery = true)
+	List<MarketingOrder> findTop2ByYearMonth(@Param("yearMonth") String yearMonth,BigDecimal version);
 
 	
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER WHERE MO_ID = :id", nativeQuery = true)

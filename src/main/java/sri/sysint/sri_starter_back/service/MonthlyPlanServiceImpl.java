@@ -1862,103 +1862,78 @@ public class MonthlyPlanServiceImpl {
         }
     }
     
-    public void generateMp(String inputJson) throws Exception {
+    public List<Map<String, Object>> generateMp(String inputJson) throws Exception {
         try {
             JsonNode root = objectMapper.readTree(inputJson);
             System.out.println("Parsed JSON: " + inputJson);
 
-			for (JsonNode moIdNode : root.path("MO_ID")) {
-				if (moIdNode == null || moIdNode.isNull()) {
-					System.out.println("Skipping null or missing MO_ID entry.");
-					continue;
-				}
-
-				String moId = moIdNode.asText();
-
-				if (totalPlanRepo.existsTotalPlanByMOID(moId)) {
-					System.out.println("MO_ID " + moId + " already exists. Skipping.");
-					continue;
-				}
-				
-				System.out.println("Processing Save Total Plan MO_ID: " + moId);
-				String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
-				monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
-				System.out.println("Finish MO_ID: " + moId);
-			}
-
-
+            List<String> moIds = new ArrayList<>();
             for (JsonNode moIdNode : root.path("MO_ID")) {
-				if (moIdNode == null || moIdNode.isNull()) {
-					System.out.println("Skipping null or missing MO_ID entry.");
-					continue;
-				}
+                if (moIdNode != null && !moIdNode.isNull()) {
+                    moIds.add(moIdNode.asText());
+                }
+            }
 
-				String moId = moIdNode.asText();
-				System.out.println("Processing Calculate Mould Needed MO_ID: " + moId);
+            // Save total plan
+            for (String moId : moIds) {
+                if (totalPlanRepo.existsTotalPlanByMOID(moId)) {
+                    System.out.println("MO_ID " + moId + " already exists. Skipping.");
+                    continue;
+                }
 
-//				if (totalPlanRepo.existsTotalPlanByMOID(moId)) {
-//					System.out.println("MO_ID " + moId + " already exists. Skipping.");
-//					continue;
-//				}
+                System.out.println("Processing Save Total Plan MO_ID: " + moId);
+                String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
+                monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
+                System.out.println("Finish MO_ID: " + moId);
+            }
+
+            // Hitung Mould
+            for (String moId : moIds) {
+                System.out.println("Processing Calculate Mould Needed MO_ID: " + moId);
                 String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
                 monthlyPlanNewRepo.hitungMould(singleInputJson);
             }
-            
-            List<String> moIds = new ArrayList<>();
-            for (JsonNode moIdNode : root.path("MO_ID")) {
-                moIds.add(moIdNode.asText());
-            }
-            
-            List<TotalPlan> totalPlans = totalPlanRepo.findAllByMOIDIn(moIds);
-            
-            //mengambil data seluruh total plan dari 2 moid
 
+            // Call Generate MP
             int cheatingId = root.path("CHEATING_ID").asInt();
-
-            for (JsonNode moIdNode : root.path("MO_ID")) {
-                String moId = moIdNode.asText();
-                System.out.println(moId);
+            for (String moId : moIds) {
+                System.out.println("Calling Generate MP for MO_ID: " + moId);
                 String singleInputJson = String.format("{\"MO_ID\":\"%s\", \"CHEATING_ID\":%d}", moId, cheatingId);
                 monthlyPlanNewRepo.callGenerateMp(singleInputJson);
             }
-            
-            for (JsonNode moIdNode : root.path("MO_ID")) {
-                String moId = moIdNode.asText();
-                System.out.println("Proccessing After Generate :"+moId);
-                
-                monthlyPlanNewRepo.callAfterGenerate(moId,BigDecimal.valueOf(cheatingId));
-            }
-            
-            
-            
-            // mengambil data mp sesuai dengan versi terbaru serta sudah di kalkulasi seperti yang di excel
-            
-            
-            
-			for (JsonNode moIdNode : root.path("MO_ID")) {
-				if (moIdNode == null || moIdNode.isNull()) {
-					System.out.println("Skipping null or missing MO_ID entry.");
-					continue;
-				}
-				String moId = moIdNode.asText();
-				System.out.println("Deleting Total Plan by MO_ID: " + moId);
-				totalPlanRepo.deleteByMOID(moId);
 
-			}
-			
-            
+            // Loop After Generate 5 times
+            for (int i = 0; i < 5; i++) {
+                for (String moId : moIds) {
+                    System.out.println("Processing After Generate (loop " + (i + 1) + "): " + moId);
+                    monthlyPlanNewRepo.callAfterGenerate(moId, BigDecimal.valueOf(cheatingId));
+                }
+            }
+
+            // Get summary
+            List<Map<String, Object>> dataDetailMp = monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIds);
+
+            // Delete total plan
+//            for (String moId : moIds) {
+//                System.out.println("Deleting Total Plan by MO_ID: " + moId);
+//                totalPlanRepo.deleteByMOID(moId);
+//            }
+
+            return dataDetailMp;
+
         } catch (Exception e) {
-            e.printStackTrace(); // This will show the error in the console
+            e.printStackTrace(); // Log the exception
             throw e;
         }
     }
+
     
     
     public List<Map<String, Object>> getSummaryByMoIds(List<String> moIds) {
         return monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIds);
     }
 	    
-    public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD, BigDecimal version) throws IOException {
+    public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD, BigDecimal versionMO,BigDecimal versionGenerate) throws IOException {
 //    	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
 //        if (!"Tidak Aktif".equals(statusMPRepo.findLatestStatusMP())) {
 //            return null; // or throw new IllegalStateException("Status is not active");
@@ -1970,7 +1945,7 @@ public class MonthlyPlanServiceImpl {
 
         String yearMonthStr = String.format("%04d%02d", year, month);
     	List<MarketingOrder> top2 = marketingOrderRepo
-    	        .findTop2ByYearMonth(yearMonthStr);
+    	        .findTop2ByYearMonth(yearMonthStr,versionMO);
 
     	List<String> moids = new ArrayList<>(); 
 
@@ -2148,9 +2123,9 @@ public class MonthlyPlanServiceImpl {
             Row tableHeadCuringRow = curingSheet.createRow(1);
             Cell tableHeadCuringCell;
             
-            String[] curingHeaderLabels = {"Tanggal", "Nomor", "Cavity", "Work Center Text", "Item Curing", "Deskripsi", "Shift 1", "Shift 2", "Shift 3", "Total"};
+            String[] curingHeaderLabels = {"Tanggal", "Nomor", "Cavity", "Work Center Text", "Item Curing", "Deskripsi", "Shift 1", "Shift 2", "Shift 3", "Total","Mould Use"};
             CellStyle[] curingHeaderStyles = {calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, 
-            		calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder};
+            		calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder};
 
             // Loop untuk kolom 0-5
             for (int col = 0; col < curingHeaderLabels.length; col++) {
@@ -2212,6 +2187,11 @@ public class MonthlyPlanServiceImpl {
         		curingDataCell = curingDataRow.createCell(10);
         		curingDataCell.setCellStyle(calibri11RightBorder);
         		curingDataCell.setCellFormula("SUM(H" + (curingDatarow + 1) + ":J" + (curingDatarow + 1) + ")");
+        		
+        		BigDecimal mouldUse = shiftMonthlyPlan.get(j).getMouldUse();
+        		curingDataCell = curingDataRow.createCell(11);
+        		curingDataCell.setCellStyle(calibri11RightBorder);
+        		curingDataCell.setCellValue(mouldUse != null ? mouldUse.doubleValue() : 0.0);
 
                 curingDatarow++;
             }

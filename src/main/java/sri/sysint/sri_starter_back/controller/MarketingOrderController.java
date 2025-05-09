@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -509,12 +511,14 @@ public class MarketingOrderController {
 //	    }
 //	    
 	    @PostMapping("/generate")
-	    public String generate(@RequestBody String inputJson) {
+	    public Response generate(@RequestBody String inputJson) {
 	        try {
-	        	monthlyPlanServiceImpl.generateMp(inputJson);
-	            return "Procedure executed sequentially for each MO_ID!";
+	        	List<Map<String, Object>> result = monthlyPlanServiceImpl.generateMp(inputJson);
+		        response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
+		        return response;
 	        } catch (Exception e) {
-	            return "Error: " + e.getMessage();
+		        response = new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, HttpStatus.OK.getReasonPhrase(), null,"Error: " + e.getMessage());
+		        return response;
 	        }
 	    }
 	    
@@ -553,10 +557,12 @@ public class MarketingOrderController {
 	            @RequestParam BigDecimal minB, @RequestParam BigDecimal maxB,
 	            @RequestParam BigDecimal minC, @RequestParam BigDecimal maxC,
 	            @RequestParam BigDecimal minD, @RequestParam BigDecimal maxD,
-	            @RequestParam BigDecimal version) throws IOException {
-		    String filename = "PREPARE PROD NOV 2024.xlsx";
+	            @RequestParam BigDecimal versionMO, @RequestParam BigDecimal versionGenerate) throws IOException {
+	    	
+	        String monthName = Month.of(month).getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase(); 
+	        String filename = "PREPARE PROD " + monthName + " " + year + ".xlsx";
 		    
-		    ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD,version);
+		    ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD,versionMO,versionGenerate);
 			//ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel();
 		    InputStreamResource file = new InputStreamResource(data);
 		    
