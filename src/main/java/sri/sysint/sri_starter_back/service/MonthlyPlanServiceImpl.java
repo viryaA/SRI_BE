@@ -3167,3 +3167,35 @@ public class MonthlyPlanServiceImpl {
     }
 
 }
+
+@Controller
+@RequestMapping("/books")
+public class BookPageController {
+
+    @GetMapping("/{id}")
+    public String getBookPage(@PathVariable int id, Model model) {
+        Book book = findBookById(id);
+        model.addAttribute("book", book); // Mengirim data ke view
+        return "bookDetail"; // Mengembalikan nama file HTML (Thymeleaf/JSP)
+    }
+
+    private Book findBookById(int id) {
+        return new Book(id, "Spring Boot Basics", "John Doe");
+    }
+}
+
+@RestController
+@RequestMapping("/api/books")
+public class BookRestController {
+
+    @GetMapping("/{id}")
+    public Book getBook(@PathVariable int id) {
+        return findBookById(id); // Mengembalikan data sebagai JSON
+    }
+
+    private Book findBookById(int id) {
+        return new Book(id, "Spring Boot Basics", "John Doe");
+    }
+}
+
+
