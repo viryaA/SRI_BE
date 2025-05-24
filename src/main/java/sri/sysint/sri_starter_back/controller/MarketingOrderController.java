@@ -452,8 +452,8 @@ public class MarketingOrderController {
 	    @GetMapping("/getAllMonthlyPlanning")
 	    public Response getAllMonthlyPlanning(final HttpServletRequest req) throws ResourceNotFoundException {
 
-	    	List <MonthlyPlan> data = marketingOrderServiceImpl.getAllMp();
-	    	response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+//	    	List <MonthlyPlan> data = marketingOrderServiceImpl.getAllMp();
+	    	response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
 	    	return response;
 	    }
 	    
