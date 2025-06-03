@@ -14,6 +14,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -767,6 +769,172 @@ public class WorkDayController {
 
         return response;
     }
+    
+    @GetMapping("/export-template-excel/{year}/{month}")
+    public ResponseEntity<byte[]> exportTemplateExcel(
+            @PathVariable("month") int month,
+            @PathVariable("year") int year) throws IOException {
+
+        ByteArrayInputStream in = workDayServiceImpl.exportTemplateExcel(
+                BigDecimal.valueOf(month), BigDecimal.valueOf(year));
+
+        byte[] bytes = in.readAllBytes();
+
+        String fileName = "WorkDayTemplate_" + year + "_" + month + ".xlsx";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(bytes);
+    }
+    
+    private Object getCellValue(Cell cell) {
+        if (cell == null) return null;
+
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue().trim();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue();
+                } else {
+                    return cell.getNumericCellValue();
+                }
+            case BOOLEAN:
+                return cell.getBooleanCellValue();
+            case FORMULA:
+                return cell.getCellFormula();
+            default:
+                return null;
+        }
+    }
+
+
+	@PostMapping("/importWDExcel")
+	public Response importWorkDaysExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
+	    if (file.isEmpty()) {
+	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	    }
+	
+	    try (InputStream inputStream = file.getInputStream()) {
+	        XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+	        XSSFSheet sheet = workbook.getSheetAt(0);
+	
+	        // Define expected vertical headers in column A
+	        String[] expectedRows = {
+	            "DATE_WD",
+	            "S1 OFF TT",
+	            "S1 START OT_TT", "S1 END OT_TT", "S1 REASON OT_TT",
+	            "S1 OFF TL",
+	            "S1 START OT_TL", "S1 END OT_TL", "S1 REASON OT_TL",
+	            "S2 OFF TT",
+	            "S2 START OT_TT", "S2 END OT_TT", "S2 REASON OT_TT",
+	            "S2 OFF TL",
+	            "S2 START OT_TL", "S2 END OT_TL", "S2 REASON OT_TL",
+	            "S3 OFF TT",
+	            "S3 START OT_TT", "S3 END OT_TT", "S3 REASON OT_TT",
+	            "S3 OFF TL",
+	            "S3 START OT_TL", "S3 END OT_TL", "S3 REASON OT_TL"
+	        };
+	
+	        // Check if vertical headers in column A match
+	        for (int i = 0; i < expectedRows.length; i++) {
+	            Row row = sheet.getRow(i);
+	            if (row == null || row.getCell(0) == null) {
+	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Missing or incomplete header in column A at row " + (i + 1), req.getRequestURI(), null);
+	            }
+	            String cellValue = row.getCell(0).getStringCellValue().trim();
+	            if (!cellValue.equals(expectedRows[i])) {
+	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Invalid header: expected '" + expectedRows[i] + "' but found '" + cellValue + "' at row " + (i + 1), req.getRequestURI(), null);
+	            }
+	        }
+	
+	        // Check if cells in column B contain valid dates
+	        Row rowh = sheet.getRow(0); // Only check the first row
+	        if (rowh != null) {
+	            int lastColumn = rowh.getLastCellNum(); // Total columns used in this row
+	
+	            for (int col = 1; col < lastColumn; col++) {
+	                Cell cell = rowh.getCell(col);
+	                System.out.print("Column " + (col + 1) + ": ");
+	
+	                if (cell == null) {
+	                    System.out.println("Cell is null");
+	                    return new Response(
+	                        new Date(),
+	                        HttpStatus.BAD_REQUEST.value(),
+	                        null,
+	                        "Missing cell at column " + (col + 1) + " in row 1",
+	                        req.getRequestURI(),
+	                        null
+	                    );
+	                }
+	
+	                if (cell.getCellType() != CellType.NUMERIC || !DateUtil.isCellDateFormatted(cell)) {
+	                    System.out.println("Invalid date");
+	                    return new Response(
+	                        new Date(),
+	                        HttpStatus.BAD_REQUEST.value(),
+	                        null,
+	                        "Invalid or non-date cell at column " + (col + 1) + " in row 1",
+	                        req.getRequestURI(),
+	                        null
+	                    );
+	                }
+	
+	                System.out.println("Date: " + cell.getDateCellValue());
+	            }
+	        }
+	        List<Map<String, Object>> resultTTList = new ArrayList<>();
+	        List<Map<String, Object>> resultTLList = new ArrayList<>();
+
+	        int lastColumn = sheet.getRow(0).getLastCellNum();
+
+	        for (int col = 1; col < lastColumn; col++) {
+	            Map<String, Object> ttData = new HashMap<>();
+	            Map<String, Object> tlData = new HashMap<>();
+
+	            // DATE_WD
+	            Cell dateCell = sheet.getRow(0).getCell(col);
+	            Date workDate = dateCell.getDateCellValue();
+	            ttData.put("DATE_WD", workDate);
+	            tlData.put("DATE_WD", workDate);
+
+	            // SHIFTS: S1, S2, S3
+	            for (int shift = 1; shift <= 3; shift++) {
+	                int baseRow = (shift - 1) * 6 + 1;
+
+	                // TT Data
+	                Map<String, Object> shiftTT = new HashMap<>();
+	                shiftTT.put("OFF", getCellValue(sheet.getRow(baseRow).getCell(col)));
+	                shiftTT.put("START", getCellValue(sheet.getRow(baseRow + 1).getCell(col)));
+	                shiftTT.put("END", getCellValue(sheet.getRow(baseRow + 2).getCell(col)));
+	                shiftTT.put("REASON", getCellValue(sheet.getRow(baseRow + 3).getCell(col)));
+	                ttData.put("S" + shift + "_TT", shiftTT);
+
+	                // TL Data
+	                Map<String, Object> shiftTL = new HashMap<>();
+	                shiftTL.put("OFF", getCellValue(sheet.getRow(baseRow + 4).getCell(col)));
+	                shiftTL.put("START", getCellValue(sheet.getRow(baseRow + 5).getCell(col)));
+	                shiftTL.put("END", getCellValue(sheet.getRow(baseRow + 6).getCell(col)));
+	                shiftTL.put("REASON", getCellValue(sheet.getRow(baseRow + 7).getCell(col)));
+	                tlData.put("S" + shift + "_TL", shiftTL);
+	            }
+
+	            resultTTList.add(ttData);
+	            resultTLList.add(tlData);
+	        }
+
+
+	        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed successfully", req.getRequestURI(), Map.of("tt", resultTTList, "tl", resultTLList));
+
+//	        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data validated successfully", req.getRequestURI(), null);
+	
+	    } catch (IOException e) {
+	        return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
+	    }
+	}
+
 
 
 }

@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.lang.reflect.Field;
 
 import javax.transaction.Transactional;
@@ -24,12 +26,18 @@ import javax.transaction.Transactional;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -637,4 +645,319 @@ public class WorkDayServiceImpl {
             }
         }
     }
+
+    public ByteArrayInputStream exportTemplateExcel(BigDecimal month, BigDecimal year) throws IOException {
+        YearMonth ym = YearMonth.of(year.intValue(), month.intValue());
+        LocalDate startDate = ym.atDay(1);         // e.g. 2025-06-01
+        LocalDate endDate = ym.atEndOfMonth();     // e.g. 2025-06-30
+
+        // Now directly pass LocalDate objects
+        List<Object[]> shiftDetails = workDayRepo.findShiftDetailsByDateRange(startDate, endDate);
+        ByteArrayInputStream byteArrayInputStream = dataExportTemplateExcel(shiftDetails);
+        return byteArrayInputStream;
+    }
+
+    public ByteArrayInputStream dataExportTemplateExcel(List<Object[]> workDays) throws IOException {
+    	String[] rows = {
+    		    "DATE_WD",
+    		    "S1 OFF TT",
+    		    "S1 START OT_TT", "S1 END OT_TT", "S1 REASON OT_TT",
+    		    "S1 OFF TL",
+    		    "S1 START OT_TL", "S1 END OT_TL", "S1 REASON OT_TL",
+    		    "S2 OFF TT", 
+    		    "S2 START OT_TT", "S2 END OT_TT", "S2 REASON OT_TT",
+    		    "S2 OFF TL",
+    		    "S2 START OT_TL", "S2 END OT_TL", "S2 REASON OT_TL",
+    		    "S3 OFF TT",
+    		    "S3 START OT_TT", "S3 END OT_TT", "S3 REASON OT_TT",
+    		    "S3 OFF TL",
+    		    "S3 START OT_TL", "S3 END OT_TL", "S3 REASON OT_TL"
+    		};
+
+    		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+    		    Sheet sheet = workbook.createSheet("WorkDays");
+
+    		    // Put the titles in the first column (column A)
+    		    for (int i = 0; i < rows.length; i++) {
+    		        Row row = sheet.getRow(i);
+    		        if (row == null) row = sheet.createRow(i);
+    		        Cell cell = row.createCell(0); // Column A
+    		        cell.setCellValue(rows[i]);
+    		    }
+    		    
+    		    int colIdx = 1; // Start from column B
+    		    Date prevDate = null;
+    		    for (Object[] record : workDays) {
+    		        int rowIdx = 0;
+    		        Row row = sheet.getRow(rowIdx++);
+    		        if (row == null) row = sheet.createRow(rowIdx - 1); // Ensure row exists
+
+    		        Cell cell = row.createCell(colIdx);
+
+    		        if (record[0] != null && record[0] instanceof Date) {
+    		            Date currentDate = (Date) record[0];
+
+    		            // Compare only the date part (ignore time)
+    		            SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+    		            String curr = fmt.format(currentDate);
+    		            String prev = prevDate != null ? fmt.format(prevDate) : "";
+
+    		            if (curr.equals(prev)) {
+    		                colIdx--; // Same date, skip setting it again
+    		            } else {
+    		                // Set date with format
+    		                CellStyle dateCellStyle = workbook.createCellStyle();
+    		                CreationHelper createHelper = workbook.getCreationHelper();
+    		                dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+
+    		                cell.setCellValue(currentDate);
+    		                cell.setCellStyle(dateCellStyle);
+    		            }
+
+
+    		            prevDate = currentDate;
+    		        } else {
+    		            cell.setCellValue("");
+    		        }
+
+
+    		        // S1 OFF & REASON
+    		        String s1Desc = record[4] != null ? record[4].toString() : "";
+    		        System.out.print("d");
+    		        // S1 OT_TT
+    		        String hsDesc = record[14] != null ? record[14].toString() : "";
+    		        if ("OT_TT".equalsIgnoreCase(hsDesc)) {
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5].toString().equals("1") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[2] != null ? record[2].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[3] != null ? record[3].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s1Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+    		        System.out.print("4");
+
+    		        // S1 OT_TL
+    		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5].toString().equals("1") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[2] != null ? record[2].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[3] != null ? record[3].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s1Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+
+    		        // S2
+    		        String s2Desc = record[8] != null ? record[8].toString() : "";
+    		        System.out.print("dr");
+    		        if ("OT_TT".equalsIgnoreCase(hsDesc)) {
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9].toString().equals("1") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[6] != null ? record[6].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[7] != null ? record[7].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s2Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+    		        System.out.print("5");
+    		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9].toString().equals("1") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[6] != null ? record[6].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[7] != null ? record[7].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s2Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+
+    		        // S3
+    		        String s3Desc = record[12] != null ? record[12].toString() : "";
+    		        System.out.print("dk");
+    		        if ("OT_TT".equalsIgnoreCase(hsDesc)) {
+    		        	sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[13].toString().equals("1") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[10] != null ? record[10].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[11] != null ? record[11].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+    		        System.out.print("7");
+    		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
+    		        	sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[13].toString().equals("1") ? "Yes" : "No");
+        		        System.out.print("7f");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[10] != null ? record[10].toString() : "");
+        		        System.out.print("7d");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[11] != null ? record[11].toString() : "");
+        		        System.out.print("7t");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Desc);
+        		        System.out.print("7h");
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+
+    		        colIdx++; // move to the next column for the next record
+    		    }
+
+    		    // Adjust widths
+    		    for (int i = 0; i < colIdx; i++) {
+    		        sheet.autoSizeColumn(i);
+    		    }
+    		    sheet.createFreezePane(1, 1);
+    		    
+    		    CellStyle lockedStyle = workbook.createCellStyle();
+    		    lockedStyle.setLocked(true);
+
+    		    CellStyle unlockedStyle = workbook.createCellStyle();
+    		    unlockedStyle.setLocked(false);
+
+    		    // Lock only the first row and column A
+    		    for (int r = 0; r <= sheet.getLastRowNum(); r++) {
+    		        Row row = sheet.getRow(r);
+    		        if (row == null) continue;
+
+    		        for (int c = 0; c < colIdx; c++) {
+    		            Cell cell = row.getCell(c);
+    		            if (cell == null) continue;
+
+    		            CellStyle originalStyle = cell.getCellStyle();
+    		            CellStyle newStyle = workbook.createCellStyle();
+    		            newStyle.cloneStyleFrom(originalStyle); // preserve formatting
+
+    		            if (r == 0 || c == 0) {
+    		                newStyle.setLocked(true);
+    		            } else {
+    		                newStyle.setLocked(false);
+    		            }
+
+    		            cell.setCellStyle(newStyle);
+    		        }
+    		    }
+
+    		    sheet.protectSheet("your_password");
+    		    
+    		    DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+    		    DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[] {"Yes", "No"});
+
+    		    // Target rows: 1, 5, 9, 13, 17, 21 (0-based index, so row 2 = index 1)
+    		    int[] dropdownRows = {1, 5, 9, 13, 17, 21};
+    		    for (int row : dropdownRows) {
+    		        CellRangeAddressList addressList = new CellRangeAddressList(row, row, 1, colIdx - 1); // From col B to last used
+    		        DataValidation validation = validationHelper.createValidation(constraint, addressList);
+    		        validation.setSuppressDropDownArrow(true);
+    		        validation.setShowErrorBox(true);
+    		        sheet.addValidationData(validation);
+    		    }
+    		    
+    		 // Create styles
+    		    CellStyle HeaderStyle = workbook.createCellStyle();
+    		    HeaderStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+    		    HeaderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+    		    
+    		    CellStyle lightBlueStyle = workbook.createCellStyle();
+    		    lightBlueStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
+    		    lightBlueStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+
+    		    CellStyle lightGreenStyle = workbook.createCellStyle();
+    		    lightGreenStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+    		    lightGreenStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+    		    
+    		    CellStyle lightYellowStyle = workbook.createCellStyle();
+    		    lightYellowStyle.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+    		    lightYellowStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    		    
+    		    Font boldFont = workbook.createFont();
+    		    boldFont.setBold(true);
+
+		        Row rowH = sheet.getRow(0);
+		        for (int c = 0; c < colIdx; c++) {
+		            Cell cell = rowH.getCell(c);
+		            if (cell == null) cell = rowH.createCell(c);
+		            CellStyle newStyle = workbook.createCellStyle();
+		            newStyle.cloneStyleFrom(cell.getCellStyle());
+		            newStyle.setFillForegroundColor(HeaderStyle.getFillForegroundColor());
+		            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		            newStyle.setBorderBottom(BorderStyle.THIN);
+		            newStyle.setBorderTop(BorderStyle.THIN);
+		            newStyle.setBorderLeft(BorderStyle.THIN);
+		            newStyle.setBorderRight(BorderStyle.THIN);
+		            newStyle.setFont(boldFont);
+		            if (c >= 1) {
+		                newStyle.setAlignment(HorizontalAlignment.CENTER);
+		            }
+		            cell.setCellStyle(newStyle);
+		        }
+		        
+    		    // Apply background to rows 2–9 (index 1 to 8)
+    		    for (int r = 1; r <= 8; r++) {
+    		        Row row = sheet.getRow(r);
+    		        if (row == null) continue;
+    		        for (int c = 0; c < colIdx; c++) {
+    		            Cell cell = row.getCell(c);
+    		            if (cell == null) cell = row.createCell(c);
+    		            CellStyle newStyle = workbook.createCellStyle();
+    		            newStyle.cloneStyleFrom(cell.getCellStyle());
+    		            newStyle.setFillForegroundColor(lightBlueStyle.getFillForegroundColor());
+    		            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    		            newStyle.setBorderBottom(BorderStyle.THIN);
+    		            newStyle.setBorderTop(BorderStyle.THIN);
+    		            newStyle.setBorderLeft(BorderStyle.THIN);
+    		            newStyle.setBorderRight(BorderStyle.THIN);
+    		            if(c == 0) {
+    			            newStyle.setFont(boldFont);
+    		            }
+    		            cell.setCellStyle(newStyle);
+    		        }
+    		    }
+
+    		    // Apply background to rows 10–17 (index 9 to 16)
+    		    for (int r = 9; r <= 16; r++) {
+    		        Row row = sheet.getRow(r);
+    		        if (row == null) continue;
+    		        for (int c = 0; c < colIdx; c++) {
+    		            Cell cell = row.getCell(c);
+    		            if (cell == null) cell = row.createCell(c);
+    		            CellStyle newStyle = workbook.createCellStyle();
+    		            newStyle.cloneStyleFrom(cell.getCellStyle());
+    		            newStyle.setFillForegroundColor(lightGreenStyle.getFillForegroundColor());
+    		            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    		            newStyle.setBorderBottom(BorderStyle.THIN);
+    		            newStyle.setBorderTop(BorderStyle.THIN);
+    		            newStyle.setBorderLeft(BorderStyle.THIN);
+    		            newStyle.setBorderRight(BorderStyle.THIN);
+    		            if(c == 0) {
+    			            newStyle.setFont(boldFont);
+    		            }
+    		            cell.setCellStyle(newStyle);
+    		        }
+    		    }
+
+    		    for (int r = 17; r <= 24; r++) {
+    		        Row row = sheet.getRow(r);
+    		        if (row == null) continue;
+    		        for (int c = 0; c < colIdx; c++) {
+    		            Cell cell = row.getCell(c);
+    		            if (cell == null) cell = row.createCell(c);
+    		            CellStyle newStyle = workbook.createCellStyle();
+    		            newStyle.cloneStyleFrom(cell.getCellStyle());
+    		            newStyle.setFillForegroundColor(lightYellowStyle.getFillForegroundColor());
+    		            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    		            newStyle.setBorderBottom(BorderStyle.THIN);
+    		            newStyle.setBorderTop(BorderStyle.THIN);
+    		            newStyle.setBorderLeft(BorderStyle.THIN);
+    		            newStyle.setBorderRight(BorderStyle.THIN);
+    		            if(c == 0 ) {
+    			            newStyle.setFont(boldFont);
+    		            }
+    		            cell.setCellStyle(newStyle);
+    		        }
+    		    }
+    		    
+
+    		    
+    		    workbook.write(out);
+    		    return new ByteArrayInputStream(out.toByteArray());
+    		}
+    		
+    }
+
 }
