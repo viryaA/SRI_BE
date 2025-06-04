@@ -12,7 +12,8 @@ import org.springframework.data.repository.query.Param;
 
 import sri.sysint.sri_starter_back.model.DWorkDayHoursSpesific;
 
-public interface DWorkDayHoursSpecificRepo extends JpaRepository<DWorkDayHoursSpesific, Date> {
+public interface DWorkDayHoursSpecificRepo extends JpaRepository<DWorkDayHoursSpesific, BigDecimal> {
+    Optional<List<DWorkDayHoursSpesific>> findByDATEWD(Date dateWD);
 	
 	@Query(value = "SELECT * FROM SRI_IMPP_D_WD_HOURS_SPECIFIC WHERE DETAIL_WD_HOURS_SPECIFIC_ID = :id", nativeQuery = true)
     Optional<DWorkDayHoursSpesific> findById(@Param("id") BigDecimal id);

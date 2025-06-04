@@ -8,10 +8,13 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,8 +54,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
 import sri.sysint.sri_starter_back.exception.ResourceNotFoundException;
+import sri.sysint.sri_starter_back.model.DWorkDayHours;
+import sri.sysint.sri_starter_back.model.DWorkDayHoursSpesific;
 import sri.sysint.sri_starter_back.model.Response;
 import sri.sysint.sri_starter_back.model.WorkDay; // Import your WorkDay model
+import sri.sysint.sri_starter_back.repository.DWorkDayHoursSpecificRepo;
+import sri.sysint.sri_starter_back.repository.DWorkDayRepo;
+import sri.sysint.sri_starter_back.repository.WorkDayRepo;
 import sri.sysint.sri_starter_back.service.WorkDayServiceImpl; // Import your WorkDay service
 
 @CrossOrigin(maxAge = 3600)
@@ -63,6 +71,15 @@ public class WorkDayController {
 
     @Autowired
     private WorkDayServiceImpl workDayServiceImpl;
+    
+    @Autowired
+    private WorkDayRepo workDayRepo;
+    
+    @Autowired
+    private DWorkDayHoursSpecificRepo detailWorkDayRepo;
+    
+    @Autowired
+    private DWorkDayRepo reasonWorkDay;
 
     @PersistenceContext
     private EntityManager em;
@@ -902,7 +919,7 @@ public class WorkDayController {
 
 	            // SHIFTS: S1, S2, S3
 	            for (int shift = 1; shift <= 3; shift++) {
-	                int baseRow = (shift - 1) * 6 + 1;
+	            	int baseRow = (shift - 1) * 8 + 1;
 
 	                // TT Data
 	                Map<String, Object> shiftTT = new HashMap<>();
@@ -924,7 +941,83 @@ public class WorkDayController {
 	            resultTTList.add(ttData);
 	            resultTLList.add(tlData);
 	        }
+	        
+	        for (int i = 0; i < resultTTList.size(); i++) {
+                boolean canUpdateDetail = false;
+	            Map<String, Object> ttData = resultTTList.get(i);
+	            Map<String, Object> tlData = resultTLList.get(i);
 
+	            Map<String, Object> s1TT = (Map<String, Object>) ttData.get("S1_TT");
+	            Map<String, Object> s1TL = (Map<String, Object>) tlData.get("S1_TL");
+                Map<String, Object> s2TT = (Map<String, Object>) ttData.get("S2_TT");
+	            Map<String, Object> s2TL = (Map<String, Object>) tlData.get("S2_TL");
+                Map<String, Object> s3TT = (Map<String, Object>) ttData.get("S3_TT");
+	            Map<String, Object> s3TL = (Map<String, Object>) tlData.get("S3_TL");
+
+                String startTT = extractHourMinute(s1TT.get("START"));
+                String startTL = extractHourMinute(s1TL.get("START"));
+
+                System.out.println("S1 TT START: " + startTT + " | S1 TL START: " + startTL);
+
+		        Date wdIsDate = (Date) ttData.get("DATE_WD");
+
+			     // Example: querying workDayRepo using the date
+		        Optional<WorkDay> workDayOpt = workDayRepo.findById(wdIsDate);
+                WorkDay updateWorkDay = null;
+                if (workDayOpt.isPresent()) {
+                    canUpdateDetail = true;
+                    System.out.println("Data ada");
+                    System.out.println(workDayOpt.get().getDATE_WD());
+                    updateWorkDay = workDayOpt.get();
+
+                    // Convert and set TL
+                    updateWorkDay.setIOT_TL_1(yesNoToBigDecimal(s1TL.get("OFF").toString(),s1TL));
+                    updateWorkDay.setIOT_TL_2(yesNoToBigDecimal(s2TL.get("OFF").toString(),s2TL));
+                    updateWorkDay.setIOT_TL_3(yesNoToBigDecimal(s3TL.get("OFF").toString(),s3TL));
+
+                    // Convert and set TT
+                    updateWorkDay.setIOT_TT_1(yesNoToBigDecimal(s1TT.get("OFF").toString(),s1TT));
+                    updateWorkDay.setIOT_TT_2(yesNoToBigDecimal(s2TT.get("OFF").toString(),s2TT));
+                    updateWorkDay.setIOT_TT_3(yesNoToBigDecimal(s3TT.get("OFF").toString(),s3TT));
+                }
+
+                DWorkDayHoursSpesific updateTT = null;
+                DWorkDayHoursSpesific updateTL = null;
+		        Optional<List<DWorkDayHoursSpesific>> detailWDData = detailWorkDayRepo.findByDATEWD(wdIsDate);
+		        if (!detailWDData.isEmpty()) {
+		            System.out.println("Data Detail ada");
+		            for (DWorkDayHoursSpesific item : detailWDData.get()) {
+		            	if(item.getDESCRIPTION().equals("OT_TT")) {
+                            updateTT = item;	            		
+		            	}else if (item.getDESCRIPTION().equals("OT_TL")){
+                            updateTL = item;
+                        }
+		            }
+		        }
+
+                if (updateTT != null && updateTL != null && canUpdateDetail) {
+                    System.out.println("Siap update");
+
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+                    // === TT Updates ===
+                    updateShift(updateTT, "TT", s1TT, 1, formatter);
+                    updateShift(updateTT, "TT", s2TT, 2, formatter);
+                    updateShift(updateTT, "TT", s3TT, 3, formatter);
+
+                    // === TL Updates ===
+                    updateShift(updateTL, "TL", s1TL, 1, formatter);
+                    updateShift(updateTL, "TL", s2TL, 2, formatter);
+                    updateShift(updateTL, "TL", s3TL, 3, formatter);
+                }
+                if(canUpdateDetail){
+                    System.out.println("UPDATEUPDATEUPDATEUPDATEUPDATE"+updateWorkDay.getDATE_WD()+updateTT.getSHIFT1_END_TIME()+" ID"+updateTT.getDETAIL_WD_HOURS_SPECIFIC_ID());
+                    workDayRepo.save(updateWorkDay);
+                    detailWorkDayRepo.save(updateTT);
+                    detailWorkDayRepo.save(updateTL);
+                }
+
+	        }
 
 	        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed successfully", req.getRequestURI(), Map.of("tt", resultTTList, "tl", resultTLList));
 
@@ -935,6 +1028,93 @@ public class WorkDayController {
 	    }
 	}
 
+    private String extractHourMinute(Object timeValue) {
+        if (timeValue == null) return null;
+
+        if (timeValue instanceof String) {
+            String str = (String) timeValue;
+            try {
+                // Try to parse full datetime
+                SimpleDateFormat fullFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                Date date = fullFormat.parse(str);
+                SimpleDateFormat hourMinuteFormat = new SimpleDateFormat("HH:mm");
+                return hourMinuteFormat.format(date);
+            } catch (ParseException e) {
+                // Try parsing HH:mm format
+                if (str.matches("\\d{2}:\\d{2}")) {
+                    return str;
+                } else {
+                    System.out.println("Invalid time format: " + str);
+                    return null;
+                }
+            }
+        } else if (timeValue instanceof Date) {
+            SimpleDateFormat hourMinuteFormat = new SimpleDateFormat("HH:mm");
+            return hourMinuteFormat.format((Date) timeValue);
+        }
+
+        return null;
+    }
+
+    private BigDecimal calculateDurationInMinutes(String start, String end, DateTimeFormatter formatter) {
+        try {
+            LocalTime startTime = LocalTime.parse(start, formatter);
+            LocalTime endTime = LocalTime.parse(end, formatter);
+
+            long minutes = Duration.between(startTime, endTime).toMinutes();
+            if (minutes < 0) {
+                minutes += 24 * 60; // overnight shift
+            }
+            return BigDecimal.valueOf(minutes);
+        } catch (DateTimeParseException e) {
+            System.err.println("Time parse error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private void updateShift(DWorkDayHoursSpesific updateObj, String label, Map<String, Object> shiftMap, int shiftNumber, DateTimeFormatter formatter) {
+        String start = extractHourMinute(shiftMap.get("START"));
+        String end = extractHourMinute(shiftMap.get("END"));
+
+        System.out.printf("%s Shift %d: start = %s, end = %s%n", label, shiftNumber, start, end);
+
+        if (start != null && end != null) {
+            BigDecimal dur = calculateDurationInMinutes(start, end, formatter);
+            System.out.printf("%s Shift %d duration = %s%n", label, shiftNumber, dur);
+
+            switch (shiftNumber) {
+                case 1 : {
+                    updateObj.setSHIFT1_START_TIME(start);
+                    updateObj.setSHIFT1_END_TIME(end);
+                    updateObj.setSHIFT1_TOTAL_TIME(dur);
+                }
+                case 2 : {
+                    updateObj.setSHIFT2_START_TIME(start);
+                    updateObj.setSHIFT2_END_TIME(end);
+                    updateObj.setSHIFT2_TOTAL_TIME(dur);
+                }
+                case 3 : {
+                    updateObj.setSHIFT3_START_TIME(start);
+                    updateObj.setSHIFT3_END_TIME(end);
+                    updateObj.setSHIFT3_TOTAL_TIME(dur);
+                }
+            }
+        }
+    }
+    
+    private BigDecimal yesNoToBigDecimal(String value, Map<String, Object> data) {
+        if ("Yes".equalsIgnoreCase(value)) {
+            Object reason = data.get("REASON");
+            if (reason != null) {
+                System.out.println("OFF = Yes, Reason: " + reason.toString());
+                // You can also save this somewhere if needed
+            } else {
+                System.out.println("OFF = Yes, but REASON is missing.");
+            }
+            return BigDecimal.ONE;
+        }
+        return BigDecimal.ZERO;
+    }
 
 
 }

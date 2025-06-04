@@ -17,7 +17,7 @@ public class DWorkDayHoursSpesific {
     private BigDecimal DETAIL_WD_HOURS_SPECIFIC_ID;
     
     @Column(name = "DATE_WD")
-    private Date DATE_WD;
+    private Date DATEWD;
     
     
     @Column(name = "SHIFT1_START_TIME")
@@ -71,7 +71,7 @@ public class DWorkDayHoursSpesific {
     
     public DWorkDayHoursSpesific(DWorkDayHoursSpesific dWorkDayHoursSpesific) {
         this.DETAIL_WD_HOURS_SPECIFIC_ID = dWorkDayHoursSpesific.getDETAIL_WD_HOURS_SPECIFIC_ID();
-        this.DATE_WD = dWorkDayHoursSpesific.getDATE_WD();
+        this.DATEWD = dWorkDayHoursSpesific.getDATE_WD();
         this.SHIFT1_START_TIME = dWorkDayHoursSpesific.getSHIFT1_START_TIME();
         this.SHIFT1_END_TIME = dWorkDayHoursSpesific.getSHIFT1_END_TIME();
         this.SHIFT1_TOTAL_TIME = dWorkDayHoursSpesific.getSHIFT1_TOTAL_TIME();
@@ -98,7 +98,7 @@ public class DWorkDayHoursSpesific {
 			Date lAST_UPDATE_DATE, String lAST_UPDATED_BY) {
 		super();
 		DETAIL_WD_HOURS_SPECIFIC_ID = dETAIL_WD_HOURS_SPECIFIC_ID;
-		DATE_WD = dATE_WD;
+		DATEWD = dATE_WD;
 		SHIFT1_START_TIME = sHIFT1_START_TIME;
 		SHIFT1_END_TIME = sHIFT1_END_TIME;
 		SHIFT1_TOTAL_TIME = sHIFT1_TOTAL_TIME;
@@ -125,11 +125,11 @@ public class DWorkDayHoursSpesific {
 	}
 
 	public Date getDATE_WD() {
-		return DATE_WD;
+		return DATEWD;
 	}
 
 	public void setDATE_WD(Date dATE_WD) {
-		DATE_WD = dATE_WD;
+		DATEWD = dATE_WD;
 	}
 
 	public String getSHIFT1_START_TIME() {
