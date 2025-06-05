@@ -13,6 +13,10 @@ import sri.sysint.sri_starter_back.model.DWorkDay;
 import sri.sysint.sri_starter_back.model.WorkDay;
 
 public interface DWorkDayRepo extends JpaRepository<DWorkDay, BigDecimal>{
+
+	@Query("SELECT d FROM DWorkDay d WHERE d.PARENT = :parent AND TRUNC(d.DATE_WD) = TRUNC(:date)")
+	DWorkDay findByParentAndStatusAndDateWDTruncated(String parent, Date date);
+
 	@Query(value = "SELECT * FROM SRI_IMPP_D_WD WHERE DETAIL_WD_ID = :id", nativeQuery = true)
     Optional<DWorkDay> findById(@Param("id") BigDecimal id);
 	

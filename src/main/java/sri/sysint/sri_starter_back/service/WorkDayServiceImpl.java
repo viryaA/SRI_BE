@@ -38,6 +38,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -653,25 +655,33 @@ public class WorkDayServiceImpl {
 
         // Now directly pass LocalDate objects
         List<Object[]> shiftDetails = workDayRepo.findShiftDetailsByDateRange(startDate, endDate);
-        ByteArrayInputStream byteArrayInputStream = dataExportTemplateExcel(shiftDetails);
+        List<Object[]> shiftDetailsNormal = workDayRepo.findShiftDetailsByDateRangeNormal(startDate, endDate);
+        ByteArrayInputStream byteArrayInputStream = dataExportTemplateExcel(shiftDetails,shiftDetailsNormal);
         return byteArrayInputStream;
     }
 
-    public ByteArrayInputStream dataExportTemplateExcel(List<Object[]> workDays) throws IOException {
+    public ByteArrayInputStream dataExportTemplateExcel(List<Object[]> workDays,List<Object[]> workDaysNormal) throws IOException {
     	String[] rows = {
     		    "DATE_WD",
+    		    "S1 OFF NORMAL", 
+                "S1 START NORMAL", "S1 END NORMAL", "S1 REASON NORMAL",
     		    "S1 OFF TT",
     		    "S1 START OT_TT", "S1 END OT_TT", "S1 REASON OT_TT",
     		    "S1 OFF TL",
     		    "S1 START OT_TL", "S1 END OT_TL", "S1 REASON OT_TL",
+                "S2 OFF NORMAL",
+    		    "S2 START NORMAL", "S2 END NORMAL", "S2 REASON NORMAL",
     		    "S2 OFF TT", 
     		    "S2 START OT_TT", "S2 END OT_TT", "S2 REASON OT_TT",
     		    "S2 OFF TL",
     		    "S2 START OT_TL", "S2 END OT_TL", "S2 REASON OT_TL",
+                "S3 OFF NORMAL",
+    		    "S3 START NORMAL", "S3 END NORMAL", "S3 REASON NORMAL",
     		    "S3 OFF TT",
     		    "S3 START OT_TT", "S3 END OT_TT", "S3 REASON OT_TT",
     		    "S3 OFF TL",
-    		    "S3 START OT_TL", "S3 END OT_TL", "S3 REASON OT_TL"
+    		    "S3 START OT_TL", "S3 END OT_TL", "S3 REASON OT_TL",
+
     		};
 
     		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -684,8 +694,42 @@ public class WorkDayServiceImpl {
     		        Cell cell = row.createCell(0); // Column A
     		        cell.setCellValue(rows[i]);
     		    }
-    		    
+
     		    int colIdx = 1; // Start from column B
+
+                for (Object[] record : workDaysNormal) {
+    		        int rowIdx = 0;
+    		        Row row = sheet.getRow(rowIdx++);
+    		        if (row == null) row = sheet.createRow(rowIdx - 1); // Ensure row exists
+
+    		        Cell cell = row.createCell(colIdx);
+
+    		        // S1 OFF & REASON
+    		        String s1Desc = record[3] != null ? record[3].toString() : "";
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[0].toString().equals("1") ? "Yes" : "No");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[1] != null ? record[1].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[2] != null ? record[2].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s1Desc);
+                    rowIdx += 8;
+
+    		        // S2
+    		        String s2Desc = record[7] != null ? record[7].toString() : "";
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[4].toString().equals("1") ? "Yes" : "No");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5] != null ? record[5].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[6] != null ? record[6].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s2Desc);
+                    rowIdx += 8;
+                    
+    		        // S3
+    		        String s3Desc = record[11] != null ? record[11].toString() : "";
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[8].toString().equals("1") ? "Yes" : "No");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9] != null ? record[9].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[10] != null ? record[10].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Desc);
+    		        colIdx++; // move to the next column for the next record
+    		    }
+
+    		    colIdx = 1; // Start from column B
     		    Date prevDate = null;
     		    for (Object[] record : workDays) {
     		        int rowIdx = 0;
@@ -720,6 +764,8 @@ public class WorkDayServiceImpl {
     		            cell.setCellValue("");
     		        }
 
+                    rowIdx +=4;
+
 
     		        // S1 OFF & REASON
     		        String s1Desc = record[4] != null ? record[4].toString() : "";
@@ -735,7 +781,7 @@ public class WorkDayServiceImpl {
     		            rowIdx += 4;
     		        }
     		        System.out.print("4");
-
+                    
     		        // S1 OT_TL
     		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
         		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5].toString().equals("1") ? "Yes" : "No");
@@ -745,6 +791,7 @@ public class WorkDayServiceImpl {
     		        } else {
     		            rowIdx += 4;
     		        }
+                    rowIdx += 4;
 
     		        // S2
     		        String s2Desc = record[8] != null ? record[8].toString() : "";
@@ -766,6 +813,8 @@ public class WorkDayServiceImpl {
     		        } else {
     		            rowIdx += 4;
     		        }
+                    rowIdx += 4;
+
 
     		        // S3
     		        String s3Desc = record[12] != null ? record[12].toString() : "";
@@ -787,13 +836,15 @@ public class WorkDayServiceImpl {
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[11] != null ? record[11].toString() : "");
         		        System.out.print("7t");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Desc);
-        		        System.out.print("7h");
+        		        System.out.println("7h");
     		        } else {
     		            rowIdx += 4;
     		        }
 
     		        colIdx++; // move to the next column for the next record
     		    }
+    		    
+    		    System.out.println("/n ff");
 
     		    // Adjust widths
     		    for (int i = 0; i < colIdx; i++) {
@@ -836,7 +887,7 @@ public class WorkDayServiceImpl {
     		    DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[] {"Yes", "No"});
 
     		    // Target rows: 1, 5, 9, 13, 17, 21 (0-based index, so row 2 = index 1)
-    		    int[] dropdownRows = {1, 5, 9, 13, 17, 21};
+    		    int[] dropdownRows = {1, 5, 9, 13, 17, 21, 25, 29, 33};
     		    for (int row : dropdownRows) {
     		        CellRangeAddressList addressList = new CellRangeAddressList(row, row, 1, colIdx - 1); // From col B to last used
     		        DataValidation validation = validationHelper.createValidation(constraint, addressList);
@@ -888,76 +939,88 @@ public class WorkDayServiceImpl {
 		        }
 		        
     		    // Apply background to rows 2–9 (index 1 to 8)
-    		    for (int r = 1; r <= 8; r++) {
-    		        Row row = sheet.getRow(r);
-    		        if (row == null) continue;
-    		        for (int c = 0; c < colIdx; c++) {
-    		            Cell cell = row.getCell(c);
-    		            if (cell == null) cell = row.createCell(c);
-    		            CellStyle newStyle = workbook.createCellStyle();
-    		            newStyle.cloneStyleFrom(cell.getCellStyle());
-    		            newStyle.setFillForegroundColor(lightBlueStyle.getFillForegroundColor());
-    		            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-    		            newStyle.setBorderBottom(BorderStyle.THIN);
-    		            newStyle.setBorderTop(BorderStyle.THIN);
-    		            newStyle.setBorderLeft(BorderStyle.THIN);
-    		            newStyle.setBorderRight(BorderStyle.THIN);
-    		            if(c == 0) {
-    			            newStyle.setFont(boldFont);
-    		            }
-    		            cell.setCellStyle(newStyle);
-    		        }
-    		    }
+                XSSFCellStyle[] greenStyles = new XSSFCellStyle[3];
+                greenStyles[0] = (XSSFCellStyle) workbook.createCellStyle();
+                greenStyles[0].setFillForegroundColor(new XSSFColor(new java.awt.Color(200, 255, 200), null)); // light green
+                greenStyles[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                greenStyles[1] = (XSSFCellStyle) workbook.createCellStyle();
+                greenStyles[1].setFillForegroundColor(new XSSFColor(new java.awt.Color(120, 200, 120), null)); // medium green
+                greenStyles[1].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                greenStyles[2] = (XSSFCellStyle) workbook.createCellStyle();
+                greenStyles[2].setFillForegroundColor(new XSSFColor(new java.awt.Color(60, 150, 60), null)); // darker green
+                greenStyles[2].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+    		    applyStyleToRows(sheet, 1, 4, colIdx, greenStyles[0], boldFont, workbook);
+                applyStyleToRows(sheet, 5, 8, colIdx, greenStyles[1], boldFont, workbook);
+                applyStyleToRows(sheet, 9, 12, colIdx, greenStyles[2], boldFont, workbook);
 
     		    // Apply background to rows 10–17 (index 9 to 16)
-    		    for (int r = 9; r <= 16; r++) {
-    		        Row row = sheet.getRow(r);
-    		        if (row == null) continue;
-    		        for (int c = 0; c < colIdx; c++) {
-    		            Cell cell = row.getCell(c);
-    		            if (cell == null) cell = row.createCell(c);
-    		            CellStyle newStyle = workbook.createCellStyle();
-    		            newStyle.cloneStyleFrom(cell.getCellStyle());
-    		            newStyle.setFillForegroundColor(lightGreenStyle.getFillForegroundColor());
-    		            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-    		            newStyle.setBorderBottom(BorderStyle.THIN);
-    		            newStyle.setBorderTop(BorderStyle.THIN);
-    		            newStyle.setBorderLeft(BorderStyle.THIN);
-    		            newStyle.setBorderRight(BorderStyle.THIN);
-    		            if(c == 0) {
-    			            newStyle.setFont(boldFont);
-    		            }
-    		            cell.setCellStyle(newStyle);
-    		        }
-    		    }
+    		    XSSFCellStyle[] yellowStyles = new XSSFCellStyle[3];
 
-    		    for (int r = 17; r <= 24; r++) {
-    		        Row row = sheet.getRow(r);
-    		        if (row == null) continue;
-    		        for (int c = 0; c < colIdx; c++) {
-    		            Cell cell = row.getCell(c);
-    		            if (cell == null) cell = row.createCell(c);
-    		            CellStyle newStyle = workbook.createCellStyle();
-    		            newStyle.cloneStyleFrom(cell.getCellStyle());
-    		            newStyle.setFillForegroundColor(lightYellowStyle.getFillForegroundColor());
-    		            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-    		            newStyle.setBorderBottom(BorderStyle.THIN);
-    		            newStyle.setBorderTop(BorderStyle.THIN);
-    		            newStyle.setBorderLeft(BorderStyle.THIN);
-    		            newStyle.setBorderRight(BorderStyle.THIN);
-    		            if(c == 0 ) {
-    			            newStyle.setFont(boldFont);
-    		            }
-    		            cell.setCellStyle(newStyle);
-    		        }
-    		    }
+                // Define progressively darker yellow shades
+                yellowStyles[0] = (XSSFCellStyle) workbook.createCellStyle();
+                yellowStyles[0].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 255, 200), null)); // light yellow
+                yellowStyles[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                yellowStyles[1] = (XSSFCellStyle) workbook.createCellStyle();
+                yellowStyles[1].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 255, 130), null)); // medium yellow
+                yellowStyles[1].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                yellowStyles[2] = (XSSFCellStyle) workbook.createCellStyle();
+                yellowStyles[2].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 220, 50), null)); // darker yellow
+                yellowStyles[2].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                
+                applyStyleToRows(sheet, 13, 16, colIdx, yellowStyles[0], boldFont, workbook); // light yellow
+                applyStyleToRows(sheet, 17, 20, colIdx, yellowStyles[1], boldFont, workbook); // medium yellow
+                applyStyleToRows(sheet, 21, 24, colIdx, yellowStyles[2], boldFont, workbook); // dark yellow
     		    
+                XSSFCellStyle[] redStyles = new XSSFCellStyle[3];
+
+                // Light red
+                redStyles[0] = (XSSFCellStyle) workbook.createCellStyle();
+                redStyles[0].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 200, 200), null)); // soft red
+                redStyles[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                // Medium red
+                redStyles[1] = (XSSFCellStyle) workbook.createCellStyle();
+                redStyles[1].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 100, 100), null)); // medium red
+                redStyles[1].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                // Darker red
+                redStyles[2] = (XSSFCellStyle) workbook.createCellStyle();
+                redStyles[2].setFillForegroundColor(new XSSFColor(new java.awt.Color(200, 50, 50), null)); // darker red
+                redStyles[2].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    		    
+                applyStyleToRows(sheet, 25, 28, colIdx, redStyles[0], boldFont, workbook); // Light red
+                applyStyleToRows(sheet, 29, 32, colIdx, redStyles[1], boldFont, workbook); // Medium red
+                applyStyleToRows(sheet, 33, 36, colIdx, redStyles[2], boldFont, workbook); // Dark red
 
     		    
     		    workbook.write(out);
     		    return new ByteArrayInputStream(out.toByteArray());
     		}
     		
+    }
+    private void applyStyleToRows(Sheet sheet, int startRow, int endRow, int colIdx, XSSFCellStyle baseStyle, Font boldFont,Workbook workbook) {
+        for (int r = startRow; r <= endRow; r++) {
+            Row row = sheet.getRow(r);
+            if (row == null) continue;
+            for (int c = 0; c < colIdx; c++) {
+                Cell cell = row.getCell(c);
+                if (cell == null) cell = row.createCell(c);
+                XSSFCellStyle newStyle = (XSSFCellStyle) workbook.createCellStyle();
+                newStyle.cloneStyleFrom(baseStyle);
+                newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                newStyle.setBorderBottom(BorderStyle.THIN);
+                newStyle.setBorderTop(BorderStyle.THIN);
+                newStyle.setBorderLeft(BorderStyle.THIN);
+                newStyle.setBorderRight(BorderStyle.THIN);
+                if (c == 0) newStyle.setFont(boldFont);
+                cell.setCellStyle(newStyle);
+            }
+        }
     }
 
 }

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -54,6 +55,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
 import sri.sysint.sri_starter_back.exception.ResourceNotFoundException;
+import sri.sysint.sri_starter_back.model.DWorkDay;
 import sri.sysint.sri_starter_back.model.DWorkDayHours;
 import sri.sysint.sri_starter_back.model.DWorkDayHoursSpesific;
 import sri.sysint.sri_starter_back.model.Response;
@@ -839,20 +841,27 @@ public class WorkDayController {
 	
 	        // Define expected vertical headers in column A
 	        String[] expectedRows = {
-	            "DATE_WD",
-	            "S1 OFF TT",
-	            "S1 START OT_TT", "S1 END OT_TT", "S1 REASON OT_TT",
-	            "S1 OFF TL",
-	            "S1 START OT_TL", "S1 END OT_TL", "S1 REASON OT_TL",
-	            "S2 OFF TT",
-	            "S2 START OT_TT", "S2 END OT_TT", "S2 REASON OT_TT",
-	            "S2 OFF TL",
-	            "S2 START OT_TL", "S2 END OT_TL", "S2 REASON OT_TL",
-	            "S3 OFF TT",
-	            "S3 START OT_TT", "S3 END OT_TT", "S3 REASON OT_TT",
-	            "S3 OFF TL",
-	            "S3 START OT_TL", "S3 END OT_TL", "S3 REASON OT_TL"
-	        };
+    		    "DATE_WD",
+    		    "S1 OFF NORMAL", 
+                "S1 START NORMAL", "S1 END NORMAL", "S1 REASON NORMAL",
+    		    "S1 OFF TT",
+    		    "S1 START OT_TT", "S1 END OT_TT", "S1 REASON OT_TT",
+    		    "S1 OFF TL",
+    		    "S1 START OT_TL", "S1 END OT_TL", "S1 REASON OT_TL",
+    		    "S2 OFF NORMAL",
+    		    "S2 START NORMAL", "S2 END NORMAL", "S2 REASON NORMAL",
+    		    "S2 OFF TT", 
+    		    "S2 START OT_TT", "S2 END OT_TT", "S2 REASON OT_TT",
+    		    "S2 OFF TL",
+    		    "S2 START OT_TL", "S2 END OT_TL", "S2 REASON OT_TL",
+    		    "S3 OFF NORMAL",
+    		    "S3 START NORMAL", "S3 END NORMAL", "S3 REASON NORMAL",
+    		    "S3 OFF TT",
+    		    "S3 START OT_TT", "S3 END OT_TT", "S3 REASON OT_TT",
+    		    "S3 OFF TL",
+    		    "S3 START OT_TL", "S3 END OT_TL", "S3 REASON OT_TL",
+
+    		};
 	
 	        // Check if vertical headers in column A match
 	        for (int i = 0; i < expectedRows.length; i++) {
@@ -904,62 +913,73 @@ public class WorkDayController {
 	        }
 	        List<Map<String, Object>> resultTTList = new ArrayList<>();
 	        List<Map<String, Object>> resultTLList = new ArrayList<>();
+	        List<Map<String, Object>> resultNORMALList = new ArrayList<>();
 
 	        int lastColumn = sheet.getRow(0).getLastCellNum();
 
 	        for (int col = 1; col < lastColumn; col++) {
 	            Map<String, Object> ttData = new HashMap<>();
 	            Map<String, Object> tlData = new HashMap<>();
+	            Map<String, Object> normalData = new HashMap<>();
 
 	            // DATE_WD
 	            Cell dateCell = sheet.getRow(0).getCell(col);
 	            Date workDate = dateCell.getDateCellValue();
 	            ttData.put("DATE_WD", workDate);
 	            tlData.put("DATE_WD", workDate);
+	            normalData.put("DATE_WD", workDate);
 
 	            // SHIFTS: S1, S2, S3
 	            for (int shift = 1; shift <= 3; shift++) {
 	            	int baseRow = (shift - 1) * 8 + 1;
+	            	
+	                Map<String, Object> shiftNormal = new HashMap<>();
+	                shiftNormal.put("OFF", getCellValue(sheet.getRow(baseRow ).getCell(col)));
+	                shiftNormal.put("START", getCellValue(sheet.getRow(baseRow + 1).getCell(col)));
+	                shiftNormal.put("END", getCellValue(sheet.getRow(baseRow + 2).getCell(col)));
+	                shiftNormal.put("REASON", getCellValue(sheet.getRow(baseRow + 3).getCell(col)));
+	                normalData.put("S" + shift + "_NORMAL", shiftNormal);
 
 	                // TT Data
 	                Map<String, Object> shiftTT = new HashMap<>();
-	                shiftTT.put("OFF", getCellValue(sheet.getRow(baseRow).getCell(col)));
-	                shiftTT.put("START", getCellValue(sheet.getRow(baseRow + 1).getCell(col)));
-	                shiftTT.put("END", getCellValue(sheet.getRow(baseRow + 2).getCell(col)));
-	                shiftTT.put("REASON", getCellValue(sheet.getRow(baseRow + 3).getCell(col)));
+	                shiftTT.put("OFF", getCellValue(sheet.getRow(baseRow + 4).getCell(col)));
+	                shiftTT.put("START", getCellValue(sheet.getRow(baseRow + 5).getCell(col)));
+	                shiftTT.put("END", getCellValue(sheet.getRow(baseRow + 6).getCell(col)));
+	                shiftTT.put("REASON", getCellValue(sheet.getRow(baseRow + 7).getCell(col)));
 	                ttData.put("S" + shift + "_TT", shiftTT);
 
 	                // TL Data
 	                Map<String, Object> shiftTL = new HashMap<>();
-	                shiftTL.put("OFF", getCellValue(sheet.getRow(baseRow + 4).getCell(col)));
-	                shiftTL.put("START", getCellValue(sheet.getRow(baseRow + 5).getCell(col)));
-	                shiftTL.put("END", getCellValue(sheet.getRow(baseRow + 6).getCell(col)));
-	                shiftTL.put("REASON", getCellValue(sheet.getRow(baseRow + 7).getCell(col)));
+	                shiftTL.put("OFF", getCellValue(sheet.getRow(baseRow + 8).getCell(col)));
+	                shiftTL.put("START", getCellValue(sheet.getRow(baseRow + 9).getCell(col)));
+	                shiftTL.put("END", getCellValue(sheet.getRow(baseRow + 10).getCell(col)));
+	                shiftTL.put("REASON", getCellValue(sheet.getRow(baseRow + 11).getCell(col)));
 	                tlData.put("S" + shift + "_TL", shiftTL);
 	            }
 
 	            resultTTList.add(ttData);
 	            resultTLList.add(tlData);
+	            resultNORMALList.add(normalData);
 	        }
 	        
 	        for (int i = 0; i < resultTTList.size(); i++) {
                 boolean canUpdateDetail = false;
+                boolean isInsert = false;
 	            Map<String, Object> ttData = resultTTList.get(i);
 	            Map<String, Object> tlData = resultTLList.get(i);
+	            Map<String, Object> normalData = resultNORMALList.get(i);
 
+	            Map<String, Object> s1NORMAL = (Map<String, Object>) normalData.get("S1_NORMAL");
 	            Map<String, Object> s1TT = (Map<String, Object>) ttData.get("S1_TT");
 	            Map<String, Object> s1TL = (Map<String, Object>) tlData.get("S1_TL");
+                Map<String, Object> s2NORMAL = (Map<String, Object>) normalData.get("S2_NORMAL");
                 Map<String, Object> s2TT = (Map<String, Object>) ttData.get("S2_TT");
 	            Map<String, Object> s2TL = (Map<String, Object>) tlData.get("S2_TL");
+                Map<String, Object> s3NORMAL = (Map<String, Object>) normalData.get("S3_NORMAL");
                 Map<String, Object> s3TT = (Map<String, Object>) ttData.get("S3_TT");
 	            Map<String, Object> s3TL = (Map<String, Object>) tlData.get("S3_TL");
 
-                String startTT = extractHourMinute(s1TT.get("START"));
-                String startTL = extractHourMinute(s1TL.get("START"));
-
-                System.out.println("S1 TT START: " + startTT + " | S1 TL START: " + startTL);
-
-		        Date wdIsDate = (Date) ttData.get("DATE_WD");
+		        Date wdIsDate = (Date) normalData.get("DATE_WD");
 
 			     // Example: querying workDayRepo using the date
 		        Optional<WorkDay> workDayOpt = workDayRepo.findById(wdIsDate);
@@ -969,20 +989,164 @@ public class WorkDayController {
                     System.out.println("Data ada");
                     System.out.println(workDayOpt.get().getDATE_WD());
                     updateWorkDay = workDayOpt.get();
+                    System.out.println("data lama udah masuk");
 
-                    // Convert and set TL
-                    updateWorkDay.setIOT_TL_1(yesNoToBigDecimal(s1TL.get("OFF").toString(),s1TL));
-                    updateWorkDay.setIOT_TL_2(yesNoToBigDecimal(s2TL.get("OFF").toString(),s2TL));
-                    updateWorkDay.setIOT_TL_3(yesNoToBigDecimal(s3TL.get("OFF").toString(),s3TL));
-
-                    // Convert and set TT
-                    updateWorkDay.setIOT_TT_1(yesNoToBigDecimal(s1TT.get("OFF").toString(),s1TT));
-                    updateWorkDay.setIOT_TT_2(yesNoToBigDecimal(s2TT.get("OFF").toString(),s2TT));
-                    updateWorkDay.setIOT_TT_3(yesNoToBigDecimal(s3TT.get("OFF").toString(),s3TT));
+                }else{
+                    System.out.println("Data ga ada, buat baru");
+                    updateWorkDay = new WorkDay();
+                    
+                    updateWorkDay.setDATE_WD(wdIsDate);
                 }
+                
+                Date date = (Date) ttData.get("DATE_WD");
+                LocalDate dayWeek = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                String offValue = s1NORMAL.get("OFF") != null ? s1NORMAL.get("OFF").toString() : "";
+                String reasonValue = s1NORMAL.get("REASON") != null ? s1NORMAL.get("REASON").toString() : "";
+
+                System.out.println("🔍 Parsing SHIFT 1 | OFF: \"" + offValue + "\" | REASON: \"" + reasonValue + "\" | Date: " + wdIsDate);
+
+                // Set NORMAL shifts
+                updateWorkDay.setIWD_SHIFT_1(yesNoToBigDecimal(
+                    getStringFromMap(s1NORMAL, "OFF"),
+                    getStringFromMap(s1NORMAL, "REASON"),
+                    "SHIFT 1", wdIsDate
+                ));
+
+                updateWorkDay.setIWD_SHIFT_2(yesNoToBigDecimal(
+                    getStringFromMap(s2NORMAL, "OFF"),
+                    getStringFromMap(s2NORMAL, "REASON"),
+                    "SHIFT 2", wdIsDate
+                ));
+
+                updateWorkDay.setIWD_SHIFT_3(yesNoToBigDecimal(
+                    getStringFromMap(s3NORMAL, "OFF"),
+                    getStringFromMap(s3NORMAL, "REASON"),
+                    "SHIFT 3", wdIsDate
+                ));
+
+                // Set TL shifts
+                updateWorkDay.setIOT_TL_1(yesNoToBigDecimal(
+                    getStringFromMap(s1TL, "OFF"),
+                    getStringFromMap(s1TL, "REASON"),
+                    "OT TL SHIFT 1", wdIsDate
+                ));
+
+                updateWorkDay.setIOT_TL_2(yesNoToBigDecimal(
+                    getStringFromMap(s2TL, "OFF"),
+                    getStringFromMap(s2TL, "REASON"),
+                    "OT TL SHIFT 2", wdIsDate
+                ));
+
+                updateWorkDay.setIOT_TL_3(yesNoToBigDecimal(
+                    getStringFromMap(s3TL, "OFF"),
+                    getStringFromMap(s3TL, "REASON"),
+                    "OT TL SHIFT 3", wdIsDate
+                ));
+
+                // Set TT shifts
+                updateWorkDay.setIOT_TT_1(yesNoToBigDecimal(
+                    getStringFromMap(s1TT, "OFF"),
+                    getStringFromMap(s1TT, "REASON"),
+                    "OT TT SHIFT 1", wdIsDate
+                ));
+
+                updateWorkDay.setIOT_TT_2(yesNoToBigDecimal(
+                    getStringFromMap(s2TT, "OFF"),
+                    getStringFromMap(s2TT, "REASON"),
+                    "OT TT SHIFT 2", wdIsDate
+                ));
+
+                updateWorkDay.setIOT_TT_3(yesNoToBigDecimal(
+                    getStringFromMap(s3TT, "OFF"),
+                    getStringFromMap(s3TT, "REASON"),
+                    "OT TT SHIFT 3", wdIsDate
+                ));
+                System.out.println("data lama udah ganti baru");
+
+                if(dayWeek.getDayOfWeek() == DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                    System.out.println("Weekend detected: " + dayWeek.getDayOfWeek());
+                    updateWorkDay.setOFF(BigDecimal.ZERO);
+                    updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
+                } else if(i < resultTTList.size() -1) {
+                    System.out.println("Using list index for next day's shift3 (i+1): " + (i + 1));
+
+                    Map<String, Object> normalDatannext = resultNORMALList.get(i+1);
+                    Map<String, Object> s3NORMALNext = (Map<String, Object>) normalDatannext.get("S3_NORMAL");
+
+                    BigDecimal shift1 = updateWorkDay.getIWD_SHIFT_1();
+                    BigDecimal shift2 = updateWorkDay.getIWD_SHIFT_2();
+                    BigDecimal shift3Next = yesNoToBigDecimal(s3NORMALNext.get("OFF").toString(), null,null,null);
+
+                    System.out.println("Shift1 (today): " + shift1);
+                    System.out.println("Shift2 (today): " + shift2);
+                    System.out.println("Shift3 (next): " + shift3Next);
+
+                    boolean s1 = shift1.compareTo(BigDecimal.ONE) == 0;
+                    boolean s2 = shift2.compareTo(BigDecimal.ONE) == 0;
+                    boolean s3 = shift3Next.compareTo(BigDecimal.ONE) == 0;
+
+                    System.out.println("Shift flags -> S1: " + s1 + ", S2: " + s2 + ", S3: " + s3);
+
+                    if (s1 && s2 && s3) {
+                        System.out.println("All shifts are ON -> OFF: 0, SEMI_OFF: 0");
+                        updateWorkDay.setOFF(BigDecimal.ZERO);
+                        updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
+                    } else if (!s1 && !s2 && !s3) {
+                        System.out.println("All shifts are OFF -> OFF: 1, SEMI_OFF: 0");
+                        updateWorkDay.setOFF(BigDecimal.ONE);
+                        updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
+                    } else {
+                        System.out.println("Mixed shift states -> OFF: 0, SEMI_OFF: 1");
+                        updateWorkDay.setOFF(BigDecimal.ZERO);
+                        updateWorkDay.setSEMI_OFF(BigDecimal.ONE);
+                    }
+                } else {
+                    LocalDate nextDateLocal = dayWeek.plusDays(1);
+                    Date nextDate = Date.from(nextDateLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    System.out.println("No more list data. Querying DB for next date: " + nextDate);
+
+                    Optional<WorkDay> workDayNextDay = workDayRepo.findById(nextDate);
+                    if(workDayNextDay.isPresent()) {
+                        WorkDay nextDay = workDayNextDay.get();
+
+                        BigDecimal shift1 = updateWorkDay.getIWD_SHIFT_1();
+                        BigDecimal shift2 = updateWorkDay.getIWD_SHIFT_2();
+                        BigDecimal shift3Next = nextDay.getIWD_SHIFT_3();
+
+                        System.out.println("Shift1 (today): " + shift1);
+                        System.out.println("Shift2 (today): " + shift2);
+                        System.out.println("Shift3 (next from DB): " + shift3Next);
+
+                        boolean s1 = shift1.compareTo(BigDecimal.ONE) == 0;
+                        boolean s2 = shift2.compareTo(BigDecimal.ONE) == 0;
+                        boolean s3 = shift3Next.compareTo(BigDecimal.ONE) == 0;
+
+                        System.out.println("Shift flags -> S1: " + s1 + ", S2: " + s2 + ", S3: " + s3);
+
+                        if (s1 && s2 && s3) {
+                            System.out.println("All shifts are ON -> OFF: 0, SEMI_OFF: 0");
+                            updateWorkDay.setOFF(BigDecimal.ZERO);
+                            updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
+                        } else if (!s1 && !s2 && !s3) {
+                            System.out.println("All shifts are OFF -> OFF: 1, SEMI_OFF: 0");
+                            updateWorkDay.setOFF(BigDecimal.ONE);
+                            updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
+                        } else {
+                            System.out.println("Mixed shift states -> OFF: 0, SEMI_OFF: 1");
+                            updateWorkDay.setOFF(BigDecimal.ZERO);
+                            updateWorkDay.setSEMI_OFF(BigDecimal.ONE);
+                        }
+                    } else {
+                        System.out.println("Next day's data not found in DB, defaulting to OFF: 0, SEMI_OFF: 0");
+                        updateWorkDay.setOFF(BigDecimal.ZERO);
+                        updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
+                    }
+                }
+
 
                 DWorkDayHoursSpesific updateTT = null;
                 DWorkDayHoursSpesific updateTL = null;
+                DWorkDayHoursSpesific updateNORMAL = null;
 		        Optional<List<DWorkDayHoursSpesific>> detailWDData = detailWorkDayRepo.findByDATEWD(wdIsDate);
 		        if (!detailWDData.isEmpty()) {
 		            System.out.println("Data Detail ada");
@@ -991,14 +1155,54 @@ public class WorkDayController {
                             updateTT = item;	            		
 		            	}else if (item.getDESCRIPTION().equals("OT_TL")){
                             updateTL = item;
+                        }else if (item.getDESCRIPTION().equals("WD_NORMAL")){
+                            updateNORMAL = item;
                         }
 		            }
-		        }
+		        } else {
+                    System.out.println("Data Detail tidak ada, membuat baru");
+                    
+                    long currentCount = detailWorkDayRepo.count();
 
-                if (updateTT != null && updateTL != null && canUpdateDetail) {
+                    BigDecimal baseIdNormal = BigDecimal.valueOf(currentCount + 1);
+                    BigDecimal baseIdTT = BigDecimal.valueOf(currentCount + 2);
+                    BigDecimal baseIdTL = BigDecimal.valueOf(currentCount + 3);
+
+                    updateTT = new DWorkDayHoursSpesific();
+                    updateTT.setDETAIL_WD_HOURS_SPECIFIC_ID(baseIdTT);
+                    updateTT.setDESCRIPTION("OT_TT");
+                    updateTT.setDATE_WD(wdIsDate);
+                    updateTT.setSTATUS(BigDecimal.ONE);
+                    updateTT.setCREATION_DATE(new Date());
+                    // set other fields if needed
+
+                    updateTL = new DWorkDayHoursSpesific();
+                    updateTL.setDETAIL_WD_HOURS_SPECIFIC_ID(baseIdTL);
+                    updateTL.setDESCRIPTION("OT_TL");
+                    updateTL.setDATE_WD(wdIsDate);
+                    updateTL.setSTATUS(BigDecimal.ONE);
+                    updateTL.setCREATION_DATE(new Date());
+                    // set other fields if needed
+
+                    updateNORMAL = new DWorkDayHoursSpesific();
+                    updateNORMAL.setDETAIL_WD_HOURS_SPECIFIC_ID(baseIdNormal);
+                    updateNORMAL.setDESCRIPTION("WD_NORMAL");
+                    updateNORMAL.setDATE_WD(wdIsDate);
+                    updateNORMAL.setSTATUS(BigDecimal.ONE);
+                    updateNORMAL.setCREATION_DATE(new Date());                    
+                    // set other fields if needed
+
+                }
+
+                if (updateTT != null && updateTL != null && updateNORMAL != null && canUpdateDetail) {
                     System.out.println("Siap update");
 
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+                    // === NORMAL Updates ===
+                    updateShift(updateNORMAL, "NORMAL", s1NORMAL, 1, formatter);
+                    updateShift(updateNORMAL, "NORMAL", s2NORMAL, 2, formatter);
+                    updateShift(updateNORMAL, "NORMAL", s3NORMAL, 3, formatter);
 
                     // === TT Updates ===
                     updateShift(updateTT, "TT", s1TT, 1, formatter);
@@ -1012,14 +1216,18 @@ public class WorkDayController {
                 }
                 if(canUpdateDetail){
                     System.out.println("UPDATEUPDATEUPDATEUPDATEUPDATE"+updateWorkDay.getDATE_WD()+updateTT.getSHIFT1_END_TIME()+" ID"+updateTT.getDETAIL_WD_HOURS_SPECIFIC_ID());
-                    workDayRepo.save(updateWorkDay);
-                    detailWorkDayRepo.save(updateTT);
-                    detailWorkDayRepo.save(updateTL);
+                    updateTT.setLAST_UPDATE_DATE(new Date());
+                    updateTL.setLAST_UPDATE_DATE(new Date());
+                    updateNORMAL.setLAST_UPDATE_DATE(new Date());
+
+//                    workDayRepo.save(updateWorkDay);
+//                    detailWorkDayRepo.save(updateTT);
+//                    detailWorkDayRepo.save(updateTL);
                 }
 
 	        }
 
-	        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed successfully", req.getRequestURI(), Map.of("tt", resultTTList, "tl", resultTLList));
+	        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed successfully", req.getRequestURI(), Map.of("tt", resultTTList, "tl", resultTLList,"normal",resultNORMALList));
 
 //	        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data validated successfully", req.getRequestURI(), null);
 	
@@ -1045,7 +1253,7 @@ public class WorkDayController {
                     return str;
                 } else {
                     System.out.println("Invalid time format: " + str);
-                    return null;
+                    return "00:00";
                 }
             }
         } else if (timeValue instanceof Date) {
@@ -1102,19 +1310,78 @@ public class WorkDayController {
         }
     }
     
-    private BigDecimal yesNoToBigDecimal(String value, Map<String, Object> data) {
+    private BigDecimal yesNoToBigDecimal(String value, String reason, String parent, Date date) {
+        System.out.println("🔍 Parsing " + parent + " | OFF: \"" + value + "\" | REASON: \"" + reason + "\" | Date: " + date);
+
         if ("Yes".equalsIgnoreCase(value)) {
-            Object reason = data.get("REASON");
-            if (reason != null) {
-                System.out.println("OFF = Yes, Reason: " + reason.toString());
-                // You can also save this somewhere if needed
+            if (parent != null && date != null) {
+                DWorkDay existing = reasonWorkDay.findByParentAndStatusAndDateWDTruncated(parent, date);
+
+                if (existing != null) {
+                    if (reason != null && !reason.trim().isEmpty()) {
+                        System.out.println("🔄 Found existing record. Updating DESCRIPTION to: \"" + reason + "\"");
+                        existing.setDESCRIPTION(reason);
+                        existing.setSTATUS(BigDecimal.ONE); // Mark as active
+                    } else {
+                        System.out.println("🗑️ Reason is empty. Marking STATUS = 0 for existing record.");
+                        existing.setSTATUS(BigDecimal.ZERO);
+                    }
+
+                    existing.setLAST_UPDATE_DATE(new Date());
+                    existing.setLAST_UPDATED_BY("System");
+                    reasonWorkDay.save(existing);
+                } else {
+                    if (reason != null && !reason.trim().isEmpty()) {
+                        long countReason = reasonWorkDay.count();
+                        BigDecimal newIDReason = BigDecimal.valueOf(countReason + 1);
+
+                        DWorkDay newEntry = new DWorkDay();
+                        newEntry.setDETAIL_WD_ID(newIDReason);
+                        newEntry.setPARENT(parent);
+                        newEntry.setDATE_WD(date);
+                        newEntry.setDESCRIPTION(reason);
+                        newEntry.setSTATUS(BigDecimal.ONE);
+                        newEntry.setCREATION_DATE(new Date());
+                        newEntry.setCREATED_BY("System");
+                        newEntry.setLAST_UPDATE_DATE(new Date());
+                        newEntry.setLAST_UPDATED_BY("System");
+
+                        reasonWorkDay.save(newEntry);
+                        System.out.println("➕ No existing record found. Creating new entry with reason: \"" + reason + "\"");
+                    } else {
+                        System.out.println("⚠️ No existing record and reason is empty. Skipping insert.");
+                    }
+                }
             } else {
-                System.out.println("OFF = Yes, but REASON is missing.");
+                System.out.println("⚠️ OFF = Yes, but parent or date is missing.");
             }
+
             return BigDecimal.ONE;
+        } else {
+            // NEW LOGIC: OFF is not "Yes" (No, null, etc.)
+            if (parent != null && date != null) {
+                DWorkDay existing = reasonWorkDay.findByParentAndStatusAndDateWDTruncated(parent, date);
+
+                if (existing != null) {
+                    System.out.println("🚫 OFF is not 'Yes'. Marking existing record STATUS = 0");
+                    existing.setSTATUS(BigDecimal.ZERO);
+                    existing.setLAST_UPDATE_DATE(new Date());
+                    existing.setLAST_UPDATED_BY("System");
+                    reasonWorkDay.save(existing);
+                } else {
+                    System.out.println("ℹ️ OFF is not 'Yes' and no existing record found. Nothing to update.");
+                }
+            }
+
+            System.out.println("🔁 OFF = No or other value. Returning 0.");
+            return BigDecimal.ZERO;
         }
-        return BigDecimal.ZERO;
     }
 
+
+    private String getStringFromMap(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        return value != null ? value.toString() : "";
+    }
 
 }
