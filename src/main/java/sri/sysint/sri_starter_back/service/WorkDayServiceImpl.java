@@ -1017,7 +1017,12 @@ public class WorkDayServiceImpl {
                 newStyle.setBorderTop(BorderStyle.THIN);
                 newStyle.setBorderLeft(BorderStyle.THIN);
                 newStyle.setBorderRight(BorderStyle.THIN);
-                if (c == 0) newStyle.setFont(boldFont);
+                if (c == 0){
+                    newStyle.setFont(boldFont);
+                    newStyle.setLocked(true);
+                }else{
+                    newStyle.setLocked(false);
+                }
                 cell.setCellStyle(newStyle);
             }
         }

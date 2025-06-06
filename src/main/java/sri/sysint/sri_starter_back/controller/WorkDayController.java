@@ -931,7 +931,7 @@ public class WorkDayController {
 
 	            // SHIFTS: S1, S2, S3
 	            for (int shift = 1; shift <= 3; shift++) {
-	            	int baseRow = (shift - 1) * 8 + 1;
+	            	int baseRow = (shift - 1) * 12 + 1;
 	            	
 	                Map<String, Object> shiftNormal = new HashMap<>();
 	                shiftNormal.put("OFF", getCellValue(sheet.getRow(baseRow ).getCell(col)));
@@ -1191,6 +1191,8 @@ public class WorkDayController {
                     updateNORMAL.setSTATUS(BigDecimal.ONE);
                     updateNORMAL.setCREATION_DATE(new Date());                    
                     // set other fields if needed
+                    
+                    canUpdateDetail = true;
 
                 }
 
@@ -1220,9 +1222,10 @@ public class WorkDayController {
                     updateTL.setLAST_UPDATE_DATE(new Date());
                     updateNORMAL.setLAST_UPDATE_DATE(new Date());
 
-//                    workDayRepo.save(updateWorkDay);
-//                    detailWorkDayRepo.save(updateTT);
-//                    detailWorkDayRepo.save(updateTL);
+                    workDayRepo.save(updateWorkDay);
+                    detailWorkDayRepo.save(updateNORMAL);
+                    detailWorkDayRepo.save(updateTT);
+                    detailWorkDayRepo.save(updateTL);
                 }
 
 	        }
@@ -1281,34 +1284,67 @@ public class WorkDayController {
     }
 
     private void updateShift(DWorkDayHoursSpesific updateObj, String label, Map<String, Object> shiftMap, int shiftNumber, DateTimeFormatter formatter) {
-        String start = extractHourMinute(shiftMap.get("START"));
-        String end = extractHourMinute(shiftMap.get("END"));
+        // Default time and allowed range per shift
+        Map<Integer, String[]> defaultShifts = Map.of(
+            1, new String[]{"07:10", "15:50"},
+            2, new String[]{"15:50", "23:30"},
+            3, new String[]{"23:30", "07:10"} // crosses midnight
+        );
 
-        System.out.printf("%s Shift %d: start = %s, end = %s%n", label, shiftNumber, start, end);
+        String[] defaultTimes = defaultShifts.get(shiftNumber);
+        String defaultStart = defaultTimes[0];
+        String defaultEnd = defaultTimes[1];
 
-        if (start != null && end != null) {
-            BigDecimal dur = calculateDurationInMinutes(start, end, formatter);
-            System.out.printf("%s Shift %d duration = %s%n", label, shiftNumber, dur);
+        String rawStart = extractHourMinute(shiftMap.get("START"));
+        String rawEnd = extractHourMinute(shiftMap.get("END"));
 
-            switch (shiftNumber) {
-                case 1 : {
-                    updateObj.setSHIFT1_START_TIME(start);
-                    updateObj.setSHIFT1_END_TIME(end);
-                    updateObj.setSHIFT1_TOTAL_TIME(dur);
-                }
-                case 2 : {
-                    updateObj.setSHIFT2_START_TIME(start);
-                    updateObj.setSHIFT2_END_TIME(end);
-                    updateObj.setSHIFT2_TOTAL_TIME(dur);
-                }
-                case 3 : {
-                    updateObj.setSHIFT3_START_TIME(start);
-                    updateObj.setSHIFT3_END_TIME(end);
-                    updateObj.setSHIFT3_TOTAL_TIME(dur);
-                }
+        System.out.printf("%s Shift %d RAW: start = %s, end = %s%n", label, shiftNumber, rawStart, rawEnd);
+
+        boolean validStart = isValidTime(rawStart, formatter);
+        boolean validEnd = isValidTime(rawEnd, formatter);
+
+        if (!validStart) System.out.printf("%s Shift %d WARNING: start '%s' is invalid, using default '%s'%n", label, shiftNumber, rawStart, defaultStart);
+        if (!validEnd) System.out.printf("%s Shift %d WARNING: end '%s' is invalid, using default '%s'%n", label, shiftNumber, rawEnd, defaultEnd);
+
+        boolean inRangeStart = validStart && (rawStart.equals("00:00") || isWithinShiftRange(rawStart, defaultStart, defaultEnd, formatter));
+        boolean inRangeEnd = validEnd && (rawEnd.equals("00:00") || isWithinShiftRange(rawEnd, defaultStart, defaultEnd, formatter));
+
+        if (validStart && !inRangeStart && !rawStart.equals("00:00"))
+            System.out.printf("%s Shift %d WARNING: start '%s' is out of range (%s - %s), using default '%s'%n",
+                    label, shiftNumber, rawStart, defaultStart, defaultEnd, defaultStart);
+
+        if (validEnd && !inRangeEnd && !rawEnd.equals("00:00"))
+            System.out.printf("%s Shift %d WARNING: end '%s' is out of range (%s - %s), using default '%s'%n",
+                    label, shiftNumber, rawEnd, defaultStart, defaultEnd, defaultEnd);
+
+        String start = (validStart && inRangeStart) ? rawStart : defaultStart;
+        String end = (validEnd && inRangeEnd) ? rawEnd : defaultEnd;
+
+        System.out.printf("%s Shift %d FINAL: start = %s, end = %s%n", label, shiftNumber, start, end);
+
+        BigDecimal dur = calculateDurationInMinutes(start, end, formatter);
+        System.out.printf("%s Shift %d DURATION: %s minutes%n", label, shiftNumber, dur);
+
+        switch (shiftNumber) {
+            case 1 : {
+                updateObj.setSHIFT1_START_TIME(start);
+                updateObj.setSHIFT1_END_TIME(end);
+                updateObj.setSHIFT1_TOTAL_TIME(dur);
+            }
+            case 2 : {
+                updateObj.setSHIFT2_START_TIME(start);
+                updateObj.setSHIFT2_END_TIME(end);
+                updateObj.setSHIFT2_TOTAL_TIME(dur);
+            }
+            case 3 : {
+                updateObj.setSHIFT3_START_TIME(start);
+                updateObj.setSHIFT3_END_TIME(end);
+                updateObj.setSHIFT3_TOTAL_TIME(dur);
             }
         }
     }
+
+
     
     private BigDecimal yesNoToBigDecimal(String value, String reason, String parent, Date date) {
         System.out.println("🔍 Parsing " + parent + " | OFF: \"" + value + "\" | REASON: \"" + reason + "\" | Date: " + date);
@@ -1378,10 +1414,38 @@ public class WorkDayController {
         }
     }
 
-
     private String getStringFromMap(Map<String, Object> map, String key) {
         Object value = map.get(key);
         return value != null ? value.toString() : "";
     }
+
+    private boolean isValidTime(String timeStr, DateTimeFormatter formatter) {
+        if (timeStr == null) return false;
+        try {
+            LocalTime.parse(timeStr, formatter);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
+    private boolean isWithinShiftRange(String timeStr, String rangeStartStr, String rangeEndStr, DateTimeFormatter formatter) {
+        try {
+            LocalTime time = LocalTime.parse(timeStr, formatter);
+            LocalTime rangeStart = LocalTime.parse(rangeStartStr, formatter);
+            LocalTime rangeEnd = LocalTime.parse(rangeEndStr, formatter);
+
+            if (rangeEnd.isAfter(rangeStart)) {
+                // Normal range (e.g., 07:10 - 15:50)
+                return !time.isBefore(rangeStart) && !time.isAfter(rangeEnd);
+            } else {
+                // Crosses midnight (e.g., 23:30 - 07:10)
+                return !time.isBefore(rangeStart) || !time.isAfter(rangeEnd);
+            }
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
 
 }
