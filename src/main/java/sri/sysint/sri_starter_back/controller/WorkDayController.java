@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -662,18 +664,18 @@ public class WorkDayController {
         return true; 
     }
 
-    @RequestMapping("/exportWorkDaysExcel")
-    public ResponseEntity<InputStreamResource> exportWorkDaysExcel() throws IOException {
-        String filename = "MASTER_WORK_DAY.xlsx";
+    // @RequestMapping("/exportWorkDaysExcel")
+    // public ResponseEntity<InputStreamResource> exportWorkDaysExcel() throws IOException {
+    //     String filename = "MASTER_WORK_DAY.xlsx";
 
-        ByteArrayInputStream data = workDayServiceImpl.exportWDsExcel();
-        InputStreamResource file = new InputStreamResource(data);
+    //     ByteArrayInputStream data = workDayServiceImpl.exportWDsExcel();
+    //     InputStreamResource file = new InputStreamResource(data);
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(file);
-    }
+    //     return ResponseEntity.ok()
+    //             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+    //             .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+    //             .body(file);
+    // }
     
    @PostMapping("/turnOnOvertime")
     public Response turnOnOvertime(final HttpServletRequest req, @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
@@ -789,7 +791,7 @@ public class WorkDayController {
         return response;
     }
     
-    @GetMapping("/export-template-excel/{year}/{month}")
+    @GetMapping("/exportWorkDaysExcel/{year}/{month}")
     public ResponseEntity<byte[]> exportTemplateExcel(
             @PathVariable("month") int month,
             @PathVariable("year") int year) throws IOException {
@@ -836,6 +838,7 @@ public class WorkDayController {
 	    }
 	
 	    try (InputStream inputStream = file.getInputStream()) {
+            ZipSecureFile.setMinInflateRatio(0.001);
 	        XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
 	        XSSFSheet sheet = workbook.getSheetAt(0);
 	
@@ -862,7 +865,9 @@ public class WorkDayController {
     		    "S3 START OT_TL", "S3 END OT_TL", "S3 REASON OT_TL",
 
     		};
-	
+            List<String> errors = new ArrayList<>();
+            List<String> successes = new ArrayList<>();
+
 	        // Check if vertical headers in column A match
 	        for (int i = 0; i < expectedRows.length; i++) {
 	            Row row = sheet.getRow(i);
@@ -877,9 +882,9 @@ public class WorkDayController {
 	
 	        // Check if cells in column B contain valid dates
 	        Row rowh = sheet.getRow(0); // Only check the first row
+	        int lastColumn = rowh.getLastCellNum(); // Total columns used in this row
 	        if (rowh != null) {
-	            int lastColumn = rowh.getLastCellNum(); // Total columns used in this row
-	
+                System.out.println("ini dfjdfdfd: "+lastColumn);
 	            for (int col = 1; col < lastColumn; col++) {
 	                Cell cell = rowh.getCell(col);
 	                System.out.print("Column " + (col + 1) + ": ");
@@ -914,8 +919,6 @@ public class WorkDayController {
 	        List<Map<String, Object>> resultTTList = new ArrayList<>();
 	        List<Map<String, Object>> resultTLList = new ArrayList<>();
 	        List<Map<String, Object>> resultNORMALList = new ArrayList<>();
-
-	        int lastColumn = sheet.getRow(0).getLastCellNum();
 
 	        for (int col = 1; col < lastColumn; col++) {
 	            Map<String, Object> ttData = new HashMap<>();
@@ -996,6 +999,8 @@ public class WorkDayController {
                     updateWorkDay = new WorkDay();
                     
                     updateWorkDay.setDATE_WD(wdIsDate);
+                    updateWorkDay.setSTATUS(BigDecimal.ONE);
+                    updateWorkDay.setCREATION_DATE(new Date());
                 }
                 
                 Date date = (Date) ttData.get("DATE_WD");
@@ -1068,7 +1073,7 @@ public class WorkDayController {
                     updateWorkDay.setOFF(BigDecimal.ZERO);
                     updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
                 } else if(i < resultTTList.size() -1) {
-                    System.out.println("Using list index for next day's shift3 (i+1): " + (i + 1));
+                    System.out.println("Using list index for next day's shift3 (i+1): " + (i + 1)+" "+ resultTTList.size());
 
                     Map<String, Object> normalDatannext = resultNORMALList.get(i+1);
                     Map<String, Object> s3NORMALNext = (Map<String, Object>) normalDatannext.get("S3_NORMAL");
@@ -1198,44 +1203,99 @@ public class WorkDayController {
 
                 if (updateTT != null && updateTL != null && updateNORMAL != null && canUpdateDetail) {
                     System.out.println("Siap update");
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String dateStr = dateFormat.format(wdIsDate);
 
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-
                     // === NORMAL Updates ===
-                    updateShift(updateNORMAL, "NORMAL", s1NORMAL, 1, formatter);
-                    updateShift(updateNORMAL, "NORMAL", s2NORMAL, 2, formatter);
-                    updateShift(updateNORMAL, "NORMAL", s3NORMAL, 3, formatter);
+                    if (updateShift(updateNORMAL, "NORMAL", s1NORMAL, 1, formatter)) {
+                        errors.add("Shift 1 NORMAL has an error on date: " + dateStr);
+                    } else {
+                        successes.add("Shift 1 NORMAL updated successfully on date: " + dateStr);
+                    }
+
+                    if (updateShift(updateNORMAL, "NORMAL", s2NORMAL, 2, formatter)) {
+                        errors.add("Shift 2 NORMAL has an error on date: " + dateStr);
+                    } else {
+                        successes.add("Shift 2 NORMAL updated successfully on date: " + dateStr);
+                    }
+
+                    if (updateShift(updateNORMAL, "NORMAL", s3NORMAL, 3, formatter)) {
+                        errors.add("Shift 3 NORMAL has an error on date: " + dateStr);
+                    } else {
+                        successes.add("Shift 3 NORMAL updated successfully on date: " + dateStr);
+                    }
 
                     // === TT Updates ===
-                    updateShift(updateTT, "TT", s1TT, 1, formatter);
-                    updateShift(updateTT, "TT", s2TT, 2, formatter);
-                    updateShift(updateTT, "TT", s3TT, 3, formatter);
+                    if (updateShift(updateTT, "TT", s1TT, 1, formatter)) {
+                        errors.add("Shift 1 TT has an error on date: " + dateStr);
+                    } else {
+                        successes.add("Shift 1 TT updated successfully on date: " + dateStr);
+                    }
+
+                    if (updateShift(updateTT, "TT", s2TT, 2, formatter)) {
+                        errors.add("Shift 2 TT has an error on date: " + dateStr);
+                    } else {
+                        successes.add("Shift 2 TT updated successfully on date: " + dateStr);
+                    }
+
+                    if (updateShift(updateTT, "TT", s3TT, 3, formatter)) {
+                        errors.add("Shift 3 TT has an error on date: " + dateStr);
+                    } else {
+                        successes.add("Shift 3 TT updated successfully on date: " + dateStr);
+                    }
 
                     // === TL Updates ===
-                    updateShift(updateTL, "TL", s1TL, 1, formatter);
-                    updateShift(updateTL, "TL", s2TL, 2, formatter);
-                    updateShift(updateTL, "TL", s3TL, 3, formatter);
+                    if (updateShift(updateTL, "TL", s1TL, 1, formatter)) {
+                        errors.add("Shift 1 TL has an error on date: " + dateStr);
+                    } else {
+                        successes.add("Shift 1 TL updated successfully on date: " + dateStr);
+                    }
+
+                    if (updateShift(updateTL, "TL", s2TL, 2, formatter)) {
+                        errors.add("Shift 2 TL has an error on date: " + dateStr);
+                    } else {
+                        successes.add("Shift 2 TL updated successfully on date: " + dateStr);
+                    }
+
+                    if (updateShift(updateTL, "TL", s3TL, 3, formatter)) {
+                        errors.add("Shift 3 TL has an error on date: " + dateStr);
+                    } else {
+                        successes.add("Shift 3 TL updated successfully on date: " + dateStr);
+                    }
+
                 }
                 if(canUpdateDetail){
-                    System.out.println("UPDATEUPDATEUPDATEUPDATEUPDATE"+updateWorkDay.getDATE_WD()+updateTT.getSHIFT1_END_TIME()+" ID"+updateTT.getDETAIL_WD_HOURS_SPECIFIC_ID());
                     updateTT.setLAST_UPDATE_DATE(new Date());
                     updateTL.setLAST_UPDATE_DATE(new Date());
                     updateNORMAL.setLAST_UPDATE_DATE(new Date());
 
                     workDayRepo.save(updateWorkDay);
                     detailWorkDayRepo.save(updateNORMAL);
+                    System.out.println("UPDATEUPDATEUPDATEUPDATEUPDATE"+updateWorkDay.getDATE_WD()+updateTT.getSHIFT1_END_TIME()+" ID"+updateTT.getDETAIL_WD_HOURS_SPECIFIC_ID());
                     detailWorkDayRepo.save(updateTT);
+                    System.out.println("ddd");
                     detailWorkDayRepo.save(updateTL);
+                    System.out.println("f");
                 }
 
 	        }
+	        
+	        if(errors.isEmpty()) {
+	        	return new Response(new Date(), HttpStatus.OK.value(), null, "File processed successfully", req.getRequestURI(),null);
+	        }
+	        
+	        String errorSummary;
+	        if (errors.size() > 3) {
+	            errorSummary = String.join(", ", errors.subList(0, 3)) + ", and more";
+	        } else {
+	            errorSummary = String.join(", ", errors);
+	        }
 
-	        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed successfully", req.getRequestURI(), Map.of("tt", resultTTList, "tl", resultTLList,"normal",resultNORMALList));
+	        return new Response(new Date(), HttpStatus.OK.value(), errorSummary, "File processed successfully With error", req.getRequestURI(),errors);
 
-//	        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data validated successfully", req.getRequestURI(), null);
-	
 	    } catch (IOException e) {
-	        return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
+	        return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    }
 	}
 
@@ -1283,7 +1343,9 @@ public class WorkDayController {
         }
     }
 
-    private void updateShift(DWorkDayHoursSpesific updateObj, String label, Map<String, Object> shiftMap, int shiftNumber, DateTimeFormatter formatter) {
+    private boolean updateShift(DWorkDayHoursSpesific updateObj, String label, Map<String, Object> shiftMap, int shiftNumber, DateTimeFormatter formatter) {
+        boolean hasError = false;
+
         // Default time and allowed range per shift
         Map<Integer, String[]> defaultShifts = Map.of(
             1, new String[]{"07:10", "15:50"},
@@ -1300,22 +1362,33 @@ public class WorkDayController {
 
         System.out.printf("%s Shift %d RAW: start = %s, end = %s%n", label, shiftNumber, rawStart, rawEnd);
 
-        boolean validStart = isValidTime(rawStart, formatter);
-        boolean validEnd = isValidTime(rawEnd, formatter);
+        boolean validStart = isValidTime(shiftMap.get("START").toString(), formatter);
+        boolean validEnd = isValidTime(shiftMap.get("END").toString(), formatter);
 
-        if (!validStart) System.out.printf("%s Shift %d WARNING: start '%s' is invalid, using default '%s'%n", label, shiftNumber, rawStart, defaultStart);
-        if (!validEnd) System.out.printf("%s Shift %d WARNING: end '%s' is invalid, using default '%s'%n", label, shiftNumber, rawEnd, defaultEnd);
+        if (!validStart) {
+            System.out.printf("%s Shift %d WARNING: start '%s' is invalid, using default '%s'%n", label, shiftNumber, rawStart, defaultStart);
+            hasError = true;
+        }
+
+        if (!validEnd) {
+            System.out.printf("%s Shift %d WARNING: end '%s' is invalid, using default '%s'%n", label, shiftNumber, rawEnd, defaultEnd);
+            hasError = true;
+        }
 
         boolean inRangeStart = validStart && (rawStart.equals("00:00") || isWithinShiftRange(rawStart, defaultStart, defaultEnd, formatter));
         boolean inRangeEnd = validEnd && (rawEnd.equals("00:00") || isWithinShiftRange(rawEnd, defaultStart, defaultEnd, formatter));
 
-        if (validStart && !inRangeStart && !rawStart.equals("00:00"))
+        if (validStart && !inRangeStart && !rawStart.equals("00:00")) {
             System.out.printf("%s Shift %d WARNING: start '%s' is out of range (%s - %s), using default '%s'%n",
                     label, shiftNumber, rawStart, defaultStart, defaultEnd, defaultStart);
+            hasError = true;
+        }
 
-        if (validEnd && !inRangeEnd && !rawEnd.equals("00:00"))
+        if (validEnd && !inRangeEnd && !rawEnd.equals("00:00")) {
             System.out.printf("%s Shift %d WARNING: end '%s' is out of range (%s - %s), using default '%s'%n",
                     label, shiftNumber, rawEnd, defaultStart, defaultEnd, defaultEnd);
+            hasError = true;
+        }
 
         String start = (validStart && inRangeStart) ? rawStart : defaultStart;
         String end = (validEnd && inRangeEnd) ? rawEnd : defaultEnd;
@@ -1324,25 +1397,30 @@ public class WorkDayController {
 
         BigDecimal dur = calculateDurationInMinutes(start, end, formatter);
         System.out.printf("%s Shift %d DURATION: %s minutes%n", label, shiftNumber, dur);
-
-        switch (shiftNumber) {
-            case 1 : {
-                updateObj.setSHIFT1_START_TIME(start);
-                updateObj.setSHIFT1_END_TIME(end);
-                updateObj.setSHIFT1_TOTAL_TIME(dur);
-            }
-            case 2 : {
-                updateObj.setSHIFT2_START_TIME(start);
-                updateObj.setSHIFT2_END_TIME(end);
-                updateObj.setSHIFT2_TOTAL_TIME(dur);
-            }
-            case 3 : {
-                updateObj.setSHIFT3_START_TIME(start);
-                updateObj.setSHIFT3_END_TIME(end);
-                updateObj.setSHIFT3_TOTAL_TIME(dur);
-            }
+        if(!hasError) {
+        	switch (shiftNumber) {
+	        	case 1:
+	        		updateObj.setSHIFT1_START_TIME(start);
+	        		updateObj.setSHIFT1_END_TIME(end);
+	        		updateObj.setSHIFT1_TOTAL_TIME(dur);
+	        		break;
+	        	case 2:
+	        		updateObj.setSHIFT2_START_TIME(start);
+	        		updateObj.setSHIFT2_END_TIME(end);
+	        		updateObj.setSHIFT2_TOTAL_TIME(dur);
+	        		break;
+	        	case 3:
+	        		updateObj.setSHIFT3_START_TIME(start);
+	        		updateObj.setSHIFT3_END_TIME(end);
+	        		updateObj.setSHIFT3_TOTAL_TIME(dur);
+	        		break;
+        	}
+        	
         }
+
+        return hasError;
     }
+
 
 
     
