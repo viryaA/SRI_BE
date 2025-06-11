@@ -1070,7 +1070,7 @@ public class WorkDayController {
 
                 if(dayWeek.getDayOfWeek() == DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
                     System.out.println("Weekend detected: " + dayWeek.getDayOfWeek());
-                    updateWorkDay.setOFF(BigDecimal.ZERO);
+                    updateWorkDay.setOFF(BigDecimal.ONE);
                     updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
                 } else if(i < resultTTList.size() -1) {
                     System.out.println("Using list index for next day's shift3 (i+1): " + (i + 1)+" "+ resultTTList.size());
@@ -1470,7 +1470,7 @@ public class WorkDayController {
                 System.out.println("⚠️ OFF = Yes, but parent or date is missing.");
             }
 
-            return BigDecimal.ONE;
+            return BigDecimal.ZERO;
         } else {
             // NEW LOGIC: OFF is not "Yes" (No, null, etc.)
             if (parent != null && date != null) {
@@ -1488,7 +1488,7 @@ public class WorkDayController {
             }
 
             System.out.println("🔁 OFF = No or other value. Returning 0.");
-            return BigDecimal.ZERO;
+            return BigDecimal.ONE;
         }
     }
 

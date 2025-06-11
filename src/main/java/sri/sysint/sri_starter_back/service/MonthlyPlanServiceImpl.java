@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.Iterator;
 
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sri.sysint.sri_starter_back.model.CTCuring;
 import sri.sysint.sri_starter_back.model.DetailDailyMonthlyPlanCuring;
@@ -1866,60 +1868,93 @@ public class MonthlyPlanServiceImpl {
         try {
             JsonNode root = objectMapper.readTree(inputJson);
             System.out.println("Parsed JSON: " + inputJson);
+			ObjectNode transformed = objectMapper.createObjectNode();
 
-            List<String> moIds = new ArrayList<>();
+			// Transform MO_ID array into individual keys
+			JsonNode moIds = root.get("MO_ID");
+			if (moIds != null && moIds.isArray()) {
+				for (int i = 0; i < moIds.size(); i++) {
+					transformed.put("MO_ID" + (i + 1), moIds.get(i).asText());
+				}
+			}
+			
+            List<String> moIdsS = new ArrayList<>();
             for (JsonNode moIdNode : root.path("MO_ID")) {
                 if (moIdNode != null && !moIdNode.isNull()) {
-                    moIds.add(moIdNode.asText());
+                    moIdsS.add(moIdNode.asText());
                 }
             }
 
-            // Save total plan
-            for (String moId : moIds) {
-                if (totalPlanRepo.existsTotalPlanByMOID(moId)) {
-                    System.out.println("MO_ID " + moId + " already exists. Skipping.");
-                    continue;
-                }
+			for (String moId : moIdsS) {
+               System.out.println("Deleting Total Plan by MO_ID: " + moId);
+               totalPlanRepo.deleteByMOID(moId);
+			}
+			
+			String transformedJson = objectMapper.writeValueAsString(transformed);
+			System.out.println("Transformed JSON: " + transformedJson);
 
-                System.out.println("Processing Save Total Plan MO_ID: " + moId);
-                String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
-                monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
-                System.out.println("Finish MO_ID: " + moId);
-            }
+			monthlyPlanNewRepo.saveTotalPlan(transformedJson);
+			System.out.println("hitung mould");
+			monthlyPlanNewRepo.hitungMould(transformedJson);
+			JsonNode cheatingID = root.get("CHEATING_ID");
+			transformed.put("CHEATING_ID",cheatingID.asText());
+			String withCheatingMO = objectMapper.writeValueAsString(transformed);
+			System.out.println("Transformed JSON with cheating: " + withCheatingMO );
+			monthlyPlanNewRepo.callGenerateMp1(withCheatingMO);
+			monthlyPlanNewRepo.callGenerateMp2(transformedJson);
+			
 
-            // Hitung Mould
-            for (String moId : moIds) {
-                System.out.println("Processing Calculate Mould Needed MO_ID: " + moId);
-                String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
-                monthlyPlanNewRepo.hitungMould(singleInputJson);
-            }
+            //  System.out.println("dapetin versi");
+            //  int ChangeMouldVersion = monthlyPlanNewRepo.getChangeMouldVersion(String.join(",", moIdsS));
+            //  System.out.println("generate change mould");
+            //  monthlyPlanNewRepo.runChangeMouldQuery(moIdsS.get(1),moIdsS.get(0), ChangeMouldVersion, String.join(",", moIdsS));
 
-            // Call Generate MP
-            int cheatingId = root.path("CHEATING_ID").asInt();
-            for (String moId : moIds) {
-                System.out.println("Calling Generate MP for MO_ID: " + moId);
-                String singleInputJson = String.format("{\"MO_ID\":\"%s\", \"CHEATING_ID\":%d}", moId, cheatingId);
-                monthlyPlanNewRepo.callGenerateMp(singleInputJson);
-            }
+            // // Save total plan
+            // for (String moId : moIds) {
+            //     if (totalPlanRepo.existsTotalPlanByMOID(moId)) {
+            //         System.out.println("MO_ID " + moId + " already exists. Skipping.");
+            //         continue;
+            //     }
 
-            // Loop After Generate 5 times
-            for (int i = 0; i < 5; i++) {
-                for (String moId : moIds) {
-                    System.out.println("Processing After Generate (loop " + (i + 1) + "): " + moId);
-                    monthlyPlanNewRepo.callAfterGenerate(moId, BigDecimal.valueOf(cheatingId));
-                }
-            }
+            //     System.out.println("Processing Save Total Plan MO_ID: " + moId);
+            //     String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
+            //     monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
+            //     System.out.println("Finish MO_ID: " + moId);
+            // }
 
-            // Get summary
-            List<Map<String, Object>> dataDetailMp = monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIds);
+            // // Hitung Mould
+            // for (String moId : moIds) {
+            //     System.out.println("Processing Calculate Mould Needed MO_ID: " + moId);
+            //     String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
+            //     monthlyPlanNewRepo.hitungMould(singleInputJson);
+            // }
+
+            // // Call Generate MP
+            // int cheatingId = root.path("CHEATING_ID").asInt();
+            // for (String moId : moIds) {
+            //     System.out.println("Calling Generate MP for MO_ID: " + moId);
+            //     String singleInputJson = String.format("{\"MO_ID\":\"%s\", \"CHEATING_ID\":%d}", moId, cheatingId);
+            //     monthlyPlanNewRepo.callGenerateMp(singleInputJson);
+            // }
+
+            // // Loop After Generate 5 times
+            // for (int i = 0; i < 5; i++) {
+            //     for (String moId : moIds) {
+            //         System.out.println("Processing After Generate (loop " + (i + 1) + "): " + moId);
+            //         monthlyPlanNewRepo.callAfterGenerate(moId, BigDecimal.valueOf(cheatingId));
+            //     }
+            // }
+
+            // // Get summary
+             System.out.println("get summary");
+			List<Map<String, Object>> dataDetailMp = monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIdsS);
+             
+			// monthlyPlanNewRepo.callChangeMouldResult(String.join(",", moIdsS));
 
             // Delete total plan
-//            for (String moId : moIds) {
-//                System.out.println("Deleting Total Plan by MO_ID: " + moId);
-//                totalPlanRepo.deleteByMOID(moId);
-//            }
 
             return dataDetailMp;
+//			return null;
 
         } catch (Exception e) {
             e.printStackTrace(); // Log the exception
@@ -2392,6 +2427,15 @@ public class MonthlyPlanServiceImpl {
                 }
             }
 	        List<Map<String, Object>> dataListDetail = totalPlanRepo.getDetailTotalPlan(moids.get(1).toString(),moids.get(0).toString());
+//	        List<Map<String, Object>> resultChangeMould = monthlyPlanNewRepo.findMouldChangeData(moids);
+//	        System.out.println("sudah dapetindata");
+//			Map<Object, Long> counts = resultChangeMould.stream()
+//				.collect(Collectors.groupingBy(
+//					row -> row.get("ORIGINAL_DATE"),
+//					TreeMap::new, // <-- ensures sorting by date
+//					Collectors.counting()
+//				));
+			System.out.println("uda ngitung");
 			String[] headerObjName = {"TOTAL_MOULD_USE_HARIAN", "TOTAL_HARIAN_PER_TANGGAL", 
 									"TOTAL_HARIAN_TT", "TOTAL_HARIAN_TL", "PERSENTASE_TT", "PERSENTASE_TL","JUMLAH_CHANGE_MOULD"};
 			String[] headersName = {"Total Mould Used per Day", "Total Day per Date", 
@@ -2425,54 +2469,70 @@ public class MonthlyPlanServiceImpl {
 				colOffset++; // Move to the next column for the next Map
 			}
 
+//			if (!counts.isEmpty()) {
+//			
+//				int changeMouldStartRow = headerRowIndex; // Same row as headers
+//				int changeMouldColumn = colOffset + headerObjName.length; // Column after the last data column
+//	
+//				for (Map.Entry<Object, Long> entry : counts.entrySet()) {
+//					Long count = entry.getValue();
+//	
+//					Row row = prepareProdSheet.getRow(changeMouldStartRow);
+//					if (row == null) {
+//						row = prepareProdSheet.createRow(changeMouldStartRow);
+//					}
+//	
+//					Cell cell = row.createCell(changeMouldColumn);
+//					cell.setCellValue(count); // Only write the count value
+//					cell.setCellStyle(calibri11RightBorder);
+//	
+//					changeMouldStartRow++;
+//				}
+//			}else {
+//				System.out.println("No Change Mould data found.");				
+//			}
+
+
             //end prepare prod sheet
             
             //change mould sheet
-            Sheet changeMouldSheet = workbook.createSheet("CHANGE MOULD");
-            
-            changeMouldSheet.setColumnWidth(3, 8000);
-            changeMouldSheet.setColumnWidth(1, 5000);
-            
-            Row tableHeadChangeMouldRow = changeMouldSheet.createRow(1);
-            Cell tableHeadChangeMouldCell;
-            
-            String[] changeMouldHeaderLabels = {"Tanggal", "Shift", "Work Center Text", "Part Number"};
-            CellStyle[] changeMouldHeaderStyles = {calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder};
+            // 1. Create the Sheet and Set Column Widths
+			Sheet changeMouldSheet = workbook.createSheet("CHANGE MOULD");
+			for (int ic = 1; i <= 7; ic++) {
+				changeMouldSheet.setColumnWidth(ic, 5000); // Uniform column width, adjust as needed
+			}
 
-            // Loop untuk kolom 0-5
-            for (int col = 0; col < changeMouldHeaderLabels.length; col++) {
-            	tableHeadChangeMouldCell = tableHeadChangeMouldRow.createCell(col+1);
-            	tableHeadChangeMouldCell.setCellStyle(changeMouldHeaderStyles[col]);
-                if (!changeMouldHeaderLabels[col].isEmpty()) {
-                	tableHeadChangeMouldCell.setCellValue(changeMouldHeaderLabels[col]);
-                }
-            }
-            
-            int changeMouldRow = 2;
-            Row changeMouldDataRow;
-            Cell changeMouldDataCell;
-            
-            for (int col = 0; col < changeMouldList.size(); col++) {
-            	changeMouldDataRow = changeMouldSheet.createRow(changeMouldRow);
-            	
-            	changeMouldDataCell = changeMouldDataRow.createCell(1);
-            	changeMouldDataCell.setCellStyle(calibri11Date);
-            	changeMouldDataCell.setCellValue(changeMouldList.get(col).getChangeDate());
-            	
-            	changeMouldDataCell = changeMouldDataRow.createCell(2);
-            	changeMouldDataCell.setCellStyle(calibriBold11CenterBorder);
-            	changeMouldDataCell.setCellValue(changeMouldList.get(col).getShift());
-            	
-            	changeMouldDataCell = changeMouldDataRow.createCell(3);
-            	changeMouldDataCell.setCellStyle(calibriBold11CenterBorder);
-            	changeMouldDataCell.setCellValue(changeMouldList.get(col).getWct());
-            	
-            	changeMouldDataCell = changeMouldDataRow.createCell(4);
-            	changeMouldDataCell.setCellStyle(calibriBold11CenterBorder);
-            	changeMouldDataCell.setCellValue(changeMouldList.get(col).getPartNum().toString());
-            	
-            	changeMouldRow++;
-            }
+			// 2. Define Header Labels and Corresponding Map Keys
+			String[] headerLabels = {
+				"Original Part Number", "Original Date", "Shift Stop", "Work Center Text", 
+				"Reused Date", "Reused Part Number", "Shift Start"
+			};
+
+			String[] mapKeys = {
+				"ORIGINAL_ITEM_CURING", "ORIGINAL_DATE", "SHIFT_STOP", "WCT",
+				"REUSED_DATE", "REUSED_ITEM_CURING", "SHIFT_START"
+			};
+
+			// 3. Create Header Row
+			Row headerRow = changeMouldSheet.createRow(1);
+			for (int col = 0; col < headerLabels.length; col++) {
+				Cell cell = headerRow.createCell(col + 1); // Start from column 1
+				cell.setCellValue(headerLabels[col]);
+				cell.setCellStyle(calibriBold11CenterBorder);
+			}
+
+			// 4. Populate Data
+			int rowIndex = 2;
+//			for (Map<String, Object> row : resultChangeMould) {
+//				Row dataRow = changeMouldSheet.createRow(rowIndex++);
+//				for (int col = 0; col < mapKeys.length; col++) {
+//					Cell dataCell = dataRow.createCell(col + 1); // Start from column 1
+//					Object value = row.get(mapKeys[col]);
+//					dataCell.setCellValue(value != null ? value.toString() : "");
+//					dataCell.setCellStyle(calibri11CenterBorder); // Apply consistent style
+//				}
+//			}
+
             //end change mould sheet
             
             workbook.write(out); // Menulis data ke output stream

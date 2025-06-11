@@ -710,7 +710,7 @@ public class WorkDayServiceImpl {
 
     		        // S1 OFF & REASON
     		        String s1Desc = record[3] != null ? record[3].toString() : "";
-                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[0].toString().equals("1") ? "Yes" : "No");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[0].toString().equals("0") ? "Yes" : "No");
                     sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[1] != null ? record[1].toString() : "");
                     sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[2] != null ? record[2].toString() : "");
                     sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s1Desc);
@@ -718,7 +718,7 @@ public class WorkDayServiceImpl {
 
     		        // S2
     		        String s2Desc = record[7] != null ? record[7].toString() : "";
-                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[4].toString().equals("1") ? "Yes" : "No");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[4].toString().equals("0") ? "Yes" : "No");
                     sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5] != null ? record[5].toString() : "");
                     sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[6] != null ? record[6].toString() : "");
                     sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s2Desc);
@@ -726,7 +726,7 @@ public class WorkDayServiceImpl {
                     
     		        // S3
     		        String s3Desc = record[11] != null ? record[11].toString() : "";
-                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[8].toString().equals("1") ? "Yes" : "No");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[8].toString().equals("0") ? "Yes" : "No");
                     sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9] != null ? record[9].toString() : "");
                     sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[10] != null ? record[10].toString() : "");
                     sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Desc);
@@ -777,7 +777,7 @@ public class WorkDayServiceImpl {
     		        // S1 OT_TT
     		        String hsDesc = record[14] != null ? record[14].toString() : "";
     		        if ("OT_TT".equalsIgnoreCase(hsDesc)) {
-        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5].toString().equals("1") ? "Yes" : "No");
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5].toString().equals("0") ? "Yes" : "No");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[2] != null ? record[2].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[3] != null ? record[3].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s1Desc);
@@ -788,7 +788,7 @@ public class WorkDayServiceImpl {
                     
     		        // S1 OT_TL
     		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
-        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5].toString().equals("1") ? "Yes" : "No");
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5].toString().equals("0") ? "Yes" : "No");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[2] != null ? record[2].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[3] != null ? record[3].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s1Desc);
@@ -801,7 +801,7 @@ public class WorkDayServiceImpl {
     		        String s2Desc = record[8] != null ? record[8].toString() : "";
     		        System.out.print("dr");
     		        if ("OT_TT".equalsIgnoreCase(hsDesc)) {
-        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9].toString().equals("1") ? "Yes" : "No");
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9].toString().equals("0") ? "Yes" : "No");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[6] != null ? record[6].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[7] != null ? record[7].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s2Desc);
@@ -810,7 +810,7 @@ public class WorkDayServiceImpl {
     		        }
     		        System.out.print("5");
     		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
-        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9].toString().equals("1") ? "Yes" : "No");
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9].toString().equals("0") ? "Yes" : "No");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[6] != null ? record[6].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[7] != null ? record[7].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s2Desc);
@@ -824,7 +824,7 @@ public class WorkDayServiceImpl {
     		        String s3Desc = record[12] != null ? record[12].toString() : "";
     		        System.out.print("dk");
     		        if ("OT_TT".equalsIgnoreCase(hsDesc)) {
-    		        	sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[13].toString().equals("1") ? "Yes" : "No");
+    		        	sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[13].toString().equals("0") ? "Yes" : "No");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[10] != null ? record[10].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[11] != null ? record[11].toString() : "");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Desc);
@@ -833,7 +833,7 @@ public class WorkDayServiceImpl {
     		        }
     		        System.out.print("7");
     		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
-    		        	sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[13].toString().equals("1") ? "Yes" : "No");
+    		        	sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[13].toString().equals("0") ? "Yes" : "No");
         		        System.out.print("7f");
     		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[10] != null ? record[10].toString() : "");
         		        System.out.print("7d");
