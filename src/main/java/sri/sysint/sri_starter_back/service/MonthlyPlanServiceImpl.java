@@ -1945,9 +1945,12 @@ public class MonthlyPlanServiceImpl {
             //     }
             // }
 
+			BigDecimal version = totalPlanRepo.getNewestVersion(moIdsS.get(1).toString(),moIdsS.get(0).toString());
+
+
             // // Get summary
              System.out.println("get summary");
-			List<Map<String, Object>> dataDetailMp = monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIdsS);
+			List<Map<String, Object>> dataDetailMp = monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIdsS,version);
              
 			// monthlyPlanNewRepo.callChangeMouldResult(String.join(",", moIdsS));
 
@@ -1965,7 +1968,8 @@ public class MonthlyPlanServiceImpl {
     
     
     public List<Map<String, Object>> getSummaryByMoIds(List<String> moIds) {
-        return monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIds);
+//        return monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIds);
+    	return null;
     }
 	    
     public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD, BigDecimal versionMO,BigDecimal versionGenerate) throws IOException {
@@ -1988,9 +1992,11 @@ public class MonthlyPlanServiceImpl {
     	    System.out.println(buffer.getMoId());	
     	    moids.add(buffer.getMoId());
     	}
+    	
+    	BigDecimal version = totalPlanRepo.getNewestVersion(moids.get(1).toString(),moids.get(0).toString());
 
-//	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdInAndVersion(moids, version);
-	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdIn(moids);
+	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdInAndVersion(moids, version);
+//	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdIn(moids);
 		
 	   	System.out.println(shiftMonthlyPlan.size());
 	   	// List<String> productDescription = new ArrayList<>();
@@ -2426,7 +2432,7 @@ public class MonthlyPlanServiceImpl {
                     mpDatarow++;
                 }
             }
-	        List<Map<String, Object>> dataListDetail = totalPlanRepo.getDetailTotalPlan(moids.get(1).toString(),moids.get(0).toString());
+	        List<Map<String, Object>> dataListDetail = totalPlanRepo.getDetailTotalPlan(moids.get(1).toString(),moids.get(0).toString(),version);
 //	        List<Map<String, Object>> resultChangeMould = monthlyPlanNewRepo.findMouldChangeData(moids);
 //	        System.out.println("sudah dapetindata");
 //			Map<Object, Long> counts = resultChangeMould.stream()

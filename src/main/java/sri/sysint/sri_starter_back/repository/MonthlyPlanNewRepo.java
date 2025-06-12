@@ -24,22 +24,23 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
 	List<MonthlyPlanningNew> findByMoIdIn(List<String> moIds);
 	
 	@Query(
-		    value = "SELECT " +
-		            "mp.ITEM_CURING, " +
-		            "LISTAGG(DISTINCT mp.WCT, ', ') WITHIN GROUP (ORDER BY mp.WCT) AS WCT_List, " +
-		            "SUM(mp.TOTAL_HARIAN) AS TOTAL, " +
-		            "MAX(tp.TOTAL_GROSS) AS Gross, " +
-		            "MAX(tp.TOTAL_PLAN) AS Net, " +
-		            "(MAX(tp.TOTAL_GROSS) - MAX(tp.TOTAL_PLAN)) AS Selisih " +
-		            "FROM SRI_IMPP_T_MONTHLYPLAN1 mp " +
-		            "JOIN SRI_IMPP_D_TOTALPLAN tp ON mp.ITEM_CURING = tp.ITEM_CURING " +
-		            "WHERE mp.MO_ID IN (:moIds) " +
-		            "AND tp.ID_MO IN (:moIds) " +
-		            "GROUP BY mp.ITEM_CURING " +
-		            "ORDER BY mp.ITEM_CURING",
-		    nativeQuery = true
-		)
-		List<Map<String, Object>> getMonthlyPlanSummaryByMoIds(@Param("moIds") List<String> moIds);
+        value = "SELECT " +
+                "mp.ITEM_CURING, " +
+                "LISTAGG(DISTINCT mp.WCT, ', ') WITHIN GROUP (ORDER BY mp.WCT) AS WCT_List, " +
+                "SUM(mp.TOTAL_HARIAN) AS TOTAL, " +
+                "MAX(tp.TOTAL_GROSS) AS Gross, " +
+                "MAX(tp.TOTAL_PLAN) AS Net, " +
+                "(MAX(tp.TOTAL_GROSS) - MAX(tp.TOTAL_PLAN)) AS Selisih " +
+                "FROM SRI_IMPP_T_MONTHLYPLAN1 mp " +
+                "JOIN SRI_IMPP_D_TOTALPLAN tp ON mp.ITEM_CURING = tp.ITEM_CURING " +
+                "WHERE mp.MO_ID IN (:moIds) " +
+                "AND mp.VERSION = :versionParam " +
+                "AND tp.ID_MO IN (:moIds) " +
+                "GROUP BY mp.ITEM_CURING " +
+                "ORDER BY mp.ITEM_CURING",
+        nativeQuery = true
+    )
+    List<Map<String, Object>> getMonthlyPlanSummaryByMoIds(@Param("moIds") List<String> moIds,@Param("versionParam") BigDecimal versionParam);
 
 	
 	
