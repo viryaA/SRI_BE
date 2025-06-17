@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "SRI_IMPP_T_MONTHLYPLAN1")
+@Table(name = "SRI_IMPP_T_MONTHLYPLAN1_COPY")
 public class MonthlyPlanningNew {
 	@Id
     @Column(name = "MP_ID")

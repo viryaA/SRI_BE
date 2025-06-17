@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -884,6 +885,7 @@ public class WorkDayController {
 	        Row rowh = sheet.getRow(0); // Only check the first row
 	        int lastColumn = rowh.getLastCellNum(); // Total columns used in this row
 	        if (rowh != null) {
+                int real = 0;
                 System.out.println("ini dfjdfdfd: "+lastColumn);
 	            for (int col = 1; col < lastColumn; col++) {
 	                Cell cell = rowh.getCell(col);
@@ -903,19 +905,23 @@ public class WorkDayController {
 	
 	                if (cell.getCellType() != CellType.NUMERIC || !DateUtil.isCellDateFormatted(cell)) {
 	                    System.out.println("Invalid date");
-	                    return new Response(
-	                        new Date(),
-	                        HttpStatus.BAD_REQUEST.value(),
-	                        null,
-	                        "Invalid or non-date cell at column " + (col + 1) + " in row 1",
-	                        req.getRequestURI(),
-	                        null
-	                    );
+	                    // return new Response(
+	                    //     new Date(),
+	                    //     HttpStatus.BAD_REQUEST.value(),
+	                    //     null,
+	                    //     "Invalid or non-date cell at column " + (col + 1) + " in row 1",
+	                    //     req.getRequestURI(),
+	                    //     null
+	                    // );
+                        break;
 	                }
 	
-	                System.out.println("Date: " + cell.getDateCellValue());
+                    real++;
+	                System.out.println("Date: " + cell.getDateCellValue() + real);
 	            }
+                lastColumn = real + 1;
 	        }
+            
 	        List<Map<String, Object>> resultTTList = new ArrayList<>();
 	        List<Map<String, Object>> resultTLList = new ArrayList<>();
 	        List<Map<String, Object>> resultNORMALList = new ArrayList<>();
@@ -1205,60 +1211,61 @@ public class WorkDayController {
                     System.out.println("Siap update");
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     String dateStr = dateFormat.format(wdIsDate);
+                    boolean isFriday = dayWeek.getDayOfWeek() == DayOfWeek.FRIDAY;
 
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
                     // === NORMAL Updates ===
-                    if (updateShift(updateNORMAL, "NORMAL", s1NORMAL, 1, formatter)) {
+                    if (updateShift(updateNORMAL, "NORMAL", s1NORMAL, 1, formatter,isFriday)) {
                         errors.add("Shift 1 NORMAL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 1 NORMAL updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateNORMAL, "NORMAL", s2NORMAL, 2, formatter)) {
+                    if (updateShift(updateNORMAL, "NORMAL", s2NORMAL, 2, formatter, isFriday)) {
                         errors.add("Shift 2 NORMAL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 2 NORMAL updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateNORMAL, "NORMAL", s3NORMAL, 3, formatter)) {
+                    if (updateShift(updateNORMAL, "NORMAL", s3NORMAL, 3, formatter, isFriday)) {
                         errors.add("Shift 3 NORMAL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 3 NORMAL updated successfully on date: " + dateStr);
                     }
 
                     // === TT Updates ===
-                    if (updateShift(updateTT, "TT", s1TT, 1, formatter)) {
+                    if (updateShift(updateTT, "TT", s1TT, 1, formatter, isFriday)) {
                         errors.add("Shift 1 TT has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 1 TT updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateTT, "TT", s2TT, 2, formatter)) {
+                    if (updateShift(updateTT, "TT", s2TT, 2, formatter, isFriday)) {
                         errors.add("Shift 2 TT has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 2 TT updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateTT, "TT", s3TT, 3, formatter)) {
+                    if (updateShift(updateTT, "TT", s3TT, 3, formatter, isFriday)) {
                         errors.add("Shift 3 TT has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 3 TT updated successfully on date: " + dateStr);
                     }
 
                     // === TL Updates ===
-                    if (updateShift(updateTL, "TL", s1TL, 1, formatter)) {
+                    if (updateShift(updateTL, "TL", s1TL, 1, formatter, isFriday)) {
                         errors.add("Shift 1 TL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 1 TL updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateTL, "TL", s2TL, 2, formatter)) {
+                    if (updateShift(updateTL, "TL", s2TL, 2, formatter, isFriday)) {
                         errors.add("Shift 2 TL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 2 TL updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateTL, "TL", s3TL, 3, formatter)) {
+                    if (updateShift(updateTL, "TL", s3TL, 3, formatter, isFriday)) {
                         errors.add("Shift 3 TL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 3 TL updated successfully on date: " + dateStr);
@@ -1327,23 +1334,85 @@ public class WorkDayController {
         return null;
     }
 
-    private BigDecimal calculateDurationInMinutes(String start, String end, DateTimeFormatter formatter) {
+    private BigDecimal calculateDurationInMinutes(String start, String end, DateTimeFormatter formatter, boolean isFriday,int shift) {
         try {
             LocalTime startTime = LocalTime.parse(start, formatter);
             LocalTime endTime = LocalTime.parse(end, formatter);
 
-            long minutes = Duration.between(startTime, endTime).toMinutes();
-            if (minutes < 0) {
-                minutes += 24 * 60; // overnight shift
+            // Assign an arbitrary base date
+            LocalDate baseDate = LocalDate.of(2000, 1, 1);
+            LocalDateTime startDateTime = LocalDateTime.of(baseDate, startTime);
+            LocalDateTime endDateTime = LocalDateTime.of(baseDate, endTime);
+
+            // Handle overnight shift by adding 1 day to endDateTime
+            if (endTime.isBefore(startTime)) {
+                endDateTime = endDateTime.plusDays(1);
             }
-            return BigDecimal.valueOf(minutes);
+
+            // Calculate total duration
+            long minutes = Duration.between(startDateTime, endDateTime).toMinutes();
+
+            // Define break time (you can customize per Friday if needed)
+            LocalTime breakStart = LocalTime.of(12, 40);
+            LocalTime breakEnd = LocalTime.of(13, 40);
+
+            LocalDateTime breakStartDateTime = LocalDateTime.of(baseDate, breakStart);
+            LocalDateTime breakEndDateTime = LocalDateTime.of(baseDate, breakEnd);
+
+            // If break is before start time in an overnight shift, adjust to the next day
+            if (endTime.isBefore(startTime) && breakStart.isBefore(startTime)) {
+                breakStartDateTime = breakStartDateTime.plusDays(1);
+                breakEndDateTime = breakEndDateTime.plusDays(1);
+            }
+
+            // Calculate overlap with break
+            long breakMinutes = 0;
+            if(isFriday && shift == 1){
+            	breakMinutes =  calculateOverlapMinutes(startDateTime, endDateTime, breakStartDateTime, breakEndDateTime);
+            	System.out.println(String.format(
+            		    "Friday detected with shift = %d. Break overlap duration = %d minutes. Start = %s, End = %s, Total duration = %d, Final duration = %d",
+            		    shift,
+            		    breakMinutes,
+            		    start,
+            		    end,
+            		    minutes,
+            		    minutes - breakMinutes
+            		));
+
+            }
+
+            return BigDecimal.valueOf(minutes - breakMinutes);
         } catch (DateTimeParseException e) {
             System.err.println("Time parse error: " + e.getMessage());
             return null;
         }
     }
 
-    private boolean updateShift(DWorkDayHoursSpesific updateObj, String label, Map<String, Object> shiftMap, int shiftNumber, DateTimeFormatter formatter) {
+    // Helper to calculate overlap between work period and break
+    private long calculateOverlapMinutes(LocalDateTime start, LocalDateTime end,
+        LocalDateTime breakStart, LocalDateTime breakEnd) {
+		LocalDateTime latestStart = start.isAfter(breakStart) ? start : breakStart;
+		LocalDateTime earliestEnd = end.isBefore(breakEnd) ? end : breakEnd;
+		
+		if (earliestEnd.isAfter(latestStart)) {
+			return Duration.between(latestStart, earliestEnd).toMinutes();
+		}
+		return 0;
+	}
+	
+
+
+    // Utility methods
+    private LocalTime max(LocalTime t1, LocalTime t2) {
+        return t1.isAfter(t2) ? t1 : t2;
+    }
+
+    private LocalTime min(LocalTime t1, LocalTime t2) {
+        return t1.isBefore(t2) ? t1 : t2;
+    }
+
+
+    private boolean updateShift(DWorkDayHoursSpesific updateObj, String label, Map<String, Object> shiftMap, int shiftNumber, DateTimeFormatter formatter, boolean isFriday) {
         boolean hasError = false;
 
         // Default time and allowed range per shift
@@ -1395,7 +1464,7 @@ public class WorkDayController {
 
         System.out.printf("%s Shift %d FINAL: start = %s, end = %s%n", label, shiftNumber, start, end);
 
-        BigDecimal dur = calculateDurationInMinutes(start, end, formatter);
+        BigDecimal dur = calculateDurationInMinutes(start, end, formatter,isFriday, shiftNumber);
         System.out.printf("%s Shift %d DURATION: %s minutes%n", label, shiftNumber, dur);
         if(!hasError) {
         	switch (shiftNumber) {

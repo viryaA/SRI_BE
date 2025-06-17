@@ -548,6 +548,13 @@ public class MarketingOrderController {
 	        response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
 	        return response;
 	    }
+
+		@GetMapping("/changemould")
+	    public Response generateMonthlyPlan() {
+			BigDecimal a = BigDecimal.ZERO;
+
+	        return monthlyPlanServiceImpl.exportExcelR(11,2024,1,BigDecimal.valueOf(2),a);
+	    }
 	    
 	    @RequestMapping("/exportMPExcel")
 		public ResponseEntity<InputStreamResource> exportPLantsExcel(@RequestParam int month,

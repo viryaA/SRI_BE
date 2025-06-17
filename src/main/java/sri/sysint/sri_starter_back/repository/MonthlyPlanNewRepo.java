@@ -59,7 +59,7 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
     void callChangeMouldResult(@Param("jsonInput") String jsonInput);
 	
     @Modifying
-    @Query(value = "BEGIN SP_BUAT_MP_12(:jsonInput); END;", nativeQuery = true)
+    @Query(value = "BEGIN SP_BUAT_MP_15(:jsonInput); END;", nativeQuery = true)
     void callGenerateMp1(@Param("jsonInput") String jsonInput);
 
     @Modifying
@@ -200,6 +200,7 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
                 "         END AS SHIFT_STOP " +
                 "  FROM SRI_IMPP_T_MONTHLYPLAN1 " +
                 "  WHERE MO_ID IN (:moIds) " +
+                "  AND VERSION  = :version " +
                 "  GROUP BY ITEM_CURING, DATE_VALID " +
                 "), " +
                 "changemould_new AS ( " +
@@ -216,6 +217,7 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
                 "              ELSE NULL END AS SHIFT_STOP " +
                 "  FROM SRI_IMPP_T_MONTHLYPLAN1 " +
                 "  WHERE MO_ID IN (:moIds) " +
+                "  AND VERSION  = :version " +
                 "  GROUP BY ITEM_CURING, DATE_VALID " +
                 "), " +
                 "OldWCT AS ( " +
@@ -247,13 +249,38 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
                 ") " +
                 "SELECT ORIGINAL_ITEM_CURING, ORIGINAL_DATE, SHIFT_STOP, WCT, REUSED_DATE, REUSED_ITEM_CURING, SHIFT_START " +
                 "FROM ReusedOnOtherDateRanked " +
-                "WHERE rn = 1 " +
+                "WHERE rn = 1 AND ORIGINAL_ITEM_CURING != REUSED_ITEM_CURING " +
                 "ORDER BY WCT, ORIGINAL_DATE, REUSED_DATE",
         nativeQuery = true
     )
-    List<Map<String, Object>> findMouldChangeData(@Param("moIds") List<String> moIds);
+    List<Map<String, Object>> findMouldChangeData(@Param("moIds") List<String> moIds, @Param("version") BigDecimal version);
 
-
+// Correct for Java 1.8
+    @Query(value =
+            "SELECT " +
+            "    DATE_VALID, " +
+            "    SUM( " +
+            "        CASE " +
+            "            WHEN TOTAL_USE > CAVITY THEN CAVITY " +
+            "            ELSE TOTAL_USE " +
+            "        END " +
+            "    ) AS TOTAL_MOULD_USE_HARIAN " +
+            "FROM ( " +
+            "    SELECT " +
+            "        DATE_VALID, " +
+            "        WCT, " +
+            "        SUM(MOULD_USE) AS TOTAL_USE, " +
+            "        CAST(REGEXP_SUBSTR(WCT, ' (\\d+) ', 1, 1) AS NUMBER) AS CAVITY " +
+            "    FROM SRI_IMPP_T_MONTHLYPLAN1 " +
+            "    WHERE MO_ID IN (:moIds) " +
+            "      AND VERSION = :version " +
+            "    GROUP BY DATE_VALID, WCT " +
+            ") subquery_alias " +
+            "GROUP BY DATE_VALID " +
+            "ORDER BY DATE_VALID", nativeQuery = true)
+    List<Map<String, Object>> findDailyMouldUseSummaryAsMap(
+            @Param("moIds") List<String> moIds,
+            @Param("version") BigDecimal version);
 //    @Modifying
 //    @Transactional
 //    @Query(value = "DELETE FROM SRI_IMPP_D_TOTALPLAN", nativeQuery = true)

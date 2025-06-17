@@ -9,8 +9,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +25,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
+import javax.persistence.EntityManager;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import javax.transaction.Transactional;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -38,7 +45,9 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xmlbeans.impl.store.Cursor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -55,6 +64,7 @@ import sri.sysint.sri_starter_back.model.MarketingOrder;
 import sri.sysint.sri_starter_back.model.ShiftMonthlyPlan;
 import sri.sysint.sri_starter_back.model.WorkDay;
 import sri.sysint.sri_starter_back.model.MonthlyPlanningNew;
+import sri.sysint.sri_starter_back.model.Response;
 import sri.sysint.sri_starter_back.model.transaksi.ViewMonthlyPlanning;
 import sri.sysint.sri_starter_back.repository.CTCuringRepo;
 import sri.sysint.sri_starter_back.repository.DWorkDayHoursSpecificRepo;
@@ -117,9 +127,6 @@ public class MonthlyPlanServiceImpl {
     @Autowired
     private ObjectMapper objectMapper;
 	
-    public MonthlyPlanServiceImpl(MonthlyPlanRepo monthlyPlanRepo){
-    	
-    }
     
     private List<MachineCuring> machineCuringList = new ArrayList<>();
 
@@ -1863,6 +1870,38 @@ public class MonthlyPlanServiceImpl {
                     '}';
         }
     }
+
+    private EntityManager entityManager;
+
+    public boolean callSpBuatMp9WithOutput(String jsonInput) {
+        try {
+            // Enable DBMS_OUTPUT with a large buffer
+            entityManager.createNativeQuery("BEGIN DBMS_OUTPUT.ENABLE(1000000); END;").executeUpdate();
+            
+            // Call your procedure
+            entityManager.createNativeQuery("BEGIN SP_BUAT_MP_9(:jsonInput); END;")
+                .setParameter("jsonInput", jsonInput)
+                .executeUpdate();
+            
+            // Check if there's any DBMS_OUTPUT
+            StoredProcedureQuery query = entityManager
+                .createStoredProcedureQuery("GET_DBMS_OUTPUT")
+                .registerStoredProcedureParameter(1, Class.class, ParameterMode.REF_CURSOR);
+            
+            query.execute();
+            
+            // Get the result set from the stored procedure
+            List<?> results = query.getResultList();
+            
+            // If there are results, return true
+            return !results.isEmpty();
+            
+        } catch (Exception e) {
+            // Log the error if needed
+            e.printStackTrace();
+            return false;
+        }
+    }
     
     public List<Map<String, Object>> generateMp(String inputJson) throws Exception {
         try {
@@ -1901,7 +1940,11 @@ public class MonthlyPlanServiceImpl {
 			String withCheatingMO = objectMapper.writeValueAsString(transformed);
 			System.out.println("Transformed JSON with cheating: " + withCheatingMO );
 			monthlyPlanNewRepo.callGenerateMp1(withCheatingMO);
-			monthlyPlanNewRepo.callGenerateMp2(transformedJson);
+			while(callSpBuatMp9WithOutput(transformedJson)) {
+				System.out.println("jalan bang");
+			}
+			
+//			monthlyPlanNewRepo.callGenerateMp2(transformedJson);
 			
 
             //  System.out.println("dapetin versi");
@@ -1971,6 +2014,542 @@ public class MonthlyPlanServiceImpl {
 //        return monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIds);
     	return null;
     }
+
+	public Response exportExcelR(int month, int year, int limitChange,BigDecimal versionMO,BigDecimal versionGenerate) {
+
+    	YearMonth yearMonth = YearMonth.of(year,month);
+    	LocalDate startLocal = yearMonth.atDay(1);
+    	LocalDate endLocal = yearMonth.atEndOfMonth();
+
+        String yearMonthStr = String.format("%04d%02d", year, month);
+    	List<MarketingOrder> top2 = marketingOrderRepo
+    	        .findTop2ByYearMonth(yearMonthStr,versionMO);
+
+    	List<String> moids = new ArrayList<>(); 
+
+    	for (MarketingOrder buffer : top2) {
+    	    System.out.println(buffer.getMoId());	
+    	    moids.add(buffer.getMoId());
+    	}
+    	
+    	BigDecimal version = totalPlanRepo.getNewestVersion(moids.get(1).toString(),moids.get(0).toString());
+
+	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdInAndVersion(moids, version);
+	 // Step 1: Sort the list by getDateMp()
+	   	shiftMonthlyPlan.sort(Comparator.comparing(MonthlyPlanningNew::getDateMp));
+
+	   	// Step 2: Loop through the sorted list
+	   	for (MonthlyPlanningNew plan : shiftMonthlyPlan) {
+	   	    System.out.println("Date: " + plan.getDateMp());
+	   	    // add your logic here
+	   	}
+	   	
+	   	List<Map<String, Object>> resultList = new ArrayList<>();
+	   	
+	   	List<Map<String, Object>> groupedByDateAndWct = shiftMonthlyPlan.stream()
+	   		    .collect(Collectors.groupingBy(plan -> {
+	   		        LocalDate date = plan.getDateMp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+	   		        String wct = plan.getWct();
+	   		        return date + "|" + wct; // Composite key
+	   		    }))
+	   		    .entrySet().stream()
+	   		    .map(entry -> {
+	   		        String[] keyParts = entry.getKey().split("\\|");
+	   		        Map<String, Object> map = new LinkedHashMap<>();
+	   		        map.put("date", keyParts[0]);
+	   		        map.put("wct", keyParts[1]);
+	   		        map.put("entries", entry.getValue());
+	   		        return map;
+	   		    })
+	   		    .sorted(Comparator.comparing(map ->
+	   		        LocalDate.parse((String) map.get("date"))
+	   		    ))
+	   		    .collect(Collectors.toList());
+
+
+	   	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	   	for (Map<String, Object> grouped : groupedByDateAndWct) {
+	   	    LocalDate currentDate = LocalDate.parse((String) grouped.get("date"), formatter);
+	   	    String currentWct = (String) grouped.get("wct");
+	   	    LocalDate nextDate = currentDate.plusDays(1);
+
+	   	    List<MonthlyPlanningNew> nextEntries = shiftMonthlyPlan.stream()
+	   	        .filter(plan -> {
+	   	            LocalDate planDate = plan.getDateMp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+	   	            return planDate.equals(nextDate) && plan.getWct().equals(currentWct);
+	   	        })
+	   	        .collect(Collectors.toList());
+
+	   	    grouped.put("nextEntries", nextEntries);
+	   	    
+		   	 boolean coupled = false;
+	
+		   	if (nextEntries.size() > 1) {
+		   	    String firstItem = nextEntries.get(0).getItemCuring();
+		   	    coupled = nextEntries.stream()
+		   	        .allMatch(e -> e.getItemCuring().equals(firstItem));
+		   	}
+	
+		   	grouped.put("coupled", coupled);
+	   	}
+	   	for (Map<String, Object> grouped : groupedByDateAndWct) {
+	   	    List<MonthlyPlanningNew> entries = (List<MonthlyPlanningNew>) grouped.get("entries");
+	   	    List<MonthlyPlanningNew> nextEntries = (List<MonthlyPlanningNew>) grouped.get("nextEntries");
+	   	    
+	   	    Set<String> currentItems = entries.stream()
+	   	        .map(MonthlyPlanningNew::getItemCuring)
+	   	        .collect(Collectors.toSet());
+	
+	   	    Set<String> nextItems = nextEntries.stream()
+	   	        .map(MonthlyPlanningNew::getItemCuring)
+	   	        .collect(Collectors.toSet());
+	
+	   	    Set<String> sameItemCuring = new HashSet<>(currentItems);
+	   	    sameItemCuring.retainAll(nextItems); // keep only common elements
+	
+	   	    Set<String> addedItemCuring = new HashSet<>(nextItems);
+	   	    addedItemCuring.removeAll(currentItems); // items only in next
+	
+	   	    Set<String> removedItemCuring = new HashSet<>(currentItems);
+	   	    removedItemCuring.removeAll(nextItems); // items only in current
+	
+	   	    // Status logic
+	   	    String status;
+	   	    if (nextItems.size() > currentItems.size()) {
+	   	        status = "increase";
+	   	    } else if (nextItems.size() < currentItems.size()) {
+	   	        status = "decrease";
+	   	    } else {
+	   	        if (addedItemCuring.isEmpty() && removedItemCuring.isEmpty()) {
+	   	            status = "same";
+	   	        } else {
+	   	            status = "same-but-different-item-curing";
+	   	        }
+	   	    }
+	
+	   	    grouped.put("changeStatus", status);
+	   	    grouped.put("entryCount", currentItems.size());
+	   	    grouped.put("nextEntryCount", nextItems.size());
+	   	    grouped.put("sameItemCuring", sameItemCuring);
+	   	    grouped.put("addedItemCuring", addedItemCuring);
+	   	    grouped.put("removedItemCuring", removedItemCuring);
+		   	 if ("decrease".equals(grouped.get("changeStatus"))) {
+		   	    String currentWct = (String) grouped.get("wct");
+		   	    LocalDate nextDate = LocalDate.parse((String) grouped.get("date")).plusDays(1);
+	
+//		   	    Set<String> sameItemCuring = (Set<String>) grouped.getOrDefault("sameItemCuring", Collections.emptySet());
+//		   	    Set<String> addedItemCuring = (Set<String>) grouped.getOrDefault("addedItemCuring", Collections.emptySet());
+	
+		   	    Map<LocalDate, List<MonthlyPlanningNew>> futureMatches = shiftMonthlyPlan.stream()
+		   	        .filter(plan -> {
+		   	            LocalDate planDate = plan.getDateMp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		   	            return planDate.isAfter(nextDate) && plan.getWct().equals(currentWct);
+		   	        })
+		   	        .collect(Collectors.groupingBy(
+		   	            plan -> plan.getDateMp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+		   	            TreeMap::new,
+		   	            Collectors.toList()
+		   	        ));
+	
+		   	    if (!futureMatches.isEmpty()) {
+		   	        // Get the first date it reappears
+		   	        Map.Entry<LocalDate, List<MonthlyPlanningNew>> firstReuse = futureMatches.entrySet().iterator().next();
+	
+		   	        List<MonthlyPlanningNew> fullEntries = firstReuse.getValue();
+		   	        // Optional: only new itemCuring
+		   	        List<MonthlyPlanningNew> onlyNewItemCurings = fullEntries.stream()
+		   	            .filter(entry ->
+		   	                !sameItemCuring.contains(entry.getItemCuring()) &&
+		   	                !addedItemCuring.contains(entry.getItemCuring())
+		   	            )
+		   	            .collect(Collectors.toList());
+		   	        if(!onlyNewItemCurings.isEmpty()) {
+		   	        	grouped.put("wctUsedAgainNewEntries", onlyNewItemCurings);		   	        	
+		   	        }
+	
+		   	    }
+		   	}
+
+	   	}
+
+
+//	   	for (MonthlyPlanningNew currentPlan : shiftMonthlyPlan) {
+//	   	    LocalDate currentLocalDate = currentPlan.getDateMp().toInstant()
+//	   	            .atZone(ZoneId.systemDefault())
+//	   	            .toLocalDate();
+//
+//	   	    LocalDate nextLocalDate = currentLocalDate.plusDays(1);
+//
+//	   	    System.out.println("== Checking current plan ==");
+//	   	    System.out.println("Current LocalDate : " + currentLocalDate);
+//	   	    System.out.println("Next LocalDate    : " + nextLocalDate);
+//	   	    System.out.println("WCT               : " + currentPlan.getWct());
+//	   	    System.out.println("Item Curing       : " + currentPlan.getItemCuring());
+//
+//	   	    List<MonthlyPlanningNew> nextMatches = new ArrayList<>();
+//
+//	   	    for (MonthlyPlanningNew candidate : shiftMonthlyPlan) {
+//	   	        LocalDate candidateDate = candidate.getDateMp().toInstant()
+//	   	                .atZone(ZoneId.systemDefault())
+//	   	                .toLocalDate();
+//
+//	   	        if (candidateDate.equals(nextLocalDate) &&
+//	   	            candidate.getWct().equals(currentPlan.getWct())) {
+//
+//	   	            nextMatches.add(candidate);
+//	   	        }
+//	   	    }
+//
+//	   	    if (!nextMatches.isEmpty()) {
+//	   	        Map<String, Object> row = new LinkedHashMap<>();
+//	   	        row.put("current", currentPlan);
+//	   	        row.put("next", nextMatches);
+//	   	        resultList.add(row);
+//
+//	   	        System.out.println("   >>> MATCH FOUND for next day! Count: " + nextMatches.size());
+//	   	        for (MonthlyPlanningNew match : nextMatches) {
+//	   	            System.out.println("       -> " + match.getDateMp());
+//	   	        }
+//	   	    } else {
+//	   	        System.out.println("   >>> No match on next day.");
+//	   	    }
+//
+//	   	    System.out.println("==================================\n");
+//	   	}
+
+
+	   	List<Map<String, Object>> filteredResults = new ArrayList<>();
+
+	   	for (Map<String, Object> grouped : groupedByDateAndWct) {
+	   	    String changeStatus = (String) grouped.get("changeStatus");
+
+	   	    if (!"same".equals(changeStatus)) {
+	   	        if ("same-but-different-item-curing".equals(changeStatus)) {
+	   	            @SuppressWarnings("unchecked")
+	   	            List<MonthlyPlanningNew> entries = (List<MonthlyPlanningNew>) grouped.get("entries");
+
+	   	            @SuppressWarnings("unchecked")
+	   	            List<MonthlyPlanningNew> nextEntries = (List<MonthlyPlanningNew>) grouped.get("nextEntries");
+
+	   	            int maxIndex = Math.min(entries.size(), nextEntries.size());
+
+	   	            for (int i = 0; i < maxIndex; i++) {
+	   	                MonthlyPlanningNew original = entries.get(i);
+	   	                MonthlyPlanningNew reused = nextEntries.get(i);
+	   	                if(!original.getItemCuring().equals(reused.getItemCuring())) {
+	   	                	Map<String, Object> data = new LinkedHashMap<>();
+	   	                	data.put("ORIGINAL_DATE", formatDate(original.getDateMp()));
+	   	                	data.put("ORIGINAL_ITEM_CURING", original.getItemCuring());
+	   	                	data.put("SHIFT_STOP", getShiftName(original));
+	   	                	data.put("WCT", original.getWct());
+	   	                	
+	   	                	data.put("REUSED_DATE", formatDate(reused.getDateMp()));
+	   	                	data.put("REUSED_ITEM_CURING", reused.getItemCuring());
+	   	                	data.put("SHIFT_START", getShiftName(reused));
+	   	                	
+	   	                	filteredResults.add(data);	   	                	
+	   	                }
+
+	   	            }
+	   	        }
+	   	     if ("increase".equals(changeStatus)) {
+	   	        @SuppressWarnings("unchecked")
+	   	        List<MonthlyPlanningNew> entries = (List<MonthlyPlanningNew>) grouped.get("entries");
+
+	   	        @SuppressWarnings("unchecked")
+	   	        List<MonthlyPlanningNew> nextEntries = (List<MonthlyPlanningNew>) grouped.get("nextEntries");
+
+	   	        int entrySize = entries.size();
+	   	        int nextEntrySize = nextEntries.size();
+
+	   	        int maxIndex = Math.max(entrySize, nextEntrySize);
+
+	   	        for (int i = 0; i < maxIndex; i++) {
+	   	            Map<String, Object> data = new LinkedHashMap<>();
+
+	   	            if (i < entrySize && i < nextEntrySize) {
+	   	                // Matched index entries
+	   	                MonthlyPlanningNew original = entries.get(i);
+	   	                MonthlyPlanningNew reused = nextEntries.get(i);
+
+	   	                if(!original.getItemCuring().equals(reused.getItemCuring())) {
+	   	                	data.put("ORIGINAL_DATE", formatDate(original.getDateMp()));
+	   	                	data.put("ORIGINAL_ITEM_CURING", original.getItemCuring());
+	   	                	data.put("SHIFT_STOP", getShiftName(original));
+	   	                	data.put("WCT", original.getWct());
+	   	                	
+	   	                	data.put("REUSED_DATE", formatDate(reused.getDateMp()));
+	   	                	data.put("REUSED_ITEM_CURING", reused.getItemCuring());
+	   	                	data.put("SHIFT_START", getShiftName(reused));
+	   	                	filteredResults.add(data);
+	   	                }
+	   	            } else if (i >= entrySize && i < nextEntrySize) {
+	   	                // Extra new items (added)
+	   	                MonthlyPlanningNew added = nextEntries.get(i);
+
+	   	                data.put("ORIGINAL_DATE", "Extend"); // No matching original
+	   	                data.put("ORIGINAL_ITEM_CURING", "Extend");
+	   	                data.put("SHIFT_STOP", "Extend"); // No shift stop info
+	   	                data.put("WCT", added.getWct()); // From new
+
+	   	                // New reused entry
+	   	                data.put("REUSED_DATE", formatDate(added.getDateMp()));
+	   	                data.put("REUSED_ITEM_CURING", added.getItemCuring());
+	   	                data.put("SHIFT_START", getShiftName(added));
+	   	                filteredResults.add(data);
+	   	            }
+
+	   	        }
+	   	    }
+	   	    }
+	   	}
+
+
+
+    	return new Response(new Date(), HttpStatus.OK.value(), null, "File processed successfully", null,filteredResults);
+	}
+
+	public List<Map<String, Object>> changemouldR(List<MonthlyPlanningNew> shiftMonthlyPlan) {
+	 // Step 1: Sort the list by getDateMp()
+	   	shiftMonthlyPlan.sort(Comparator.comparing(MonthlyPlanningNew::getDateMp));
+
+	   	// Step 2: Loop through the sorted list
+	   	for (MonthlyPlanningNew plan : shiftMonthlyPlan) {
+	   	    System.out.println("Date: " + plan.getDateMp());
+	   	    // add your logic here
+	   	}
+	   	
+	   	List<Map<String, Object>> resultList = new ArrayList<>();
+	   	
+	   	List<Map<String, Object>> groupedByDateAndWct = shiftMonthlyPlan.stream()
+	   		    .collect(Collectors.groupingBy(plan -> {
+	   		        LocalDate date = plan.getDateMp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+	   		        String wct = plan.getWct();
+	   		        return date + "|" + wct; // Composite key
+	   		    }))
+	   		    .entrySet().stream()
+	   		    .map(entry -> {
+	   		        String[] keyParts = entry.getKey().split("\\|");
+	   		        Map<String, Object> map = new LinkedHashMap<>();
+	   		        map.put("date", keyParts[0]);
+	   		        map.put("wct", keyParts[1]);
+	   		        map.put("entries", entry.getValue());
+	   		        return map;
+	   		    })
+	   		    .sorted(Comparator.comparing(map ->
+	   		        LocalDate.parse((String) map.get("date"))
+	   		    ))
+	   		    .collect(Collectors.toList());
+
+
+	   	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	   	for (Map<String, Object> grouped : groupedByDateAndWct) {
+	   	    LocalDate currentDate = LocalDate.parse((String) grouped.get("date"), formatter);
+	   	    String currentWct = (String) grouped.get("wct");
+	   	    LocalDate nextDate = currentDate.plusDays(1);
+
+	   	    List<MonthlyPlanningNew> nextEntries = shiftMonthlyPlan.stream()
+	   	        .filter(plan -> {
+	   	            LocalDate planDate = plan.getDateMp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+	   	            return planDate.equals(nextDate) && plan.getWct().equals(currentWct);
+	   	        })
+	   	        .collect(Collectors.toList());
+
+	   	    grouped.put("nextEntries", nextEntries);
+	   	    
+		   	 boolean coupled = false;
+	
+		   	if (nextEntries.size() > 1) {
+		   	    String firstItem = nextEntries.get(0).getItemCuring();
+		   	    coupled = nextEntries.stream()
+		   	        .allMatch(e -> e.getItemCuring().equals(firstItem));
+		   	}
+	
+		   	grouped.put("coupled", coupled);
+	   	}
+	   	for (Map<String, Object> grouped : groupedByDateAndWct) {
+	   	    List<MonthlyPlanningNew> entries = (List<MonthlyPlanningNew>) grouped.get("entries");
+	   	    List<MonthlyPlanningNew> nextEntries = (List<MonthlyPlanningNew>) grouped.get("nextEntries");
+	   	    
+	   	    Set<String> currentItems = entries.stream()
+	   	        .map(MonthlyPlanningNew::getItemCuring)
+	   	        .collect(Collectors.toSet());
+	
+	   	    Set<String> nextItems = nextEntries.stream()
+	   	        .map(MonthlyPlanningNew::getItemCuring)
+	   	        .collect(Collectors.toSet());
+	
+	   	    Set<String> sameItemCuring = new HashSet<>(currentItems);
+	   	    sameItemCuring.retainAll(nextItems); // keep only common elements
+	
+	   	    Set<String> addedItemCuring = new HashSet<>(nextItems);
+	   	    addedItemCuring.removeAll(currentItems); // items only in next
+	
+	   	    Set<String> removedItemCuring = new HashSet<>(currentItems);
+	   	    removedItemCuring.removeAll(nextItems); // items only in current
+	
+	   	    // Status logic
+	   	    String status;
+	   	    if (nextItems.size() > currentItems.size()) {
+	   	        status = "increase";
+	   	    } else if (nextItems.size() < currentItems.size()) {
+	   	        status = "decrease";
+	   	    } else {
+	   	        if (addedItemCuring.isEmpty() && removedItemCuring.isEmpty()) {
+	   	            status = "same";
+	   	        } else {
+	   	            status = "same-but-different-item-curing";
+	   	        }
+	   	    }
+	
+	   	    grouped.put("changeStatus", status);
+	   	    grouped.put("entryCount", currentItems.size());
+	   	    grouped.put("nextEntryCount", nextItems.size());
+	   	    grouped.put("sameItemCuring", sameItemCuring);
+	   	    grouped.put("addedItemCuring", addedItemCuring);
+	   	    grouped.put("removedItemCuring", removedItemCuring);
+		   	 if ("decrease".equals(grouped.get("changeStatus"))) {
+		   	    String currentWct = (String) grouped.get("wct");
+		   	    LocalDate nextDate = LocalDate.parse((String) grouped.get("date")).plusDays(1);
+
+		   	    Map<LocalDate, List<MonthlyPlanningNew>> futureMatches = shiftMonthlyPlan.stream()
+		   	        .filter(plan -> {
+		   	            LocalDate planDate = plan.getDateMp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		   	            return planDate.isAfter(nextDate) && plan.getWct().equals(currentWct);
+		   	        })
+		   	        .collect(Collectors.groupingBy(
+		   	            plan -> plan.getDateMp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+		   	            TreeMap::new,
+		   	            Collectors.toList()
+		   	        ));
+	
+		   	    if (!futureMatches.isEmpty()) {
+		   	        // Get the first date it reappears
+		   	        Map.Entry<LocalDate, List<MonthlyPlanningNew>> firstReuse = futureMatches.entrySet().iterator().next();
+	
+		   	        List<MonthlyPlanningNew> fullEntries = firstReuse.getValue();
+		   	        // Optional: only new itemCuring
+		   	        List<MonthlyPlanningNew> onlyNewItemCurings = fullEntries.stream()
+		   	            .filter(entry ->
+		   	                !sameItemCuring.contains(entry.getItemCuring()) &&
+		   	                !addedItemCuring.contains(entry.getItemCuring())
+		   	            )
+		   	            .collect(Collectors.toList());
+		   	        if(!onlyNewItemCurings.isEmpty()) {
+		   	        	grouped.put("wctUsedAgainNewEntries", onlyNewItemCurings);		   	        	
+		   	        }
+	
+		   	    }
+		   	}
+
+	   	}
+
+	   	List<Map<String, Object>> filteredResults = new ArrayList<>();
+
+	   	for (Map<String, Object> grouped : groupedByDateAndWct) {
+	   	    String changeStatus = (String) grouped.get("changeStatus");
+
+	   	    if (!"same".equals(changeStatus)) {
+	   	        if ("same-but-different-item-curing".equals(changeStatus)) {
+	   	            @SuppressWarnings("unchecked")
+	   	            List<MonthlyPlanningNew> entries = (List<MonthlyPlanningNew>) grouped.get("entries");
+
+	   	            @SuppressWarnings("unchecked")
+	   	            List<MonthlyPlanningNew> nextEntries = (List<MonthlyPlanningNew>) grouped.get("nextEntries");
+
+	   	            int maxIndex = Math.min(entries.size(), nextEntries.size());
+
+	   	            for (int i = 0; i < maxIndex; i++) {
+	   	                MonthlyPlanningNew original = entries.get(i);
+	   	                MonthlyPlanningNew reused = nextEntries.get(i);
+
+	   	                if(!original.getItemCuring().equals(reused.getItemCuring())) {
+	   	                	Map<String, Object> data = new LinkedHashMap<>();
+	   	                	data.put("ORIGINAL_DATE", formatDate(original.getDateMp()));
+	   	                	data.put("ORIGINAL_ITEM_CURING", original.getItemCuring());
+	   	                	data.put("SHIFT_STOP", getShiftName(original));
+	   	                	data.put("WCT", original.getWct());
+	   	                	
+	   	                	data.put("REUSED_DATE", formatDate(reused.getDateMp()));
+	   	                	data.put("REUSED_ITEM_CURING", reused.getItemCuring());
+	   	                	data.put("SHIFT_START", getShiftName(reused));
+	   	                	
+	   	                	filteredResults.add(data);	   	                	
+	   	                }
+	   	            }
+	   	        }
+	   	     if ("increase".equals(changeStatus)) {
+	   	        @SuppressWarnings("unchecked")
+	   	        List<MonthlyPlanningNew> entries = (List<MonthlyPlanningNew>) grouped.get("entries");
+
+	   	        @SuppressWarnings("unchecked")
+	   	        List<MonthlyPlanningNew> nextEntries = (List<MonthlyPlanningNew>) grouped.get("nextEntries");
+
+	   	        int entrySize = entries.size();
+	   	        int nextEntrySize = nextEntries.size();
+
+	   	        int maxIndex = Math.max(entrySize, nextEntrySize);
+
+	   	        for (int i = 0; i < maxIndex; i++) {
+	   	            Map<String, Object> data = new LinkedHashMap<>();
+
+	   	            if (i < entrySize && i < nextEntrySize) {
+	   	                // Matched index entries
+	   	                MonthlyPlanningNew original = entries.get(i);
+	   	                MonthlyPlanningNew reused = nextEntries.get(i);
+
+	   	                if(!original.getItemCuring().equals(reused.getItemCuring())) {
+	   	                	data.put("ORIGINAL_DATE", formatDate(original.getDateMp()));
+	   	                	data.put("ORIGINAL_ITEM_CURING", original.getItemCuring());
+	   	                	data.put("SHIFT_STOP", getShiftName(original));
+	   	                	data.put("WCT", original.getWct());
+	   	                	
+	   	                	data.put("REUSED_DATE", formatDate(reused.getDateMp()));
+	   	                	data.put("REUSED_ITEM_CURING", reused.getItemCuring());
+	   	                	data.put("SHIFT_START", getShiftName(reused));
+	   	                	filteredResults.add(data);       	
+	   	                }
+	   	            } else if (i >= entrySize && i < nextEntrySize) {
+	   	                // Extra new items (added)
+	   	                MonthlyPlanningNew added = nextEntries.get(i);
+
+	   	                data.put("ORIGINAL_DATE", "Extend"); // No matching original
+	   	                data.put("ORIGINAL_ITEM_CURING", "Extend");
+	   	                data.put("SHIFT_STOP", "Extend"); // No shift stop info
+	   	                data.put("WCT", added.getWct()); // From new
+
+	   	                // New reused entry
+	   	                data.put("REUSED_DATE", formatDate(added.getDateMp()));
+	   	                data.put("REUSED_ITEM_CURING", added.getItemCuring());
+	   	                data.put("SHIFT_START", getShiftName(added));
+	   	                filteredResults.add(data);
+	   	            }
+
+	   	        }
+	   	    }
+	   	    }
+	   	}
+
+		return filteredResults;
+	}
+	
+		private String getShiftName(MonthlyPlanningNew plan) {
+		    int s1 = plan.getShift1() != null ? plan.getShift1().intValue() : 0;
+		    int s2 = plan.getShift2() != null ? plan.getShift2().intValue() : 0;
+		    int s3 = plan.getShift3() != null ? plan.getShift3().intValue() : 0;
+	
+		    if (s1 > 0) return "SHIFT_1";
+		    if (s2 > 0) return "SHIFT_2";
+		    if (s3 > 0) return "SHIFT_3";
+		    return "NONE";
+		}
+	
+		private String formatDate(Date date) {
+		    return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
+		}
+
 	    
     public ByteArrayInputStream exportExcel(int month, int year, int limitChange, BigDecimal minA, BigDecimal maxA, BigDecimal minB, BigDecimal maxB, BigDecimal minC, BigDecimal maxC, BigDecimal minD, BigDecimal maxD, BigDecimal versionMO,BigDecimal versionGenerate) throws IOException {
 //    	List<ShiftMonthlyPlan> shiftMonthlyPlan = MonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
@@ -1996,6 +2575,14 @@ public class MonthlyPlanServiceImpl {
     	BigDecimal version = totalPlanRepo.getNewestVersion(moids.get(1).toString(),moids.get(0).toString());
 
 	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdInAndVersion(moids, version);
+	 // Step 1: Sort the list by getDateMp()
+	   	shiftMonthlyPlan.sort(Comparator.comparing(MonthlyPlanningNew::getDateMp));
+
+	   	// Step 2: Loop through the sorted list
+	   	for (MonthlyPlanningNew plan : shiftMonthlyPlan) {
+	   	    System.out.println("Date: " + plan.getDateMp());
+	   	    // add your logic here
+	   	}
 //	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdIn(moids);
 		
 	   	System.out.println(shiftMonthlyPlan.size());
@@ -2433,17 +3020,26 @@ public class MonthlyPlanServiceImpl {
                 }
             }
 	        List<Map<String, Object>> dataListDetail = totalPlanRepo.getDetailTotalPlan(moids.get(1).toString(),moids.get(0).toString(),version);
-//	        List<Map<String, Object>> resultChangeMould = monthlyPlanNewRepo.findMouldChangeData(moids);
-//	        System.out.println("sudah dapetindata");
-//			Map<Object, Long> counts = resultChangeMould.stream()
-//				.collect(Collectors.groupingBy(
-//					row -> row.get("ORIGINAL_DATE"),
-//					TreeMap::new, // <-- ensures sorting by date
-//					Collectors.counting()
-//				));
+	        List<Map<String, Object>> resultChangeMould = changemouldR(shiftMonthlyPlan);
+			List<Map<String, Object>> resultMouldUsed = monthlyPlanNewRepo.findDailyMouldUseSummaryAsMap(moids,version);
+	        System.out.println("sudah dapetindata");
+			Map<Object, Long> counts = resultChangeMould.stream()
+				.collect(Collectors.groupingBy(
+					row -> row.get("REUSED_DATE"),
+					TreeMap::new,
+					Collectors.collectingAndThen(
+						Collectors.mapping(
+							row -> Arrays.asList(row.get("WCT"), row.get("REUSED_ITEM_CURING")),
+							Collectors.toSet()
+						),
+						set -> (long) set.size()
+					)
+				));
+
+
 			System.out.println("uda ngitung");
-			String[] headerObjName = {"TOTAL_MOULD_USE_HARIAN", "TOTAL_HARIAN_PER_TANGGAL", 
-									"TOTAL_HARIAN_TT", "TOTAL_HARIAN_TL", "PERSENTASE_TT", "PERSENTASE_TL","JUMLAH_CHANGE_MOULD"};
+			String[] headerObjName = { "TOTAL_HARIAN_PER_TANGGAL", 
+									"TOTAL_HARIAN_TT", "TOTAL_HARIAN_TL", "PERSENTASE_TT", "PERSENTASE_TL"};
 			String[] headersName = {"Total Mould Used per Day", "Total Day per Date", 
 									"Total Day TT", "Total Day TL", "Percentage TT", "Percentage TL","Change Mould"};
 			// Write Headers
@@ -2456,11 +3052,23 @@ public class MonthlyPlanServiceImpl {
 			}
 
 			// Write Data (Start below headers)
+			int colOffset = 6;
 			int dataStartRow = headerRowIndex;
-			int colOffset = 6; // Start writing from column 6
+			for (Map<String, Object> row : resultMouldUsed) {
+				mpDataRow = prepareProdSheet.getRow(dataStartRow); // Get the existing row
+				if (mpDataRow == null) {
+					mpDataRow = prepareProdSheet.createRow(dataStartRow);
+				}
+				Object value = row.get("TOTAL_MOULD_USE_HARIAN");
+				mpDataCell = mpDataRow.createCell(colOffset);
+				mpDataCell.setCellValue(value != null ? value.toString() : "");
+				mpDataCell.setCellStyle(calibri11RightBorder);
+				colOffset++; // Move to the next column for the next Map
+			}
+			colOffset = 6; // Start writing from column 6
 
 			for (Map<String, Object> row : dataListDetail) {
-				int currentRow = dataStartRow;
+				int currentRow = dataStartRow + 1;
 				for (String header : headerObjName) {
 					mpDataRow = prepareProdSheet.getRow(currentRow); // Get the existing row
 					if (mpDataRow == null) {
@@ -2475,28 +3083,68 @@ public class MonthlyPlanServiceImpl {
 				colOffset++; // Move to the next column for the next Map
 			}
 
-//			if (!counts.isEmpty()) {
-//			
-//				int changeMouldStartRow = headerRowIndex; // Same row as headers
-//				int changeMouldColumn = colOffset + headerObjName.length; // Column after the last data column
-//	
-//				for (Map.Entry<Object, Long> entry : counts.entrySet()) {
-//					Long count = entry.getValue();
-//	
-//					Row row = prepareProdSheet.getRow(changeMouldStartRow);
-//					if (row == null) {
-//						row = prepareProdSheet.createRow(changeMouldStartRow);
-//					}
-//	
-//					Cell cell = row.createCell(changeMouldColumn);
-//					cell.setCellValue(count); // Only write the count value
-//					cell.setCellStyle(calibri11RightBorder);
-//	
-//					changeMouldStartRow++;
-//				}
-//			}else {
-//				System.out.println("No Change Mould data found.");				
-//			}
+			if (!counts.isEmpty()) {
+				System.out.println("ini ada");
+
+				int countRowIndex = headerRowIndex + 6; // The row where all count values will go
+
+				Map<Integer, Long> countByDay = new TreeMap<>();
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+				// Determine year and month from the first date
+				Integer targetYear = null;
+				Integer targetMonth = null;
+
+				for (Map.Entry<Object, Long> entry : counts.entrySet()) {
+					Object originalDateObj = entry.getKey();
+					Long count = entry.getValue();
+
+					if (originalDateObj != null) {
+						LocalDate dateM;
+						if (originalDateObj instanceof java.sql.Date) {
+							dateM = ((java.sql.Date) originalDateObj).toLocalDate();
+						} else if (originalDateObj instanceof java.util.Date) {
+							dateM = ((java.util.Date) originalDateObj).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+						} else if (originalDateObj instanceof String) {
+							dateM = LocalDate.parse((String) originalDateObj, formatter);
+						} else {
+							continue; // Skip unknown type
+						}
+
+						if (targetYear == null || targetMonth == null) {
+							targetYear = dateM.getYear();
+							targetMonth = dateM.getMonthValue();
+						}
+
+						int dayOfMonth = dateM.getDayOfMonth();
+						countByDay.put(dayOfMonth, count);
+					}
+				}
+
+				// Ensure year and month were found
+				if (targetYear != null && targetMonth != null) {
+					int daysInMonth = java.time.YearMonth.of(targetYear, targetMonth).lengthOfMonth();
+
+					Row countRow = prepareProdSheet.getRow(countRowIndex);
+					if (countRow == null) countRow = prepareProdSheet.createRow(countRowIndex);
+
+					int currentCol = 6;
+
+					for (int day = 1; day <= daysInMonth; day++) {
+						Cell countCell = countRow.createCell(currentCol);
+						countCell.setCellValue(countByDay.getOrDefault(day, 0L));
+						countCell.setCellStyle(calibri11RightBorder);
+						currentCol++;
+					}
+				} else {
+					System.out.println("No valid dates found to determine month.");
+				}
+
+			} else {
+				System.out.println("No Change Mould data found.");
+			}
+
+
 
 
             //end prepare prod sheet
@@ -2510,8 +3158,8 @@ public class MonthlyPlanServiceImpl {
 
 			// 2. Define Header Labels and Corresponding Map Keys
 			String[] headerLabels = {
-				"Original Part Number", "Original Date", "Shift Stop", "Work Center Text", 
-				"Reused Date", "Reused Part Number", "Shift Start"
+				"Original Item Curing", "Original Date", "Shift Stop", "Work Center Text", 
+				"Reused Date", "Reused Item Curing", "Shift Start"
 			};
 
 			String[] mapKeys = {
@@ -2529,15 +3177,15 @@ public class MonthlyPlanServiceImpl {
 
 			// 4. Populate Data
 			int rowIndex = 2;
-//			for (Map<String, Object> row : resultChangeMould) {
-//				Row dataRow = changeMouldSheet.createRow(rowIndex++);
-//				for (int col = 0; col < mapKeys.length; col++) {
-//					Cell dataCell = dataRow.createCell(col + 1); // Start from column 1
-//					Object value = row.get(mapKeys[col]);
-//					dataCell.setCellValue(value != null ? value.toString() : "");
-//					dataCell.setCellStyle(calibri11CenterBorder); // Apply consistent style
-//				}
-//			}
+			for (Map<String, Object> row : resultChangeMould) {
+				Row dataRow = changeMouldSheet.createRow(rowIndex++);
+				for (int col = 0; col < mapKeys.length; col++) {
+					Cell dataCell = dataRow.createCell(col + 1); // Start from column 1
+					Object value = row.get(mapKeys[col]);
+					dataCell.setCellValue(value != null ? value.toString() : "");
+					dataCell.setCellStyle(calibri11CenterBorder); // Apply consistent style
+				}
+			}
 
             //end change mould sheet
             
