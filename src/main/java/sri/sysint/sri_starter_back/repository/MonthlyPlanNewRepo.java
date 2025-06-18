@@ -59,7 +59,7 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
     void callChangeMouldResult(@Param("jsonInput") String jsonInput);
 	
     @Modifying
-    @Query(value = "BEGIN SP_BUAT_MP_15(:jsonInput); END;", nativeQuery = true)
+    @Query(value = "BEGIN SP_BUAT_MP_18(:jsonInput); END;", nativeQuery = true)
     void callGenerateMp1(@Param("jsonInput") String jsonInput);
 
     @Modifying

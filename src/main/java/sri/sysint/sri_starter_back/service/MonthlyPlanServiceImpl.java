@@ -1940,12 +1940,12 @@ public class MonthlyPlanServiceImpl {
 			String withCheatingMO = objectMapper.writeValueAsString(transformed);
 			System.out.println("Transformed JSON with cheating: " + withCheatingMO );
 			monthlyPlanNewRepo.callGenerateMp1(withCheatingMO);
-			while(callSpBuatMp9WithOutput(transformedJson)) {
-				System.out.println("jalan bang");
-			}
-			
-//			monthlyPlanNewRepo.callGenerateMp2(transformedJson);
-			
+			// while(callSpBuatMp9WithOutput(transformedJson)) {
+			// 	System.out.println("jalan bang");
+			// }
+			System.out.println("ppsdfjs");
+			monthlyPlanNewRepo.callGenerateMp2(transformedJson);
+			System.out.println("dhdhfd");
 
             //  System.out.println("dapetin versi");
             //  int ChangeMouldVersion = monthlyPlanNewRepo.getChangeMouldVersion(String.join(",", moIdsS));
