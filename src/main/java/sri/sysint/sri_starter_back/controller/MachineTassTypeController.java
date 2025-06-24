@@ -86,7 +86,7 @@ public class MachineTassTypeController {
 		        	machineTassTypes = machineTassTypeServiceImpl.getAllMachineTassType();
 
 		    	    response = new Response(
-		    	        new Date(),
+		    	        
 		    	        HttpStatus.OK.value(),
 		    	        null,
 		    	        HttpStatus.OK.getReasonPhrase(),
@@ -124,7 +124,7 @@ public class MachineTassTypeController {
 		        	machineTassType = machineTassTypeServiceImpl.getMachineTassTypeById(id);
 
 		    	    response = new Response(
-		    	        new Date(),
+		    	        
 		    	        HttpStatus.OK.value(),
 		    	        null,
 		    	        HttpStatus.OK.getReasonPhrase(),
@@ -163,7 +163,7 @@ public class MachineTassTypeController {
 			        	MachineTassType savedMachineTassType = machineTassTypeServiceImpl.saveMachineTassType(machineTassType);
 
 			    	    response = new Response(
-			    	        new Date(),
+			    	        
 			    	        HttpStatus.OK.value(),
 			    	        null,
 			    	        HttpStatus.OK.getReasonPhrase(),
@@ -200,7 +200,7 @@ public class MachineTassTypeController {
 			        	MachineTassType updatedMachineTassType = machineTassTypeServiceImpl.updateMachineTassType(machineTassType);
 
 			    	    response = new Response(
-			    	        new Date(),
+			    	        
 			    	        HttpStatus.OK.value(),
 			    	        null,
 			    	        HttpStatus.OK.getReasonPhrase(),
@@ -237,7 +237,7 @@ public class MachineTassTypeController {
 			        	MachineTassType deletedMachineTassType = machineTassTypeServiceImpl.deleteMachineTassType(machineTassType);
 
 			    	    response = new Response(
-			    	        new Date(),
+			    	        
 			    	        HttpStatus.OK.value(),
 			    	        null,
 			    	        HttpStatus.OK.getReasonPhrase(),
@@ -274,7 +274,7 @@ public class MachineTassTypeController {
 			            MachineTassType restoredMachineTassType = machineTassTypeServiceImpl.restoreMachineTassType(machineTassType);
 
 			            response = new Response(
-			                new Date(),
+			                
 			                HttpStatus.OK.value(),
 			                null,
 			                HttpStatus.OK.getReasonPhrase(),
@@ -310,7 +310,7 @@ public class MachineTassTypeController {
 
 			        if (user != null) {
 			            if (file.isEmpty()) {
-			                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+			                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 			            }
 
 			            try (InputStream inputStream = file.getInputStream()) {
@@ -385,7 +385,7 @@ public class MachineTassTypeController {
 			                }
 
 			                if (!errorMessages.isEmpty()) {
-			                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+			                    return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 			                }
 
 			                machineTassTypeServiceImpl.deleteAllMachineTassType();
@@ -393,7 +393,7 @@ public class MachineTassTypeController {
 			                    machineTassTypeServiceImpl.saveMachineTassType(machineTassType);
 			                }
 
-			                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), machineTassTypes);
+			                return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), machineTassTypes);
 
 			            } catch (IOException e) {
 			                throw new RuntimeException("Error processing file", e);
@@ -402,7 +402,7 @@ public class MachineTassTypeController {
 			            throw new ResourceNotFoundException("User not found");
 			        }
 			    } catch (IllegalArgumentException e) {
-			        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+			        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 			    } catch (Exception e) {
 			        throw new ResourceNotFoundException("JWT token is not valid or expired");
 			    }

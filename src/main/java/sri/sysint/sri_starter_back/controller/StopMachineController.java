@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -33,6 +32,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,90 +71,57 @@ public class StopMachineController {
     @PersistenceContext
     private EntityManager em;
 
-    private String validateTokenAndGetUser(HttpServletRequest req) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
-        try {
-            return JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                      .build()
-                      .verify(token)
-                      .getSubject();
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
-    }
-
-    // GET ALL STOP MACHINES
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/getAllStopMachines")
     public Response getAllStopMachines(final HttpServletRequest req) throws ResourceNotFoundException {
-        String user = validateTokenAndGetUser(req);
 
-        if (user != null) {
-            List<StopMachine> stopMachines = stopMachineService.getAllStopMachines();
-            response = new Response(
-                new Date(),
-                HttpStatus.OK.value(),
-                null,
-                HttpStatus.OK.getReasonPhrase(),
-                req.getRequestURI(),
-                stopMachines
-            );
-        } else {
-            throw new ResourceNotFoundException("User not found");
-        }
+        List<StopMachine> stopMachines = stopMachineService.getAllStopMachines();
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            stopMachines
+        );
 
         return response;
     }
 
-    // GET STOP MACHINE BY ID
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/getStopMachineById/{id}")
     public Response getStopMachineById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
-        String user = validateTokenAndGetUser(req);
 
-        if (user != null) {
-            Optional<StopMachine> stopMachine = stopMachineService.getStopMachineById(id);
-            response = new Response(
-                new Date(),
-                HttpStatus.OK.value(),
-                null,
-                HttpStatus.OK.getReasonPhrase(),
-                req.getRequestURI(),
-                stopMachine
-            );
-        } else {
-            throw new ResourceNotFoundException("User not found");
-        }
+        Optional<StopMachine> stopMachine = stopMachineService.getStopMachineById(id);
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            stopMachine
+        );
 
         return response;
     }
 
-    // CREATE NEW STOP MACHINE
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/saveStopMachine")
     public Response saveStopMachine(final HttpServletRequest req, @RequestBody StopMachine stopMachine) throws ResourceNotFoundException {
-        String user = validateTokenAndGetUser(req);
 
-        if (user != null) {
-        	stopMachine.setSTART_DATE(adjustDate(stopMachine.getSTART_DATE()));
-        	stopMachine.setEND_DATE(adjustDate(stopMachine.getEND_DATE()));
+        stopMachine.setSTART_DATE(adjustDate(stopMachine.getSTART_DATE()));
+        stopMachine.setEND_DATE(adjustDate(stopMachine.getEND_DATE()));
 
-            StopMachine savedStopMachine = stopMachineService.saveStopMachine(stopMachine);
-            response = new Response(
-                new Date(),
-                HttpStatus.OK.value(),
-                null,
-                HttpStatus.OK.getReasonPhrase(),
-                req.getRequestURI(),
-                savedStopMachine
-            );
-        } else {
-            throw new ResourceNotFoundException("User not found");
-        }
+        StopMachine savedStopMachine = stopMachineService.saveStopMachine(stopMachine);
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            savedStopMachine
+        );
 
         return response;
     }
@@ -172,235 +139,200 @@ public class StopMachineController {
 	    return null;  
 	}
 	
-    // UPDATE STOP MACHINE
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/updateStopMachine")
     public Response updateStopMachine(final HttpServletRequest req, @RequestBody StopMachine stopMachine) throws ResourceNotFoundException {
-        String user = validateTokenAndGetUser(req);
 
-        if (user != null) {
-        	stopMachine.setSTART_DATE(adjustDate(stopMachine.getSTART_DATE()));
-        	stopMachine.setEND_DATE(adjustDate(stopMachine.getEND_DATE()));
-        	
-            StopMachine updatedStopMachine = stopMachineService.updateStopMachine(stopMachine);
-            response = new Response(
-                new Date(),
-                HttpStatus.OK.value(),
-                null,
-                HttpStatus.OK.getReasonPhrase(),
-                req.getRequestURI(),
-                updatedStopMachine
-            );
-        } else {
-            throw new ResourceNotFoundException("User not found");
-        }
+        stopMachine.setSTART_DATE(adjustDate(stopMachine.getSTART_DATE()));
+        stopMachine.setEND_DATE(adjustDate(stopMachine.getEND_DATE()));
+        
+        StopMachine updatedStopMachine = stopMachineService.updateStopMachine(stopMachine);
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            updatedStopMachine
+        );
 
         return response;
     }
 
-    // DELETE STOP MACHINE
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/deleteStopMachine")
     public Response deleteStopMachine(final HttpServletRequest req, @RequestBody StopMachine stopMachine) throws ResourceNotFoundException {
-        String user = validateTokenAndGetUser(req);
 
-        if (user != null) {
-            StopMachine deletedStopMachine = stopMachineService.deleteStopMachine(stopMachine);
-            response = new Response(
-                new Date(),
-                HttpStatus.OK.value(),
-                null,
-                HttpStatus.OK.getReasonPhrase(),
-                req.getRequestURI(),
-                deletedStopMachine
-            );
-        } else {
-            throw new ResourceNotFoundException("User not found");
-        }
+        StopMachine deletedStopMachine = stopMachineService.deleteStopMachine(stopMachine);
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            deletedStopMachine
+        );
 
         return response;
     }
 
-    // RESTORE STOP MACHINE
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/restoreStopMachine")
     public Response restoreStopMachine(final HttpServletRequest req, @RequestBody StopMachine stopMachine) throws ResourceNotFoundException {
-        String user = validateTokenAndGetUser(req);
 
-        if (user != null) {
-            StopMachine restoredStopMachine = stopMachineService.restoreStopMachine(stopMachine);
-            response = new Response(
-                new Date(),
-                HttpStatus.OK.value(),
-                null,
-                HttpStatus.OK.getReasonPhrase(),
-                req.getRequestURI(),
-                restoredStopMachine
-            );
-        } else {
-            throw new ResourceNotFoundException("User not found");
-        }
+        StopMachine restoredStopMachine = stopMachineService.restoreStopMachine(stopMachine);
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            restoredStopMachine
+        );
 
         return response;
     }
-    
+
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/saveStopMachinesExcel")
     @Transactional
     public Response saveStopMachinesExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException, ParseException {
-//        String header = req.getHeader("Authorization");
-//
-//        if (header == null || !header.startsWith("Bearer ")) {
-//            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-//        }
-//
-//        String token = header.replace("Bearer ", "");
-//
-//        try {
-//            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-//                .build()
-//                .verify(token)
-//                .getSubject();
-//
-//            if (user != null) {
-                if (file.isEmpty()) {
-                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
-                }
 
-                try (InputStream inputStream = file.getInputStream()) {
-                    XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-                    XSSFSheet sheet = workbook.getSheetAt(0);
+        if (file.isEmpty()) {
+            return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+        }
 
-                    List<StopMachine> stopMachines = new ArrayList<>();
-                    List<String> errorMessages = new ArrayList<>();
+        try (InputStream inputStream = file.getInputStream()) {
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+            XSSFSheet sheet = workbook.getSheetAt(0);
 
-                    for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                        Row row = sheet.getRow(i);
+            List<StopMachine> stopMachines = new ArrayList<>();
+            List<String> errorMessages = new ArrayList<>();
 
-                        if (row != null) {
-                            boolean isEmptyRow = true;
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
 
-                            for (int j = 0; j < row.getLastCellNum(); j++) {
-                                Cell cell = row.getCell(j);
-                                if (cell != null && cell.getCellType() != CellType.BLANK) {
-                                    isEmptyRow = false;
-                                    break;
-                                }
-                            }
+                if (row != null) {
+                    boolean isEmptyRow = true;
 
-                            if (isEmptyRow) {
-                                continue;
-                            }
-
-                            StopMachine stopMachine = new StopMachine();
-                            Cell workCenterCell = row.getCell(2);
-                            Cell startDatePmCell = row.getCell(3);
-                            Cell endDatePmCell = row.getCell(4);
-                            Cell startTimeCell = row.getCell(5);
-                            Cell endTimeCell = row.getCell(6);
-                            Cell totalTimeCell = row.getCell(7);
-
-                            if (workCenterCell == null || workCenterCell.getCellType() == CellType.BLANK) {
-                                errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Work Center)");
-                                continue;
-                            }
-
-                            String workCenter = workCenterCell.getStringCellValue();
-
-                            Optional<MachineCuring> machineCuringOpt = machineCuringRepo.findById(workCenter);
-                            Optional<MachineTass> machineTassOpt = machineTassRepo.findByWct(workCenter);
-
-                            if (machineCuringOpt.isEmpty() && machineTassOpt.isEmpty()) {
-                                errorMessages.add("Data Tidak Valid, Work Center pada Baris " + (i + 1) + " Tidak Ditemukan di Tabel MACHINE CURING atau MACHINE TASS");
-                                continue;
-                            }
-
-                            if (startDatePmCell == null || startDatePmCell.getCellType() == CellType.BLANK) {
-                                errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 4 (Start Date PM)");
-                                continue;
-                            }
-
-                            if (!isValidDate(startDatePmCell)) {
-                                errorMessages.add("Data Tidak Valid, Format Tanggal pada Baris " + (i + 1) + " Kolom 4 (Start Date PM) Tidak Valid");
-                                continue;
-                            }
-
-                            if (endDatePmCell == null || endDatePmCell.getCellType() == CellType.BLANK) {
-                                errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (End Date PM)");
-                                continue;
-                            }
-
-                            if (!isValidDate(endDatePmCell)) {
-                                errorMessages.add("Data Tidak Valid, Format Tanggal pada Baris " + (i + 1) + " Kolom 5 (End Date PM) Tidak Valid");
-                                continue;
-                            }
-
-                            Date startDate = getDateFromCell(startDatePmCell);
-                            Date endDate = getDateFromCell(endDatePmCell);
-
-                            if (startTimeCell == null || startTimeCell.getCellType() == CellType.BLANK) {
-                                errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 6 (Start Time)");
-                                continue;
-                            }
-
-                            if (!isValidTimeFormat(startTimeCell.getStringCellValue())) {
-                                errorMessages.add("Data Tidak Valid, Format Waktu pada Baris " + (i + 1) + " Kolom 6 (Start Time) Tidak Valid");
-                                continue;
-                            }
-
-                            if (endTimeCell == null || endTimeCell.getCellType() == CellType.BLANK) {
-                                errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 7 (End Time)");
-                                continue;
-                            }
-
-                            if (!isValidTimeFormat(endTimeCell.getStringCellValue())) {
-                                errorMessages.add("Data Tidak Valid, Format Waktu pada Baris " + (i + 1) + " Kolom 7 (End Time) Tidak Valid");
-                                continue;
-                            }
-
-                            if (totalTimeCell == null || totalTimeCell.getCellType() == CellType.BLANK) {
-                                errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 8 (Total Time)");
-                                continue;
-                            }
-
-                            if (totalTimeCell.getCellType() != CellType.NUMERIC) {
-                                errorMessages.add("Data Tidak Valid, Format Total Time pada Baris " + (i + 1) + " Kolom 8 (Total Time) Tidak Valid");
-                                continue;
-                            }
-
-                            stopMachine.setSTOP_MACHINE_ID(stopMachineService.getNewId());
-                            stopMachine.setWORK_CENTER_TEXT(workCenter);
-                            stopMachine.setSTART_DATE(startDate);
-                            stopMachine.setEND_DATE(endDate);
-                            stopMachine.setSTART_TIME(startTimeCell.getStringCellValue());
-                            stopMachine.setEND_TIME(endTimeCell.getStringCellValue());
-                            stopMachine.setTOTAL_TIME(BigDecimal.valueOf(totalTimeCell.getNumericCellValue()));
-                            stopMachine.setSTATUS(BigDecimal.valueOf(1));
-                            stopMachine.setCREATION_DATE(new Date());
-                            stopMachine.setLAST_UPDATE_DATE(new Date());
-
-                            stopMachines.add(stopMachine);
+                    for (int j = 0; j < row.getLastCellNum(); j++) {
+                        Cell cell = row.getCell(j);
+                        if (cell != null && cell.getCellType() != CellType.BLANK) {
+                            isEmptyRow = false;
+                            break;
                         }
                     }
 
-                    if (!errorMessages.isEmpty()) {
-                        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+                    if (isEmptyRow) {
+                        continue;
                     }
 
-                    stopMachineService.deleteAllStopMachines();
-                    for (StopMachine stopMachine : stopMachines) {
-                        stopMachineService.saveStopMachine(stopMachine);
+                    StopMachine stopMachine = new StopMachine();
+                    Cell workCenterCell = row.getCell(2);
+                    Cell startDatePmCell = row.getCell(3);
+                    Cell endDatePmCell = row.getCell(4);
+                    Cell startTimeCell = row.getCell(5);
+                    Cell endTimeCell = row.getCell(6);
+                    Cell totalTimeCell = row.getCell(7);
+
+                    if (workCenterCell == null || workCenterCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Work Center)");
+                        continue;
                     }
 
-                    return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), stopMachines);
+                    String workCenter = workCenterCell.getStringCellValue();
 
-                } catch (IOException e) {
-                    throw new RuntimeException("Error processing file", e);
+                    Optional<MachineCuring> machineCuringOpt = machineCuringRepo.findById(workCenter);
+                    Optional<MachineTass> machineTassOpt = machineTassRepo.findByWct(workCenter);
+
+                    if (machineCuringOpt.isEmpty() && machineTassOpt.isEmpty()) {
+                        errorMessages.add("Data Tidak Valid, Work Center pada Baris " + (i + 1) + " Tidak Ditemukan di Tabel MACHINE CURING atau MACHINE TASS");
+                        continue;
+                    }
+
+                    if (startDatePmCell == null || startDatePmCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 4 (Start Date PM)");
+                        continue;
+                    }
+
+                    if (!isValidDate(startDatePmCell)) {
+                        errorMessages.add("Data Tidak Valid, Format Tanggal pada Baris " + (i + 1) + " Kolom 4 (Start Date PM) Tidak Valid");
+                        continue;
+                    }
+
+                    if (endDatePmCell == null || endDatePmCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (End Date PM)");
+                        continue;
+                    }
+
+                    if (!isValidDate(endDatePmCell)) {
+                        errorMessages.add("Data Tidak Valid, Format Tanggal pada Baris " + (i + 1) + " Kolom 5 (End Date PM) Tidak Valid");
+                        continue;
+                    }
+
+                    Date startDate = getDateFromCell(startDatePmCell);
+                    Date endDate = getDateFromCell(endDatePmCell);
+
+                    if (startTimeCell == null || startTimeCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 6 (Start Time)");
+                        continue;
+                    }
+
+                    if (!isValidTimeFormat(startTimeCell.getStringCellValue())) {
+                        errorMessages.add("Data Tidak Valid, Format Waktu pada Baris " + (i + 1) + " Kolom 6 (Start Time) Tidak Valid");
+                        continue;
+                    }
+
+                    if (endTimeCell == null || endTimeCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 7 (End Time)");
+                        continue;
+                    }
+
+                    if (!isValidTimeFormat(endTimeCell.getStringCellValue())) {
+                        errorMessages.add("Data Tidak Valid, Format Waktu pada Baris " + (i + 1) + " Kolom 7 (End Time) Tidak Valid");
+                        continue;
+                    }
+
+                    if (totalTimeCell == null || totalTimeCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 8 (Total Time)");
+                        continue;
+                    }
+
+                    if (totalTimeCell.getCellType() != CellType.NUMERIC) {
+                        errorMessages.add("Data Tidak Valid, Format Total Time pada Baris " + (i + 1) + " Kolom 8 (Total Time) Tidak Valid");
+                        continue;
+                    }
+
+                    stopMachine.setSTOP_MACHINE_ID(stopMachineService.getNewId());
+                    stopMachine.setWORK_CENTER_TEXT(workCenter);
+                    stopMachine.setSTART_DATE(startDate);
+                    stopMachine.setEND_DATE(endDate);
+                    stopMachine.setSTART_TIME(startTimeCell.getStringCellValue());
+                    stopMachine.setEND_TIME(endTimeCell.getStringCellValue());
+                    stopMachine.setTOTAL_TIME(BigDecimal.valueOf(totalTimeCell.getNumericCellValue()));
+                    stopMachine.setSTATUS(BigDecimal.valueOf(1));
+                    stopMachine.setCREATION_DATE(new Date());
+                    stopMachine.setLAST_UPDATE_DATE(new Date());
+
+                    stopMachines.add(stopMachine);
                 }
-//            } else {
-//                throw new ResourceNotFoundException("User not found");
-//            }
-//        } catch (IllegalArgumentException e) {
-//            return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
-//        } catch (Exception e) {
-//            throw new ResourceNotFoundException("JWT token is not valid or expired");
-//        }
+            }
+
+            if (!errorMessages.isEmpty()) {
+                return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+            }
+
+            stopMachineService.deleteAllStopMachines();
+            for (StopMachine stopMachine : stopMachines) {
+                stopMachineService.saveStopMachine(stopMachine);
+            }
+
+            return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), stopMachines);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error processing file", e);
+        }
+
     }
 
     private boolean isValidTimeFormat(String time) {
@@ -450,6 +382,7 @@ public class StopMachineController {
 	    return null;
 	}
 
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/exportStopMachinesExcel")
     public ResponseEntity<InputStreamResource> exportStopMachinesExcel() throws IOException {
         String filename = "EXPORT_MASTER_STOP_MACHINE.xlsx";
@@ -463,6 +396,7 @@ public class StopMachineController {
             .body(file);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/layoutStopMachinesExcel")
     public ResponseEntity<InputStreamResource> layoutStopMachinesExcel() throws IOException {
         String filename = "LAYOUT_MASTER_STOP_MACHINE.xlsx";

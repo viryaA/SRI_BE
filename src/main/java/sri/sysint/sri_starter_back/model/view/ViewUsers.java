@@ -10,11 +10,6 @@ public class ViewUsers {
 	    private Integer userId;
 	    private String userName;
 	    private String email;
-	    private String password;
-	    private String passWordConf;
-	    private String userStatus;
-	    private String sessionKey;
-	    private String resetToken;
 	    private String fullName;
 	    private Roles roles; 
 	    
@@ -23,11 +18,6 @@ public class ViewUsers {
 	    	this.userId = user.getUserId();
 	    	this.email = user.getEmail();
 	    	this.userName = user.getUserName();
-	    	this.password = user.getPassword();
-	    	this.passWordConf = user.getPassWordConf();
-	    	this.userStatus = user.getUserStatus();
-	    	this.sessionKey = user.getSessionKey();
-	    	this.resetToken = user.getResetToken();
 	    	this.fullName = user.getFullname();
 	    	this.roles = role;
 	    }
@@ -62,46 +52,6 @@ public class ViewUsers {
 		
 		public void setEmail(String email) {
 			this.email = email;
-		}
-		
-		public String getPassword() {
-			return password;
-		}
-		
-		public void setPassword(String password) {
-			this.password = password;
-		}
-		
-		public String getPassWordConf() {
-			return passWordConf;
-		}
-		
-		public void setPassWordConf(String passWordConf) {
-			this.passWordConf = passWordConf;
-		}
-		
-		public String getUserStatus() {
-			return userStatus;
-		}
-		
-		public void setUserStatus(String userStatus) {
-			this.userStatus = userStatus;
-		}
-		
-		public String getSessionKey() {
-			return sessionKey;
-		}
-		
-		public void setSessionKey(String sessionKey) {
-			this.sessionKey = sessionKey;
-		}
-		
-		public String getResetToken() {
-			return resetToken;
-		}
-		
-		public void setResetToken(String resetToken) {
-			this.resetToken = resetToken;
 		}
 		
 		public String getFullName() {

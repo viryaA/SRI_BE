@@ -84,7 +84,7 @@ public class DeliveryScheduleController {
 	    	    deliverySchedules = deliveryScheduleServiceImpl.getAllDeliverySchedules();
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -122,7 +122,7 @@ public class DeliveryScheduleController {
 	    	    deliverySchedule = deliveryScheduleServiceImpl.getDeliveryScheduleById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -164,7 +164,7 @@ public class DeliveryScheduleController {
 	            DeliverySchedule savedDeliverySchedule = deliveryScheduleServiceImpl.saveDeliverySchedule(deliverySchedule);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -217,7 +217,7 @@ public class DeliveryScheduleController {
 	        	DeliverySchedule updatedDeliverySchedule = deliveryScheduleServiceImpl.updateDeliverySchedule(deliverySchedule);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -254,7 +254,7 @@ public class DeliveryScheduleController {
 	        	DeliverySchedule deletedDeliverySchedule = deliveryScheduleServiceImpl.deleteDeliverySchedule(deliverySchedule);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -292,7 +292,7 @@ public class DeliveryScheduleController {
 	            DeliverySchedule restoredDeliverySchedule = deliveryScheduleServiceImpl.restoreDeliverySchedule(deliverySchedule);
 
 	            response = new Response(
-	                new Date(),
+	                
 	                HttpStatus.OK.value(),
 	                null,
 	                HttpStatus.OK.getReasonPhrase(),
@@ -328,7 +328,7 @@ public class DeliveryScheduleController {
 
 	        if (user != null) {
 	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	            }
 
 	            try (InputStream inputStream = file.getInputStream()) {
@@ -428,7 +428,7 @@ public class DeliveryScheduleController {
 	                }
 
 	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+	                    return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 	                }
 
 	                deliveryScheduleServiceImpl.deleteAllDeliverySchedules();
@@ -436,7 +436,7 @@ public class DeliveryScheduleController {
 	                    deliveryScheduleServiceImpl.saveDeliverySchedule(deliverySchedule);
 	                }
 
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), deliverySchedules);
+	                return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), deliverySchedules);
 
 	            } catch (IOException e) {
 	                throw new RuntimeException("Error processing file", e);
@@ -445,7 +445,7 @@ public class DeliveryScheduleController {
 	            throw new ResourceNotFoundException("User not found");
 	        }
 	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    } catch (Exception e) {
 	        throw new ResourceNotFoundException("JWT token is not valid or expired");
 	    }

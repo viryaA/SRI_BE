@@ -33,49 +33,49 @@ import sri.sysint.sri_starter_back.model.Users;
  */
 public class JWTAuthenFilter extends UsernamePasswordAuthenticationFilter{
     
-    private AuthenticationManager authenticationManager;
+    // private AuthenticationManager authenticationManager;
     
-    public JWTAuthenFilter(AuthenticationManager authenticationManager){
-        this.authenticationManager = authenticationManager;
-    }
+    // public JWTAuthenFilter(AuthenticationManager authenticationManager){
+    //     this.authenticationManager = authenticationManager;
+    // }
 
-    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException{
-		try{
-            Users creds = new ObjectMapper()
-                    .readValue(req.getInputStream(), Users.class);
+    // public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException{
+	// 	try{
+    //         Users creds = new ObjectMapper()
+    //                 .readValue(req.getInputStream(), Users.class);
             
-            return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    creds.getUserName(), 
-                    creds.getPassword(), 
-                    new ArrayList<>())
-            );
-        }catch(IOException e){
-            throw new RuntimeException(e);
-        }
+    //         return authenticationManager.authenticate(
+    //             new UsernamePasswordAuthenticationToken(
+    //                 creds.getUserName(), 
+    //                 creds.getPassword(), 
+    //                 new ArrayList<>())
+    //         );
+    //     }catch(IOException e){
+    //         throw new RuntimeException(e);
+    //     }
 
-    }
+    // }
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest req, 
-                                            HttpServletResponse res,
-                                            FilterChain chain,
-                                            Authentication auth) throws IOException, ServletException{
+    // @Override
+    // protected void successfulAuthentication(HttpServletRequest req, 
+    //                                         HttpServletResponse res,
+    //                                         FilterChain chain,
+    //                                         Authentication auth) throws IOException, ServletException{
 
-        String token = JWT.create()
-                .withSubject(((User)auth.getPrincipal()).getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .sign(HMAC512(SECRET.getBytes()));
+    //     String token = JWT.create()
+    //             .withSubject(((User)auth.getPrincipal()).getUsername())
+    //             .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+    //             .sign(HMAC512(SECRET.getBytes()));
         
-        res.addHeader("Access-Control-Expose-Headers", "Authorization");
-        res.addHeader("Access-Control-Allow-Headers", "Authorization, X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept, X-Custom-header");
-        res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
-        res.addHeader(USER_NAME, ((User)auth.getPrincipal()).getUsername());
-        
-        
+    //     res.addHeader("Access-Control-Expose-Headers", "Authorization");
+    //     res.addHeader("Access-Control-Allow-Headers", "Authorization, X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept, X-Custom-header");
+    //     res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+    //     res.addHeader(USER_NAME, ((User)auth.getPrincipal()).getUsername());
         
         
-        }
+        
+        
+    //     }
 
     
 }

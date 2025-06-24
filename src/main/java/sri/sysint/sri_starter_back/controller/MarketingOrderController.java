@@ -109,12 +109,12 @@ public class MarketingOrderController {
     	try {
         	List<ViewDistinctMarketingOrder> data = marketingOrderServiceImpl.findDistinctMonths();
         	if(!data.isEmpty()) {
-        		response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+        		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
         	}else {
-        		response = new Response(new Date(), HttpStatus.NOT_FOUND.value(), null, HttpStatus.NOT_FOUND.getReasonPhrase(), req.getRequestURI(), null);
+        		response = new Response( HttpStatus.NOT_FOUND.value(), null, HttpStatus.NOT_FOUND.getReasonPhrase(), req.getRequestURI(), null);
         	}
     	}catch(Exception e){
-    		response = new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, e.getMessage(), req.getRequestURI(), null);
+    		response = new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, e.getMessage(), req.getRequestURI(), null);
     	}
     	return response;
     }
@@ -153,9 +153,9 @@ public class MarketingOrderController {
     	int statusSaved = marketingOrderServiceImpl.saveArDefectReject(mo);
     	
     	if(statusSaved == 1) {
-    		response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+    		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
     	}else {
-    		response = new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), req.getRequestURI(), null);
+    		response = new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), req.getRequestURI(), null);
     	}
     	return response;
     }
@@ -169,7 +169,7 @@ public class MarketingOrderController {
     	String moMonth2 = object.get("moMonth2").toString();
 
     	GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllTypeMarketingOrder(moMonth0, moMonth1, moMonth2);
-        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
         return response;
     }
     
@@ -178,7 +178,7 @@ public class MarketingOrderController {
     public Response getCapacity(final HttpServletRequest req) throws ResourceNotFoundException {
     	validateToken(req);
     	String capacity = marketingOrderServiceImpl.getCapacityValue();
-    	response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), capacity);
+    	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), capacity);
     	return response;
     }
     
@@ -186,7 +186,7 @@ public class MarketingOrderController {
     public Response getLastIdMo(final HttpServletRequest req) throws ResourceNotFoundException {
     	validateToken(req);
     	String lastId = marketingOrderServiceImpl.getLastIdMo();
-    	response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), lastId);
+    	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), lastId);
     	return response;
     }
     
@@ -195,9 +195,9 @@ public class MarketingOrderController {
     	validateToken(req);
     	int statusSaved = marketingOrderServiceImpl.saveMarketingOrderPPC(saveMarketingOrderPPC);
     	if(statusSaved == 1) {
-    		response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+    		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
     	}else {
-    		response = new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), req.getRequestURI(), null);
+    		response = new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), req.getRequestURI(), null);
     	}
     	return response;
     }
@@ -206,7 +206,7 @@ public class MarketingOrderController {
 	public Response getAllMarketingOrderLatest(final HttpServletRequest req) throws ResourceNotFoundException {
     	validateToken(req);
     	List<MarketingOrder> data = marketingOrderServiceImpl.getAllMarketingOrderLatest();
-    	response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+    	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	    return response;
 	}
     
@@ -214,7 +214,7 @@ public class MarketingOrderController {
 	public Response getAllMoOnlyMonth(final HttpServletRequest req) throws ResourceNotFoundException {
     	validateToken(req);
     	List<Map<String, Object>> data = marketingOrderServiceImpl.getAllMoOnlyMonth();
-    	response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+    	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	    return response;
 	}
     
@@ -224,7 +224,7 @@ public class MarketingOrderController {
         
         List<MarketingOrder> marketingOrders = marketingOrderServiceImpl.getAllMarketingOrderMarketing(role);
         
-        Response response = new Response(new Date(), HttpStatus.OK.value(),null, HttpStatus.OK.getReasonPhrase(),req.getRequestURI(), marketingOrders);
+        Response response = new Response( HttpStatus.OK.value(),null, HttpStatus.OK.getReasonPhrase(),req.getRequestURI(), marketingOrders);
 
         return response;
     }
@@ -243,7 +243,7 @@ public class MarketingOrderController {
 
         int availability = marketingOrderServiceImpl.checkMonthsAvailability(month1, month2, month3, year1, year2, year3, type);
 
-        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), availability);
+        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), availability);
 
         return response;
     }
@@ -255,7 +255,7 @@ public class MarketingOrderController {
 
         List<MarketingOrder> data = marketingOrderServiceImpl.getAllMarketingOrder(month0Str, month1Str, month2Str, type);
         
-        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
         return response;
     }
 
@@ -266,7 +266,7 @@ public class MarketingOrderController {
 
 	    marketingOrderServiceImpl.disableMarketingOrder(marketingOrder);
 
-        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
 	    return response;
 	}
 	
@@ -276,7 +276,7 @@ public class MarketingOrderController {
 
 	    marketingOrderServiceImpl.enableMarketingOrder(marketingOrder);
 
-        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
 	    return response;
 	}
 	
@@ -288,7 +288,7 @@ public class MarketingOrderController {
 
         Optional<HeaderMarketingOrder> headerMO = marketingOrderServiceImpl.getHeaderMOById(id);
         if (headerMO.isPresent()) {
-            response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), headerMO.get());
+            response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), headerMO.get());
         } else {
             throw new ResourceNotFoundException("HeaderMO not found with id " + id);
         }
@@ -320,7 +320,7 @@ public class MarketingOrderController {
 	                typeMo, monthYear0, monthYear1, monthYear2
 	        );
 	
-	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), detailMarketingOrders);
+	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), detailMarketingOrders);
 	        return response;
 	    }
 
@@ -371,7 +371,7 @@ public class MarketingOrderController {
 	        }
 	        marketingOrderServiceImpl.updateDetailMOById(MOListProducts);
 
-	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
 	        return response;
 	    }
 	    
@@ -382,9 +382,9 @@ public class MarketingOrderController {
 	    	int statusSaved = marketingOrderServiceImpl.editMarketingOrderMarketing(marketingOrderData);
 	    	
 	    	if(statusSaved == 1) {
-	    		response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+	    		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
 	    	}else {
-	    		response = new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), req.getRequestURI(), null);
+	    		response = new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), req.getRequestURI(), null);
 	    	}
 	    	return response;
 	    }
@@ -397,7 +397,7 @@ public class MarketingOrderController {
 		ViewMarketingOrder marketingOrderDetail = marketingOrderServiceImpl.getAllMoById(moId);
 			     
 			if (marketingOrderDetail != null) {
-				response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), marketingOrderDetail);
+				response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), marketingOrderDetail);
 			} else {
 				throw new ResourceNotFoundException("DetailMarketingOrder not found with moId " + moId);
 			}
@@ -420,7 +420,7 @@ public class MarketingOrderController {
 	        // Memanggil service dengan parameter yang diambil dari requestBody
 	        List<Map<String, Object>> workDays = marketingOrderServiceImpl.getWorkDay(month1, year1, month2, year2, month3, year3);
 
-	        Response response = new Response(new Date(),HttpStatus.OK.value(),null, HttpStatus.OK.getReasonPhrase(),req.getRequestURI(),workDays);
+	        Response response = new Response(HttpStatus.OK.value(),null, HttpStatus.OK.getReasonPhrase(),req.getRequestURI(),workDays);
 
 	        return response;
 	    }
@@ -453,7 +453,7 @@ public class MarketingOrderController {
 	    public Response getAllMonthlyPlanning(final HttpServletRequest req) throws ResourceNotFoundException {
 
 //	    	List <MonthlyPlan> data = marketingOrderServiceImpl.getAllMp();
-	    	response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+	    	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
 	    	return response;
 	    }
 	    
@@ -462,7 +462,7 @@ public class MarketingOrderController {
 	        
 	        List<ViewMachineCuring> data = marketingOrderServiceImpl.getMachinesByItemCuring(itemCuring);
 	        
-	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	        
 	        return response;
 	    }
@@ -472,7 +472,7 @@ public class MarketingOrderController {
 	        
 	    	ViewMonthlyPlanning data = marketingOrderServiceImpl.getDetailMonthlyPlan();
 	        
-	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	        
 	        return response;
 	    }
@@ -482,7 +482,7 @@ public class MarketingOrderController {
 	        
 	    	ViewMonthlyPlanning data = marketingOrderServiceImpl.getDetailMonthlyPlanById(docNum);
 	        
-	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	        
 	        return response;
 	    }
@@ -493,7 +493,7 @@ public class MarketingOrderController {
 	        
 	    	List <ViewDetailShiftMonthlyPlan> data = marketingOrderServiceImpl.getShiftMonthlyPlan(actualDate, detailDailyId);
 	        
-	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	        
 	        return response;
 	    }
@@ -506,7 +506,7 @@ public class MarketingOrderController {
 //	            return null; 
 //	        }
 //
-//	        response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, marketingOrder);
+//	        response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, marketingOrder);
 //	        return response;
 //	    }
 //	    
@@ -514,10 +514,10 @@ public class MarketingOrderController {
 	    public Response generate(@RequestBody String inputJson) {
 	        try {
 	        	List<Map<String, Object>> result = monthlyPlanServiceImpl.generateMp(inputJson);
-		        response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
+		        response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
 		        return response;
 	        } catch (Exception e) {
-		        response = new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, HttpStatus.OK.getReasonPhrase(), null,"Error: " + e.getMessage());
+		        response = new Response( HttpStatus.BAD_REQUEST.value(), null, HttpStatus.OK.getReasonPhrase(), null,"Error: " + e.getMessage());
 		        return response;
 	        }
 	    }
@@ -535,7 +535,7 @@ public class MarketingOrderController {
 	    	
 	    	ViewMonthlyPlanning data = monthlyPlanServiceImpl.getDetailMonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
 	        
-	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	        
 	        return response;
 	    }
@@ -545,7 +545,7 @@ public class MarketingOrderController {
 	    	List<String> data = request.getMoIds();
 	    	System.out.println(data.get(0) + " " + data.get(1));
 	        List<Map<String, Object>> result = monthlyPlanServiceImpl.getSummaryByMoIds(request.getMoIds());
-	        response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
+	        response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
 	        return response;
 	    }
 
@@ -599,7 +599,7 @@ public class MarketingOrderController {
 			}
 
 	    	GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllMarketingOrderGroupCuring(moMonth0, moMonth1, moMonth2, versionAfterArDfRj);
-	        Response response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	        return response;
 	    }
 

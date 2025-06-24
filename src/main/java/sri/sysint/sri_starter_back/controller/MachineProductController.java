@@ -42,7 +42,7 @@ public class MachineProductController {
     	machineProductServiceImpl.saveMachineProducts(jsonInput);
 
         return new Response(
-                new Date(),
+                
                 HttpStatus.OK.value(),
                 null,
                 HttpStatus.OK.getReasonPhrase(),
@@ -63,7 +63,7 @@ public class MachineProductController {
                 .findCheatingMacProdByMoIdAndVcheating(moId1, moId2, verCheating);
 
         return new Response(
-                new Date(),
+                
                 HttpStatus.OK.value(),
                 null,
                 HttpStatus.OK.getReasonPhrase(),
@@ -82,7 +82,7 @@ public class MachineProductController {
                 .findCheatingMacProdByMoId(moId1, moId2);
 
         return new Response(
-                new Date(),
+                
                 HttpStatus.OK.value(),
                 null,
                 HttpStatus.OK.getReasonPhrase(),
@@ -103,7 +103,7 @@ public class MachineProductController {
                 .findCheatingMacProdByMoIdVcheatingAndItemCuring(moId1, moId2, verCheating, itemCuring);
 
         return new Response(
-                new Date(),
+                
                 HttpStatus.OK.value(),
                 null,
                 HttpStatus.OK.getReasonPhrase(),

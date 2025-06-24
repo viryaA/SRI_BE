@@ -1944,7 +1944,7 @@ public class MonthlyPlanServiceImpl {
 			// 	System.out.println("jalan bang");
 			// }
 			System.out.println("ppsdfjs");
-			monthlyPlanNewRepo.callGenerateMp2(transformedJson);
+//			monthlyPlanNewRepo.callGenerateMp2(transformedJson);
 			System.out.println("dhdhfd");
 
             //  System.out.println("dapetin versi");
@@ -2307,7 +2307,7 @@ public class MonthlyPlanServiceImpl {
 
 
 
-    	return new Response(new Date(), HttpStatus.OK.value(), null, "File processed successfully", null,filteredResults);
+    	return new Response( HttpStatus.OK.value(), null, "File processed successfully", null,filteredResults);
 	}
 
 	public List<Map<String, Object>> changemouldR(List<MonthlyPlanningNew> shiftMonthlyPlan) {
@@ -2603,12 +2603,22 @@ public class MonthlyPlanServiceImpl {
 		}
 		List<Object[]> results = shiftMonthlyRepo.findDescriptionsByItemCuring(new ArrayList<>(uniqueItemCuring));
 		// Map ITEM_CURING to DESCRIPTION
+		// Create map for descriptions
 		Map<String, String> itemCuringToDescription = results.stream()
 				.collect(Collectors.toMap(
-						result -> (String) result[0], // ITEM_CURING
-						result -> (String) result[1], // DESCRIPTION
-						(existing, replacement) -> existing // In case of duplicates, keep the first one
+					result -> (String) result[0], // ITEM_CURING
+					result -> (String) result[1], // DESCRIPTION
+					(existing, replacement) -> existing
 				));
+
+		// Create map for kapa per mould
+		Map<String, Integer> itemCuringToKapaPerMould = results.stream()
+				.collect(Collectors.toMap(
+					result -> (String) result[0], // ITEM_CURING
+					result -> Integer.parseInt(result[2].toString()), // KAPA_PER_MOULD
+					(existing, replacement) -> existing
+				));
+
 
 		// Prepare product descriptions
 		List<String> productDescription = shiftMonthlyPlan.stream()
@@ -2621,20 +2631,11 @@ public class MonthlyPlanServiceImpl {
 					return description;
 				})
 				.collect(Collectors.toList());
-
 				
-		// for (int i = 0; i < shiftMonthlyPlan.size(); i++) {
-		// 	String partNumber = shiftMonthlyPlan.get(i).getItemCuring();
-		// 	System.out.println("Item Curing: " + partNumber);
-			
-		// 	String description = shiftMonthlyRepo.findDescriptionByItemCuring(partNumber);
-		// 	System.out.println("Description: " + description);
+		List<Integer> productKapaPerMould = shiftMonthlyPlan.stream()
+				.map(plan -> itemCuringToKapaPerMould.getOrDefault(plan.getItemCuring(), 0))
+				.collect(Collectors.toList());
 
-		// 	if (description == null) {
-		// 		description = "N/A";
-		// 	}
-		// 	productDescription.add(description);
-		// }
 
 
 
@@ -2751,9 +2752,9 @@ public class MonthlyPlanServiceImpl {
             Row tableHeadCuringRow = curingSheet.createRow(1);
             Cell tableHeadCuringCell;
             
-            String[] curingHeaderLabels = {"Tanggal", "Nomor", "Cavity", "Work Center Text", "Item Curing", "Deskripsi", "Shift 1", "Shift 2", "Shift 3", "Total","Mould Use"};
+            String[] curingHeaderLabels = {"Tanggal", "Nomor", "Cavity", "Work Center Text", "Item Curing", "Deskripsi", "Shift 1", "Shift 2", "Shift 3", "Total","Mould Use","Kapa Per Mould"};
             CellStyle[] curingHeaderStyles = {calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, 
-            		calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder};
+            		calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder,calibriBold11CenterBorder};
 
             // Loop untuk kolom 0-5
             for (int col = 0; col < curingHeaderLabels.length; col++) {
@@ -2820,7 +2821,12 @@ public class MonthlyPlanServiceImpl {
         		curingDataCell = curingDataRow.createCell(11);
         		curingDataCell.setCellStyle(calibri11RightBorder);
         		curingDataCell.setCellValue(mouldUse != null ? mouldUse.doubleValue() : 0.0);
-
+        		
+        		Integer kapaPerMould = productKapaPerMould.get(j);
+        		curingDataCell = curingDataRow.createCell(12);
+        		curingDataCell.setCellStyle(calibri11RightBorder);
+        		curingDataCell.setCellValue(kapaPerMould != null ? kapaPerMould : 0);
+        		
                 curingDatarow++;
             }
             //end curing sheet
@@ -3170,7 +3176,7 @@ public class MonthlyPlanServiceImpl {
 			// 3. Create Header Row
 			Row headerRow = changeMouldSheet.createRow(1);
 			for (int col = 0; col < headerLabels.length; col++) {
-				Cell cell = headerRow.createCell(col + 1); // Start from column 1
+				Cell cell = headerRow.createCell(col + 1); // Start from column 1	
 				cell.setCellValue(headerLabels[col]);
 				cell.setCellStyle(calibriBold11CenterBorder);
 			}

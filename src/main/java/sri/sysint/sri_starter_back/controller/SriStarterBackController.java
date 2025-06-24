@@ -41,14 +41,14 @@ public class SriStarterBackController {
 	@GetMapping("/sysdate")
 	public Response getSysdate(final HttpServletRequest req) throws ResourceNotFoundException {
 		Date sys = userRepo.getSysdate();
-		response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(),
+		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(),
 				req.getRequestURI(), sys);
 		return response;
 	}
 	@GetMapping("/truncSysdate")
 	public Response getTruncSysdate(final HttpServletRequest req) throws ResourceNotFoundException {
 		Date sys = userRepo.getTruncSysdate();
-		response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(),
+		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(),
 				req.getRequestURI(), sys);
 		return response;
 	}
@@ -56,10 +56,10 @@ public class SriStarterBackController {
 	public Response getUserByUserName(final HttpServletRequest req, @PathVariable("userName") String userName) throws ResourceNotFoundException{
 		Users users = userRepo.findByUserName(userName);
 		if(users == null) {
-			response = new Response(new Date(), HttpStatus.NOT_FOUND.value(), null, "DATA NOT FOUND", req.getRequestURI(), users);
+			response = new Response( HttpStatus.NOT_FOUND.value(), null, "DATA NOT FOUND", req.getRequestURI(), users);
 		}
 		else {
-			response = new Response(new Date(), HttpStatus.OK.value(), null, "DATA EXIST", req.getRequestURI(), users);
+			response = new Response( HttpStatus.OK.value(), null, "DATA EXIST", req.getRequestURI(), users);
 		}
 		return response;
 	}	
@@ -71,11 +71,11 @@ public class SriStarterBackController {
 			dt.setCode(code);
 			dt.setDesc(desc);
 			dummyRepo.saveAndFlush(dt);
-			response = new Response(new Date(), HttpStatus.OK.value(), null, "INSERTED", req.getRequestURI(), dt);
+			response = new Response( HttpStatus.OK.value(), null, "INSERTED", req.getRequestURI(), dt);
 		}else {
 			res.setDesc(desc);
 			dummyRepo.saveAndFlush(res);
-			response = new Response(new Date(), HttpStatus.OK.value(), null, "UPDATED", req.getRequestURI(), res);
+			response = new Response( HttpStatus.OK.value(), null, "UPDATED", req.getRequestURI(), res);
 		}
 		return response;
 	}

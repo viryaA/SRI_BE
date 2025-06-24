@@ -89,7 +89,7 @@ public class DWorkDayController {
 	    	    dWorkDays = dWorkDayServiceImpl.getAllDWorkDays();
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -127,7 +127,7 @@ public class DWorkDayController {
 	    	    dWorkDay = dWorkDayServiceImpl.getDWorkDayById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -180,7 +180,7 @@ public class DWorkDayController {
 			List<DWorkDay> dworkDays = dWorkDayServiceImpl.getDWorkDayByDate(parsedDate);
 
 			return new Response(
-				new Date(),
+				
 				HttpStatus.OK.value(),
 				null,
 				HttpStatus.OK.getReasonPhrase(),
@@ -214,7 +214,7 @@ public class DWorkDayController {
 	        	DWorkDay savedDWorkDay = dWorkDayServiceImpl.saveDWorkDay(dWorkDay);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -251,7 +251,7 @@ public class DWorkDayController {
 	        	DWorkDay updatedDWorkDay = dWorkDayServiceImpl.updateDWorkDay(dWorkDay);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -288,7 +288,7 @@ public class DWorkDayController {
 	        	DWorkDay deletedDWorkDay = dWorkDayServiceImpl.deleteDWorkDay(dWorkDay);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -325,7 +325,7 @@ public class DWorkDayController {
 	            DWorkDay restoredDWorkDay = dWorkDayServiceImpl.restoreDWorkDay(dWorkDay);
 
 	            response = new Response(
-	                new Date(),
+	                
 	                HttpStatus.OK.value(),
 	                null,
 	                HttpStatus.OK.getReasonPhrase(),
@@ -362,7 +362,7 @@ public class DWorkDayController {
 
 	        if (user != null) {
 	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	            }
 
 	            dWorkDayServiceImpl.deleteAllDWorkDay();
@@ -415,7 +415,7 @@ public class DWorkDayController {
 	                                                .toLocalDate();
 	                                        zonedDateTime = localDate.atStartOfDay(ZoneId.of("UTC"));
 	                                    } else {
-	                                        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null,
+	                                        return new Response( HttpStatus.BAD_REQUEST.value(), null,
 	                                                "Invalid date format in file: " + dateCell.toString(), req.getRequestURI(), null);
 	                                    }
 	                                } else if (dateCell.getCellType() == CellType.STRING) {
@@ -444,7 +444,7 @@ public class DWorkDayController {
 	                                dWorkDays.add(dWorkDay);
 
 	                            } catch (Exception e) {
-	                                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null,
+	                                return new Response( HttpStatus.BAD_REQUEST.value(), null,
 	                                        "Error parsing date: " + dateCell.toString(), req.getRequestURI(), null);
 	                            }
 	                        } else {
@@ -456,10 +456,10 @@ public class DWorkDayController {
 	                    }
 	                }
 
-	                response = new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDays);
+	                response = new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDays);
 
 	            } catch (IOException e) {
-	                response = new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
+	                response = new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
 	            }
 	        } else {
 	            throw new ResourceNotFoundException("User not found");

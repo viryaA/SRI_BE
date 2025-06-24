@@ -94,7 +94,7 @@ public class DWorkDayHoursSpecificController {
             	System.out.println("Data fetched: " + dWorkDayHoursSpecific);
             	
             	response = new Response(
-            	    new Date(),
+            	    
             	    HttpStatus.OK.value(),
             	    null,
             	    HttpStatus.OK.getReasonPhrase(),
@@ -135,7 +135,7 @@ public class DWorkDayHoursSpecificController {
                 Optional<DWorkDayHoursSpesific> dWorkDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificByDate(parsedDate);
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -177,7 +177,7 @@ public class DWorkDayHoursSpecificController {
                 List<DWorkDayHoursSpesific> dWorkDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificListByDate(parsedDate);
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -202,12 +202,15 @@ public class DWorkDayHoursSpecificController {
             @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
         
         String header = req.getHeader("Authorization");
+        System.out.println("[DEBUG] Authorization Header: " + header);
 
         if (header == null || !header.startsWith("Bearer ")) {
+            System.out.println("[ERROR] JWT token is missing or does not start with 'Bearer '");
             throw new ResourceNotFoundException("JWT token not found or maybe not valid");
         }
 
         String token = header.replace("Bearer ", "");
+        System.out.println("[DEBUG] Extracted Token: " + token);
 
         Response response;
         try {
@@ -216,11 +219,16 @@ public class DWorkDayHoursSpecificController {
                 .verify(token)
                 .getSubject();
 
+            System.out.println("[DEBUG] Token Subject (User): " + user);
+
             if (user != null) {
                 String dateStr = requestBody.get("date");
                 String description = requestBody.get("description");
 
+                System.out.println("[DEBUG] Request Body - date: " + dateStr + ", description: " + description);
+
                 if (dateStr == null || description == null) {
+                    System.out.println("[ERROR] Missing required fields in request body");
                     throw new ResourceNotFoundException("Missing required fields: 'date' or 'description'");
                 }
 
@@ -228,15 +236,25 @@ public class DWorkDayHoursSpecificController {
                 Date parsedDate;
                 try {
                     parsedDate = dateFormat.parse(dateStr);
+                    System.out.println("[DEBUG] Parsed Date: " + parsedDate);
                 } catch (ParseException e) {
+                    System.out.println("[ERROR] Date parsing failed: " + e.getMessage());
                     throw new ResourceNotFoundException("Invalid date format, expected format is dd-MM-yyyy");
                 }
 
                 Optional<DWorkDayHoursSpesific> workDayHoursSpecific = 
                     dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificByDateDesc(parsedDate, description);
 
+                System.out.println("[DEBUG] Fetched WorkDayHoursSpesific: " + workDayHoursSpecific);
+                
+                if (workDayHoursSpecific.isPresent()) {
+                    System.out.println("[DEBUG] WorkDayHoursSpesific is present: " + workDayHoursSpecific.get());
+                } else {
+                    System.out.println("[DEBUG] WorkDayHoursSpesific is EMPTY");
+                }
+
                 response = new Response(
-                        new Date(),
+                        
                         HttpStatus.OK.value(),
                         null,
                         HttpStatus.OK.getReasonPhrase(),
@@ -245,14 +263,18 @@ public class DWorkDayHoursSpecificController {
                 );
 
             } else {
+                System.out.println("[ERROR] Token subject (user) is null");
                 throw new ResourceNotFoundException("User not found");
             }
         } catch (Exception e) {
+            System.out.println("[ERROR] Exception occurred: " + e.getMessage());
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
 
+        System.out.println("[DEBUG] Response Ready: " + response);
         return response;
     }
+
 
     
     @GetMapping("/getWorkDayHoursByMonthYear/{month}/{year}")
@@ -283,7 +305,7 @@ public class DWorkDayHoursSpecificController {
 
                 // Membentuk response sukses
                 response = new Response(
-                        new Date(),
+                        
                         HttpStatus.OK.value(),
                         null,
                         HttpStatus.OK.getReasonPhrase(),
@@ -321,7 +343,7 @@ public class DWorkDayHoursSpecificController {
             	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.saveWorkDayHoursSpecific(dWorkDayHours); 
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -358,7 +380,7 @@ public class DWorkDayHoursSpecificController {
             	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.updateWorkDayHoursSpecific(dWorkDayHours); 
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -395,7 +417,7 @@ public class DWorkDayHoursSpecificController {
             	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.deleteWorkDayHoursSpecific(dWorkDayHours); 
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -432,7 +454,7 @@ public class DWorkDayHoursSpecificController {
             	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.restoreWorkDayHoursSpecific(dWorkDayHours); 
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -483,7 +505,7 @@ public class DWorkDayHoursSpecificController {
                 // Return response based on the result
                 if (updatedWorkDayHours.isPresent()) {
                     return new Response(
-                        new Date(),
+                        
                         HttpStatus.OK.value(),
                         null,
                         HttpStatus.OK.getReasonPhrase(),
@@ -492,7 +514,7 @@ public class DWorkDayHoursSpecificController {
                     );
                 } else {
                     return new Response(
-                        new Date(),
+                        
                         HttpStatus.NOT_FOUND.value(),
                         null,
                         "No record found for the provided date",
@@ -527,7 +549,7 @@ public class DWorkDayHoursSpecificController {
 
             if (user != null) {
                 if (file.isEmpty()) {
-                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+                    return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
                 }
 
                 dWorkDayHoursSpecificServiceImpl.deleteAllWorkDayHoursSpecific();
@@ -646,10 +668,10 @@ public class DWorkDayHoursSpecificController {
                         }
                     }
 
-                    return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDayHoursList);
+                    return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDayHoursList);
 
                 } catch (IOException e) {
-                    return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file: " + e.getMessage(), req.getRequestURI(), null);
+                    return new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file: " + e.getMessage(), req.getRequestURI(), null);
                 }
             } else {
                 throw new ResourceNotFoundException("User not found");

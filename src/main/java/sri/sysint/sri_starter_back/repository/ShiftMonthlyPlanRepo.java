@@ -29,15 +29,19 @@ public interface ShiftMonthlyPlanRepo extends JpaRepository<ShiftMonthlyPlan, Bi
 	
 	@Query(value = "SELECT DESCRIPTION FROM SRI_IMPP_M_PRODUCT WHERE PART_NUMBER = :partNum", nativeQuery = true)
 	String findDescriptionByPartNum(@Param("partNum") BigDecimal partNum);
-	@Query(value = "SELECT ITEM_CURING, DESCRIPTION " +
+	
+	@Query(value = "SELECT p.ITEM_CURING, p.DESCRIPTION, ic.KAPA_PER_MOULD " +
 				"FROM ( " +
 				"    SELECT ITEM_CURING, DESCRIPTION, " +
 				"           ROW_NUMBER() OVER (PARTITION BY ITEM_CURING ORDER BY ITEM_CURING) AS rn " +
 				"    FROM SRI_IMPP_M_PRODUCT " +
 				"    WHERE ITEM_CURING IN (:data) " +
-				")", 
+				") p " +
+				"JOIN SRI_IMPP_M_ITEMCURING ic ON p.ITEM_CURING = ic.ITEM_CURING " +
+				"WHERE p.rn = 1",
 		nativeQuery = true)
 	List<Object[]> findDescriptionsByItemCuring(@Param("data") List<String> data);
+
 
 
 	@Query(value = "SELECT "

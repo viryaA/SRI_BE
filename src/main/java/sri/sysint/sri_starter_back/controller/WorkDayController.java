@@ -89,63 +89,29 @@ public class WorkDayController {
     @PersistenceContext
     private EntityManager em;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/getAllWorkDays")
     public Response getAllWorkDays(final HttpServletRequest req) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
+        List<WorkDay> workDays = workDayServiceImpl.getAllWorkDays();
 
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                List<WorkDay> workDays = workDayServiceImpl.getAllWorkDays();
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    workDays
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            workDays
+        );
 
         return response;
     }
     
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/getAllWorkDaysByDateRange")
     public Response getAllWorkDaysByDateRange(final HttpServletRequest req, 
                                             @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
-        // Validate JWT token
-        String header = req.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
         try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
-
-            if (user == null) {
-                throw new ResourceNotFoundException("User not found");
-            }
 
             String startDateStr = requestBody.get("startDate");
             String endDateStr = requestBody.get("endDate");
@@ -167,7 +133,7 @@ public class WorkDayController {
             List<WorkDay> workDays = workDayServiceImpl.getAllWorkDaysByDateRange(parsedStartDate, parsedEndDate);
 
             return new Response(
-                new Date(),
+                
                 HttpStatus.OK.value(),
                 null,
                 HttpStatus.OK.getReasonPhrase(),
@@ -182,367 +148,106 @@ public class WorkDayController {
 
 
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/getWorkDayByDate")
     public Response getWorkDayByDate(final HttpServletRequest req, @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
+        String date = requestBody.get("date"); // Extract date from body
 
-        String token = header.replace("Bearer ", "");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        Date parsedDate = dateFormat.parse(date);
 
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
+        Optional<WorkDay> workDay = workDayServiceImpl.getWorkDayByDate(parsedDate);
 
-            if (user != null) {
-                String date = requestBody.get("date"); // Extract date from body
-
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                Date parsedDate = dateFormat.parse(date);
-
-                Optional<WorkDay> workDay = workDayServiceImpl.getWorkDayByDate(parsedDate);
-
-                return new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    workDay
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        return new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            workDay
+        );
     }
 
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/saveWorkDay")
     public Response saveWorkDay(final HttpServletRequest req, @RequestBody WorkDay workDay) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
+        WorkDay savedWorkDay = workDayServiceImpl.saveWorkDay(workDay);
 
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                WorkDay savedWorkDay = workDayServiceImpl.saveWorkDay(workDay);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    savedWorkDay
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            savedWorkDay
+        );
 
         return response;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/updateWorkDay")
     public Response updateWorkDay(final HttpServletRequest req, @RequestBody WorkDay workDay) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
+        WorkDay updatedWorkDay = workDayServiceImpl.updateWorkDay(workDay);
 
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                WorkDay updatedWorkDay = workDayServiceImpl.updateWorkDay(workDay);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    updatedWorkDay
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            updatedWorkDay
+        );
 
         return response;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/deleteWorkDay")
     public Response deleteWorkDay(final HttpServletRequest req, @RequestBody WorkDay workDay) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
+        WorkDay deletedWorkDay = workDayServiceImpl.deleteWorkDay(workDay);
 
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                WorkDay deletedWorkDay = workDayServiceImpl.deleteWorkDay(workDay);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    deletedWorkDay
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            deletedWorkDay
+        );
 
         return response;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/restoreWorkDay")
     public Response restoreWorkDay(final HttpServletRequest req, @RequestBody WorkDay workDay) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
+        WorkDay restoredWorkDay = workDayServiceImpl.restoreWorkDay(workDay);
 
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                WorkDay restoredWorkDay = workDayServiceImpl.restoreWorkDay(workDay);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    restoredWorkDay
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            restoredWorkDay
+        );
 
         return response;
     }
 
-//    @PostMapping("/saveWorkDaysExcel")
-//    public Response saveWorkDaysExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
-//        String header = req.getHeader("Authorization");
-//
-//        if (header == null || !header.startsWith("Bearer ")) {
-//            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-//        }
-//
-//        String token = header.replace("Bearer ", "");
-//        Response response;
-//
-//        try {
-//            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-//                .build()
-//                .verify(token)
-//                .getSubject();
-//
-//            if (user != null) {
-//                if (file.isEmpty()) {
-//                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
-//                }
-//
-//                workDayServiceImpl.deleteAllWorkDays();  
-//
-//                try (InputStream inputStream = file.getInputStream()) {
-//                    XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-//                    XSSFSheet sheet = workbook.getSheetAt(0);
-//
-//                    List<WorkDay> workDays = new ArrayList<>();
-//
-//                    Row headerRow = sheet.getRow(0);
-//                    if (headerRow == null) {
-//                        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Invalid file format", req.getRequestURI(), null);
-//                    }
-//
-//                    // Date format for "Wed July 03, 2024"
-//                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E MMMM dd, yyyy", Locale.ENGLISH);
-//                    // Date format for ZonedDateTime parsing
-//                    DateTimeFormatter zonedDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-//
-//                    for (int j = 1; j < headerRow.getLastCellNum(); j++) {
-//                        Cell dateCell = headerRow.getCell(j);
-//                        if (dateCell != null) {
-//                            ZonedDateTime zonedDateTime = null;
-//
-//                            try {
-//                                if (dateCell.getCellType() == CellType.NUMERIC) {
-//                                    if (DateUtil.isCellDateFormatted(dateCell)) {
-//                                        LocalDate localDate = dateCell.getDateCellValue().toInstant()
-//                                                .atZone(ZoneId.systemDefault()) 
-//                                                .toLocalDate();
-//                                        zonedDateTime = localDate.atStartOfDay(ZoneId.of("UTC"));
-//                                    } else {
-//                                        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Invalid date format in file: " + dateCell.toString(), req.getRequestURI(), null);
-//                                    }
-//                                } else if (dateCell.getCellType() == CellType.STRING) {
-//                                    try {
-//                                        // Attempt to parse the string date
-//                                        LocalDate parsedDate = LocalDate.parse(dateCell.getStringCellValue().trim(), dateFormatter);
-//                                        zonedDateTime = parsedDate.atStartOfDay(ZoneId.of("UTC"));
-//                                    } catch (Exception e) {
-//                                        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Error parsing date: " + dateCell.toString(), req.getRequestURI(), null);
-//                                    }
-//                                }
-//                            } catch (Exception e) {
-//                                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Error processing date cell: " + dateCell.toString(), req.getRequestURI(), null);
-//                            }
-//
-//                            Date date = Date.from(zonedDateTime.toInstant());
-//                            WorkDay workDay = new WorkDay();
-//                            workDay.setDATE_WD(date);
-//
-//                            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-//                                Row row = sheet.getRow(i);
-//                                if (row == null || isRowEmpty(row)) {
-//                                    break; 
-//                                }
-//
-//                                Cell cell = row.getCell(j);  
-//                                String shiftName = row.getCell(0).getStringCellValue();  
-//                                int status = 0;
-//
-//                                if (cell != null) {
-//                                    System.out.println("Row: " + (i + 1) + ", Col: " + (j + 1) + ", Cell Type: " + cell.getCellType() + ", Value: " + cell.toString());
-//
-//                                    if (cell.getCellType() == CellType.STRING) {
-//                                        String cellValue = cell.getStringCellValue().trim();
-//                                        if ("v".equalsIgnoreCase(cellValue)) {
-//                                            status = 1;
-//                                        } else if (cellValue.isEmpty()) {
-//                                            status = 0;
-//                                        }
-//                                    } else if (cell.getCellType() == CellType.BLANK) {
-//                                        status = 0;
-//                                    }
-//                                } else {
-//                                    status = 0; 
-//                                }
-//
-//                                switch (shiftName.toUpperCase()) {
-//                                    case "WD_SHIFT_1":
-//                                        workDay.setIWD_SHIFT_1(BigDecimal.valueOf(status));
-//                                        break;
-//                                    case "WD_SHIFT_2":
-//                                        workDay.setIWD_SHIFT_2(BigDecimal.valueOf(status));
-//                                        break;
-//                                    case "WD_SHIFT_3":
-//                                        workDay.setIWD_SHIFT_3(BigDecimal.valueOf(status));
-//                                        break;
-//                                    case "OT_TL_1":
-//                                        workDay.setIOT_TL_1(BigDecimal.valueOf(status));
-//                                        break;
-//                                    case "OT_TL_2":
-//                                        workDay.setIOT_TL_2(BigDecimal.valueOf(status));
-//                                        break;
-//                                    case "OT_TL_3":
-//                                        workDay.setIOT_TL_3(BigDecimal.valueOf(status));
-//                                        break;
-//                                    case "OT_TT_1":
-//                                        workDay.setIOT_TT_1(BigDecimal.valueOf(status));
-//                                        break;
-//                                    case "OT_TT_2":
-//                                        workDay.setIOT_TT_2(BigDecimal.valueOf(status));
-//                                        break;
-//                                    case "OT_TT_3":
-//                                        workDay.setIOT_TT_3(BigDecimal.valueOf(status));
-//                                        break;
-//                                    default:
-//                                        throw new IllegalArgumentException("Unknown shift name: " + shiftName);
-//                                }
-//                            }
-//
-//                            int iwdShift1Status = workDay.getIWD_SHIFT_1().intValue();
-//                            int iwdShift2Status = workDay.getIWD_SHIFT_2().intValue();
-//                            int iwdShift3Status = workDay.getIWD_SHIFT_3().intValue();
-//
-//                            if (iwdShift1Status == 0 && iwdShift2Status == 0 && iwdShift3Status == 0) {
-//                                workDay.setOFF(BigDecimal.ONE); 
-//                                workDay.setSEMI_OFF(BigDecimal.ZERO);
-//                            } else if (iwdShift1Status == 1 && iwdShift2Status == 1 && iwdShift3Status == 1) {
-//                                workDay.setOFF(BigDecimal.ZERO); 
-//                                workDay.setSEMI_OFF(BigDecimal.ZERO);
-//                            } else {
-//                                workDay.setOFF(BigDecimal.ZERO); 
-//                                workDay.setSEMI_OFF(BigDecimal.ONE);
-//                            }
-//
-//                            workDayServiceImpl.saveWorkDay(workDay); 
-//                            workDays.add(workDay);
-//                        }
-//                    }
-//
-//                    response = new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), workDays);
-//
-//                } catch (IOException e) {
-//                    response = new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
-//                }
-//            } else {
-//                throw new ResourceNotFoundException("User not found");
-//            }
-//        } catch (Exception e) {
-//            throw new ResourceNotFoundException("JWT token is not valid or expired");
-//        }
-//
-//        return response;
-//    }
-    
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/saveWorkDaysExcel")
     public Response saveWorkDaysExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
 
         if (file.isEmpty()) {
-            return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+            return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
         }
 
         workDayServiceImpl.deleteAllWorkDays();
@@ -562,7 +267,7 @@ public class WorkDayController {
 
                 Cell dateCell = row.getCell(0);
                 if (dateCell == null || (dateCell.getCellType() != CellType.STRING && dateCell.getCellType() != CellType.NUMERIC)) {
-                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Invalid date format in file", req.getRequestURI(), null);
+                    return new Response( HttpStatus.BAD_REQUEST.value(), null, "Invalid date format in file", req.getRequestURI(), null);
                 }
 
                 ZonedDateTime zonedDateTime = null;
@@ -575,14 +280,14 @@ public class WorkDayController {
                                     .toLocalDate();
                             zonedDateTime = localDate.atStartOfDay(ZoneId.of("UTC"));
                         } else {
-                            return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Invalid date format in file: " + dateCell.toString(), req.getRequestURI(), null);
+                            return new Response( HttpStatus.BAD_REQUEST.value(), null, "Invalid date format in file: " + dateCell.toString(), req.getRequestURI(), null);
                         }
                     } else if (dateCell.getCellType() == CellType.STRING) {
                         LocalDate parsedDate = LocalDate.parse(dateCell.getStringCellValue().trim(), dateFormatter);
                         zonedDateTime = parsedDate.atStartOfDay(ZoneId.of("UTC"));
                     }
                 } catch (Exception e) {
-                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Error parsing date: " + dateCell.toString(), req.getRequestURI(), null);
+                    return new Response( HttpStatus.BAD_REQUEST.value(), null, "Error parsing date: " + dateCell.toString(), req.getRequestURI(), null);
                 }
 
                 Date date = Date.from(zonedDateTime.toInstant());
@@ -647,10 +352,10 @@ public class WorkDayController {
                 workDays.add(workDay);
             }
 
-            return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), workDays);
+            return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), workDays);
 
         } catch (IOException e) {
-            return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
+            return new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
         }
     }
 
@@ -665,133 +370,61 @@ public class WorkDayController {
         return true; 
     }
 
-    // @RequestMapping("/exportWorkDaysExcel")
-    // public ResponseEntity<InputStreamResource> exportWorkDaysExcel() throws IOException {
-    //     String filename = "MASTER_WORK_DAY.xlsx";
-
-    //     ByteArrayInputStream data = workDayServiceImpl.exportWDsExcel();
-    //     InputStreamResource file = new InputStreamResource(data);
-
-    //     return ResponseEntity.ok()
-    //             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-    //             .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-    //             .body(file);
-    // }
-    
-   @PostMapping("/turnOnOvertime")
+    @PreAuthorize("isAuthenticated()")    
+    @PostMapping("/turnOnOvertime")
     public Response turnOnOvertime(final HttpServletRequest req, @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
                 String dateWd = requestBody.get("dateWd"); // Extract dateWd from JSON request body
 
                 WorkDay updatedWorkDay = workDayServiceImpl.turnOnOvertime(dateWd);
 
                 return new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
                     req.getRequestURI(),
                     updatedWorkDay
                 );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
     }
 
-    
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/turnOnShift/{dateWd}/{shift}")
     public Response turnOnShift(final HttpServletRequest req, @PathVariable String dateWd, @PathVariable String shift) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
+        WorkDay updatedWorkDay = workDayServiceImpl.turnOnShift(dateWd, shift);
 
-        String token = header.replace("Bearer ", "");
-        Response response;
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                WorkDay updatedWorkDay = workDayServiceImpl.turnOnShift(dateWd, shift);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    updatedWorkDay
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            updatedWorkDay
+        );
 
         return response;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/turnOffShift/{dateWd}/{shift}")
     public Response turnOffShift(final HttpServletRequest req, @PathVariable String dateWd, @PathVariable String shift) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
+        WorkDay updatedWorkDay = workDayServiceImpl.turnOffShift(dateWd, shift);
 
-        String token = header.replace("Bearer ", "");
-        Response response;
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                WorkDay updatedWorkDay = workDayServiceImpl.turnOffShift(dateWd, shift);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    updatedWorkDay
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            updatedWorkDay
+        );
 
         return response;
     }
     
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/exportWorkDaysExcel/{year}/{month}")
     public ResponseEntity<byte[]> exportTemplateExcel(
             @PathVariable("month") int month,
@@ -831,11 +464,11 @@ public class WorkDayController {
         }
     }
 
-
+    @PreAuthorize("isAuthenticated()")
 	@PostMapping("/importWDExcel")
 	public Response importWorkDaysExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
 	    if (file.isEmpty()) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	    }
 	
 	    try (InputStream inputStream = file.getInputStream()) {
@@ -873,11 +506,11 @@ public class WorkDayController {
 	        for (int i = 0; i < expectedRows.length; i++) {
 	            Row row = sheet.getRow(i);
 	            if (row == null || row.getCell(0) == null) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Missing or incomplete header in column A at row " + (i + 1), req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "Missing or incomplete header in column A at row " + (i + 1), req.getRequestURI(), null);
 	            }
 	            String cellValue = row.getCell(0).getStringCellValue().trim();
 	            if (!cellValue.equals(expectedRows[i])) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "Invalid header: expected '" + expectedRows[i] + "' but found '" + cellValue + "' at row " + (i + 1), req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "Invalid header: expected '" + expectedRows[i] + "' but found '" + cellValue + "' at row " + (i + 1), req.getRequestURI(), null);
 	            }
 	        }
 	
@@ -886,7 +519,6 @@ public class WorkDayController {
 	        int lastColumn = rowh.getLastCellNum(); // Total columns used in this row
 	        if (rowh != null) {
                 int real = 0;
-                System.out.println("ini dfjdfdfd: "+lastColumn);
 	            for (int col = 1; col < lastColumn; col++) {
 	                Cell cell = rowh.getCell(col);
 	                System.out.print("Column " + (col + 1) + ": ");
@@ -894,7 +526,7 @@ public class WorkDayController {
 	                if (cell == null) {
 	                    System.out.println("Cell is null");
 	                    return new Response(
-	                        new Date(),
+	                        
 	                        HttpStatus.BAD_REQUEST.value(),
 	                        null,
 	                        "Missing cell at column " + (col + 1) + " in row 1",
@@ -905,14 +537,6 @@ public class WorkDayController {
 	
 	                if (cell.getCellType() != CellType.NUMERIC || !DateUtil.isCellDateFormatted(cell)) {
 	                    System.out.println("Invalid date");
-	                    // return new Response(
-	                    //     new Date(),
-	                    //     HttpStatus.BAD_REQUEST.value(),
-	                    //     null,
-	                    //     "Invalid or non-date cell at column " + (col + 1) + " in row 1",
-	                    //     req.getRequestURI(),
-	                    //     null
-	                    // );
                         break;
 	                }
 	
@@ -1289,7 +913,7 @@ public class WorkDayController {
 	        }
 	        
 	        if(errors.isEmpty()) {
-	        	return new Response(new Date(), HttpStatus.OK.value(), null, "File processed successfully", req.getRequestURI(),null);
+	        	return new Response( HttpStatus.OK.value(), null, "File processed successfully", req.getRequestURI(),null);
 	        }
 	        
 	        String errorSummary;
@@ -1299,10 +923,10 @@ public class WorkDayController {
 	            errorSummary = String.join(", ", errors);
 	        }
 
-	        return new Response(new Date(), HttpStatus.OK.value(), errorSummary, "File processed successfully With error", req.getRequestURI(),errors);
+	        return new Response( HttpStatus.OK.value(), errorSummary, "File processed successfully With error", req.getRequestURI(),errors);
 
 	    } catch (IOException e) {
-	        return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    }
 	}
 

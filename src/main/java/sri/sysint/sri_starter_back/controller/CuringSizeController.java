@@ -85,7 +85,7 @@ public class CuringSizeController {
 	    		curingSizes = curingSizeServiceImpl.getAllCuringSize();
 		
 			    response = new Response(
-			        new Date(),
+			        
 			        HttpStatus.OK.value(),
 			        null,
 			        HttpStatus.OK.getReasonPhrase(),
@@ -124,7 +124,7 @@ public class CuringSizeController {
 	        	curingSize = curingSizeServiceImpl.getCuringSizeById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -161,7 +161,7 @@ public class CuringSizeController {
 	        	CuringSize savedCuringSize = curingSizeServiceImpl.saveCuringSize(curingSize);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -198,7 +198,7 @@ public class CuringSizeController {
 	        	CuringSize updatedCuringSize = curingSizeServiceImpl.updateCuringSize(curingSize);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -235,7 +235,7 @@ public class CuringSizeController {
 	        	CuringSize deletedCuringSize = curingSizeServiceImpl.deleteCuringSize(curingSize);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -272,7 +272,7 @@ public class CuringSizeController {
 	        	CuringSize activatedCuringSize = curingSizeServiceImpl.activateCuringSize(curingSize);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -308,7 +308,7 @@ public class CuringSizeController {
 
 	        if (user != null) {
 	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	            }
 
 	            try (InputStream inputStream = file.getInputStream()) {
@@ -397,7 +397,7 @@ public class CuringSizeController {
 	                }
 
 	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+	                    return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 	                }
 
 	                curingSizeServiceImpl.deleteAllCuringSize();
@@ -405,7 +405,7 @@ public class CuringSizeController {
 	                    curingSizeServiceImpl.saveCuringSize(curingSize);
 	                }
 
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), curingSizes);
+	                return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), curingSizes);
 
 	            } catch (IOException e) {
 	                throw new RuntimeException("Error processing file", e);
@@ -414,7 +414,7 @@ public class CuringSizeController {
 	            throw new ResourceNotFoundException("User not found");
 	        }
 	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    } catch (Exception e) {
 	        throw new ResourceNotFoundException("JWT token is not valid or expired");
 	    }

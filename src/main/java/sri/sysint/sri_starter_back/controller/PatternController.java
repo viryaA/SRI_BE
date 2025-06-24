@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,324 +60,181 @@ public class PatternController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-//START - GET MAPPING
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/getAllPattern")
 	public Response getAllPattern(final HttpServletRequest req) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
+		List<Pattern> patterns = new ArrayList<>();
+		patterns = patternServiceImpl.getAllPattern();
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
-
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	//function goes here
-	        	List<Pattern> patterns = new ArrayList<>();
-	    	    patterns = patternServiceImpl.getAllPattern();
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        patterns
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			patterns
+		);
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/getPatternById/{id}")
 	public Response getPatternById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Optional<Pattern> pattern = Optional.of(new Pattern());
+		pattern = patternServiceImpl.getPatternById(id);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	Optional<Pattern> pattern = Optional.of(new Pattern());
-	    	    pattern = patternServiceImpl.getPatternById(id);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        pattern
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			pattern
+		);
 	    return response;
 	}
-//END - GET MAPPING
-//START - POST MAPPING
+
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/savePattern")
 	public Response savePattern(final HttpServletRequest req, @RequestBody Pattern pattern) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Pattern savedPattern = patternServiceImpl.savePattern(pattern);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	Pattern savedPattern = patternServiceImpl.savePattern(pattern);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        savedPattern
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			savedPattern
+		);
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/updatePattern")
 	public Response updatePattern(final HttpServletRequest req, @RequestBody Pattern pattern) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
+	
+		Pattern updatedPattern = patternServiceImpl.updatePattern(pattern);
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
-
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	Pattern updatedPattern = patternServiceImpl.updatePattern(pattern);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        updatedPattern
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			updatedPattern
+		);
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/deletePattern")
 	public Response deletetePattern(final HttpServletRequest req, @RequestBody Pattern pattern) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Pattern deletedPattern = patternServiceImpl.deletePattern(pattern);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	Pattern deletedPattern = patternServiceImpl.deletePattern(pattern);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        deletedPattern
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			deletedPattern
+		);
+		
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/restorePattern")
 	public Response restorePattern(final HttpServletRequest req, @RequestBody Pattern pattern) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Pattern restoredPattern = patternServiceImpl.restorePattern(pattern);
 
-	    String token = header.replace("Bearer ", "");
+		Response response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			restoredPattern
+		);
 
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	            Pattern restoredPattern = patternServiceImpl.restorePattern(pattern);
-
-	            Response response = new Response(
-	                new Date(),
-	                HttpStatus.OK.value(),
-	                null,
-	                HttpStatus.OK.getReasonPhrase(),
-	                req.getRequestURI(),
-	                restoredPattern
-	            );
-	            return response;
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+		return response;
 	}
 
-	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/savePatternsExcel")
 	@Transactional
 	public Response savePatternsExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
+		if (file.isEmpty()) {
+			return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+		}
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		try (InputStream inputStream = file.getInputStream()) {
+			XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+			XSSFSheet sheet = workbook.getSheetAt(0);
 
-	    String token = header.replace("Bearer ", "");
+			List<Pattern> patterns = new ArrayList<>();
+			List<String> errorMessages = new ArrayList<>();
 
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
+			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
 
-	        if (user != null) {
-	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
-	            }
+				if (row != null) {
+					boolean isEmptyRow = true;
 
-	            try (InputStream inputStream = file.getInputStream()) {
-	                XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-	                XSSFSheet sheet = workbook.getSheetAt(0);
+					for (int j = 0; j < row.getLastCellNum(); j++) {
+						Cell cell = row.getCell(j);
+						if (cell != null && cell.getCellType() != CellType.BLANK) {
+							isEmptyRow = false;
+							break;
+						}
+					}
 
-	                List<Pattern> patterns = new ArrayList<>();
-	                List<String> errorMessages = new ArrayList<>();
+					if (isEmptyRow) {
+						continue;
+					}
 
-	                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-	                    Row row = sheet.getRow(i);
+					Pattern pattern = new Pattern();
+					Cell patternNameCell = row.getCell(2);
 
-	                    if (row != null) {
-	                        boolean isEmptyRow = true;
+					if (patternNameCell == null || patternNameCell.getCellType() == CellType.BLANK) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Pattern Name)");
+						continue;
+					}
 
-	                        for (int j = 0; j < row.getLastCellNum(); j++) {
-	                            Cell cell = row.getCell(j);
-	                            if (cell != null && cell.getCellType() != CellType.BLANK) {
-	                                isEmptyRow = false;
-	                                break;
-	                            }
-	                        }
+					if (patternNameCell.getCellType() == CellType.STRING) {
+						pattern.setPATTERN_ID(patternServiceImpl.getNewId());
+						pattern.setPATTERN_NAME(patternNameCell.getStringCellValue());
+						pattern.setSTATUS(BigDecimal.valueOf(1));
+						pattern.setCREATION_DATE(new Date());
+						pattern.setLAST_UPDATE_DATE(new Date());
 
-	                        if (isEmptyRow) {
-	                            continue;
-	                        }
+						patterns.add(pattern);
+					}
+				}
+			}
 
-	                        Pattern pattern = new Pattern();
-	                        Cell patternNameCell = row.getCell(2);
+			if (!errorMessages.isEmpty()) {
+				return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+			}
 
-	                        if (patternNameCell == null || patternNameCell.getCellType() == CellType.BLANK) {
-	                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Pattern Name)");
-	                            continue;
-	                        }
+			patternServiceImpl.deleteAllPattern();
+			for (Pattern pattern : patterns) {
+				patternServiceImpl.savePattern(pattern);
+			}
 
-	                        if (patternNameCell.getCellType() == CellType.STRING) {
-	                            pattern.setPATTERN_ID(patternServiceImpl.getNewId());
-	                            pattern.setPATTERN_NAME(patternNameCell.getStringCellValue());
-	                            pattern.setSTATUS(BigDecimal.valueOf(1));
-	                            pattern.setCREATION_DATE(new Date());
-	                            pattern.setLAST_UPDATE_DATE(new Date());
+			return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), patterns);
 
-	                            patterns.add(pattern);
-	                        }
-	                    }
-	                }
-
-	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
-	                }
-
-	                patternServiceImpl.deleteAllPattern();
-	                for (Pattern pattern : patterns) {
-	                    patternServiceImpl.savePattern(pattern);
-	                }
-
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), patterns);
-
-	            } catch (IOException e) {
-	                throw new RuntimeException("Error processing file", e);
-	            }
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+		} catch (IOException e) {
+			throw new RuntimeException("Error processing file", e);
+		}
 	}
 
+	@PreAuthorize("isAuthenticated()")
     @RequestMapping("/exportPatternExcel")
     public ResponseEntity<InputStreamResource> exportPatternExcel() throws IOException {
         String filename = "EXPORT_MASTER_PATTERN.xlsx"; 
@@ -389,7 +247,8 @@ public class PatternController {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(file); 
     }
-    
+
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/layoutPatternExcel")
     public ResponseEntity<InputStreamResource> layoutPatternExcel() throws IOException {
         String filename = "LAYOUT_MASTER_PATTERN.xlsx"; 
@@ -403,13 +262,6 @@ public class PatternController {
                 .body(file); 
     }
 
-//END - POST MAPPING
-//START - PUT MAPPING
-//END - PUT MAPPING
-//START - DELETE MAPPING
-//END - DELETE MAPPING
-//START - PROCEDURE
-//END - PROCEDURE
 }
 
 

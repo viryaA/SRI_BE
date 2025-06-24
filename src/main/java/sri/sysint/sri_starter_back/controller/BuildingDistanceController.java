@@ -83,7 +83,6 @@ public class BuildingDistanceController {
 	    	    buildingDistances = buildingDistanceServiceImpl.getAllBuildingDistance();
 
 	    	    response = new Response(
-	    	        new Date(),
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -121,7 +120,6 @@ public class BuildingDistanceController {
 	    	    buildingDistance = buildingDistanceServiceImpl.getBuildingDistanceById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -159,7 +157,6 @@ public class BuildingDistanceController {
 	        	BuildingDistance savedBuildingDistance = buildingDistanceServiceImpl.saveBuildingDistance(buildingDistance);
 
 	    	    response = new Response(
-	    	        new Date(),
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -196,7 +193,6 @@ public class BuildingDistanceController {
 	        	BuildingDistance updatedBuildingDistance = buildingDistanceServiceImpl.updateBuildingDistance(buildingDistance);
 
 	    	    response = new Response(
-	    	        new Date(),
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -233,7 +229,6 @@ public class BuildingDistanceController {
 	        	BuildingDistance deletedBuildingDistance = buildingDistanceServiceImpl.deleteBuildingDistance(buildingDistance);
 
 	    	    response = new Response(
-	    	        new Date(),
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -270,7 +265,7 @@ public class BuildingDistanceController {
 	            BuildingDistance restoredBuildingDistance = buildingDistanceServiceImpl.restoreBuildingDistance(buildingDistance);
 
 	            response = new Response(
-	                new Date(),
+	                
 	                HttpStatus.OK.value(),
 	                null,
 	                HttpStatus.OK.getReasonPhrase(),
@@ -307,7 +302,7 @@ public class BuildingDistanceController {
 
 	        if (user != null) {
 	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	            }
 
 	            try (InputStream inputStream = file.getInputStream()) {
@@ -388,7 +383,7 @@ public class BuildingDistanceController {
 	                }
 
 	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+	                    return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 	                }
 
 	                // Delete all previous building distances before saving the new ones
@@ -397,7 +392,7 @@ public class BuildingDistanceController {
 	                    buildingDistanceServiceImpl.saveBuildingDistance(buildingDistance);
 	                }
 
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), buildingDistances);
+	                return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), buildingDistances);
 
 	            } catch (IOException e) {
 	                throw new RuntimeException("Error processing file", e);
@@ -406,7 +401,7 @@ public class BuildingDistanceController {
 	            throw new ResourceNotFoundException("User not found");
 	        }
 	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    } catch (Exception e) {
 	        throw new ResourceNotFoundException("JWT token is not valid or expired");
 	    }

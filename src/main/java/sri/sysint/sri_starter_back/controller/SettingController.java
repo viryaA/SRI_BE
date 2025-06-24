@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,346 +58,212 @@ public class SettingController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-//START - GET MAPPING
+
+    @PreAuthorize("isAuthenticated()")
 	@GetMapping("/getAllSettings")
     public Response getAllSettings(final HttpServletRequest req) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
+ 
+        List<Setting> settings = new ArrayList<>();
+        settings = settingServiceImpl.getAllSettings();
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                List<Setting> settings = new ArrayList<>();
-                settings = settingServiceImpl.getAllSettings();
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    settings
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            settings
+        );
 
         return response;
     }
-	
+
+    @PreAuthorize("isAuthenticated()")	
 	@GetMapping("/getSettingById/{id}")
     public Response getSettingById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
+ 
+        Optional<Setting> setting = Optional.of(new Setting());
+        setting = settingServiceImpl.getSettingById(id);
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                Optional<Setting> setting = Optional.of(new Setting());
-                setting = settingServiceImpl.getSettingById(id);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    setting
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            setting
+        );
 
         return response;
     }
 	
-//END - GET MAPPING
-//START - POST MAPPING
+
+
+    @PreAuthorize("isAuthenticated()")
 	@PostMapping("/saveSetting")
     public Response saveSetting(final HttpServletRequest req, @RequestBody Setting setting) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
+ 
+        Setting savedSetting = settingServiceImpl.saveSetting(setting);
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                Setting savedSetting = settingServiceImpl.saveSetting(setting);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    savedSetting
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            savedSetting
+        );
 
         return response;
     }
     
-	
+
+    @PreAuthorize("isAuthenticated()")	
 	@PostMapping("/updateSetting")
     public Response updateSetting(final HttpServletRequest req, @RequestBody Setting setting) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
+ 
+        Setting updatedSetting = settingServiceImpl.updateSetting(setting);
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                Setting updatedSetting = settingServiceImpl.updateSetting(setting);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    updatedSetting
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            updatedSetting
+        );
 
         return response;
     }
-	
+
+    @PreAuthorize("isAuthenticated()")	
 	@PostMapping("/deleteSetting")
     public Response deleteSetting(final HttpServletRequest req, @RequestBody Setting setting) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
+ 
+        Setting deletedSetting = settingServiceImpl.deleteSetting(setting);
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                Setting deletedSetting = settingServiceImpl.deleteSetting(setting);
-
-                response = new Response(
-                    new Date(),
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    deletedSetting
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            deletedSetting
+        );
 
         return response;
     }
-	
+
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/restoreSetting")
 	public Response restoreSetting(final HttpServletRequest req, @RequestBody Setting setting) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+        Setting restoredSetting = settingServiceImpl.restoreSetting(setting);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	            Setting restoredSetting = settingServiceImpl.restoreSetting(setting);
-
-	            response = new Response(
-	                new Date(),
-	                HttpStatus.OK.value(),
-	                null,
-	                HttpStatus.OK.getReasonPhrase(),
-	                req.getRequestURI(),
-	                restoredSetting
-	            );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            restoredSetting
+        );
 
 	    return response;
 	}
-	
+
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/saveSettingsExcel")
 	@Transactional
 	public Response saveSettingsExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+        if (file.isEmpty()) {
+            return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+        }
 
-	    String token = header.replace("Bearer ", "");
+        try (InputStream inputStream = file.getInputStream()) {
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+            XSSFSheet sheet = workbook.getSheetAt(0);
 
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
+            List<Setting> settings = new ArrayList<>();
+            List<String> errorMessages = new ArrayList<>();
 
-	        if (user != null) {
-	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
-	            }
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
 
-	            try (InputStream inputStream = file.getInputStream()) {
-	                XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-	                XSSFSheet sheet = workbook.getSheetAt(0);
+                if (row != null) {
+                    boolean isEmptyRow = true;
 
-	                List<Setting> settings = new ArrayList<>();
-	                List<String> errorMessages = new ArrayList<>();
+                    for (int j = 0; j < row.getLastCellNum(); j++) {
+                        Cell cell = row.getCell(j);
+                        if (cell != null && cell.getCellType() != CellType.BLANK) {
+                            isEmptyRow = false;
+                            break;
+                        }
+                    }
 
-	                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-	                    Row row = sheet.getRow(i);
+                    if (isEmptyRow) {
+                        continue;
+                    }
 
-	                    if (row != null) {
-	                        boolean isEmptyRow = true;
+                    Setting setting = new Setting();
+                    Cell keyCell = row.getCell(2);
+                    Cell valueCell = row.getCell(3);
+                    Cell descriptionCell = row.getCell(4);
 
-	                        for (int j = 0; j < row.getLastCellNum(); j++) {
-	                            Cell cell = row.getCell(j);
-	                            if (cell != null && cell.getCellType() != CellType.BLANK) {
-	                                isEmptyRow = false;
-	                                break;
-	                            }
-	                        }
+                    if (keyCell == null || keyCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Setting Key)");
+                        continue;
+                    }
 
-	                        if (isEmptyRow) {
-	                            continue;
-	                        }
+                    if (valueCell == null || valueCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 4 (Setting Value)");
+                        continue;
+                    }
 
-	                        Setting setting = new Setting();
-	                        Cell keyCell = row.getCell(2);
-	                        Cell valueCell = row.getCell(3);
-	                        Cell descriptionCell = row.getCell(4);
+                    if (descriptionCell == null || descriptionCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (Description)");
+                        continue;
+                    }
 
-	                        if (keyCell == null || keyCell.getCellType() == CellType.BLANK) {
-	                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Setting Key)");
-	                            continue;
-	                        }
+                    setting.setSETTING_ID(settingServiceImpl.getNewId());
+                    setting.setSETTING_KEY(keyCell.getStringCellValue());
+                    
+                    String valueString = "";
+                    if (valueCell.getCellType() == CellType.STRING) {
+                        valueString = valueCell.getStringCellValue();
+                    } else if (valueCell.getCellType() == CellType.NUMERIC) {
+                        valueString = String.valueOf(valueCell.getNumericCellValue());
+                    }
 
-	                        if (valueCell == null || valueCell.getCellType() == CellType.BLANK) {
-	                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 4 (Setting Value)");
-	                            continue;
-	                        }
+                    setting.setSETTING_VALUE(valueString);
+                    setting.setDESCRIPTION(descriptionCell.getStringCellValue());
+                    setting.setSTATUS(BigDecimal.valueOf(1));
+                    setting.setCREATION_DATE(new Date());
+                    setting.setLAST_UPDATE_DATE(new Date());
 
-	                        if (descriptionCell == null || descriptionCell.getCellType() == CellType.BLANK) {
-	                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (Description)");
-	                            continue;
-	                        }
+                    settings.add(setting);
+                }
+            }
 
-	                        setting.setSETTING_ID(settingServiceImpl.getNewId());
-	                        setting.setSETTING_KEY(keyCell.getStringCellValue());
-	                        
-	                        String valueString = "";
-	                        if (valueCell.getCellType() == CellType.STRING) {
-	                            valueString = valueCell.getStringCellValue();
-	                        } else if (valueCell.getCellType() == CellType.NUMERIC) {
-	                            valueString = String.valueOf(valueCell.getNumericCellValue());
-	                        }
+            if (!errorMessages.isEmpty()) {
+                return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+            }
 
-	                        setting.setSETTING_VALUE(valueString);
-	                        setting.setDESCRIPTION(descriptionCell.getStringCellValue());
-	                        setting.setSTATUS(BigDecimal.valueOf(1));
-	                        setting.setCREATION_DATE(new Date());
-	                        setting.setLAST_UPDATE_DATE(new Date());
+            settingServiceImpl.deleteAllSettings();
+            for (Setting setting : settings) {
+                settingServiceImpl.saveSetting(setting);
+            }
 
-	                        settings.add(setting);
-	                    }
-	                }
+            return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), settings);
 
-	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
-	                }
+        } catch (IOException e) {
+            throw new RuntimeException("Error processing file", e);
+        }
 
-	                settingServiceImpl.deleteAllSettings();
-	                for (Setting setting : settings) {
-	                    settingServiceImpl.saveSetting(setting);
-	                }
-
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), settings);
-
-	            } catch (IOException e) {
-	                throw new RuntimeException("Error processing file", e);
-	            }
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
 	}
 
-	
+	@PreAuthorize("isAuthenticated()")
     @RequestMapping("/exportSettingsExcel")
     public ResponseEntity<InputStreamResource> exportBuildingsExcel() throws IOException {
         String filename = "EXPORT_MASTER_SETTING.xlsx";
@@ -410,6 +277,7 @@ public class SettingController {
                 .body(file);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/layoutSettingsExcel")
     public ResponseEntity<InputStreamResource> layoutSettingsExcel() throws IOException {
         String filename = "LAYOUT_MASTER_SETTING.xlsx";
@@ -422,11 +290,5 @@ public class SettingController {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(file);
     }
-//END - POST MAPPING
-//START - PUT MAPPING
-//END - PUT MAPPING
-//START - DELETE MAPPING
-//END - DELETE MAPPING
-//START - PROCEDURE
-//END - PROCEDURE
+
 }

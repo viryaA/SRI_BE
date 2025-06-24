@@ -42,7 +42,7 @@ public class FrontRearController {
     public ResponseEntity<Response> getAllFrontRearItems(HttpServletRequest req) throws ResourceNotFoundException {
         validateToken(req);
         List<FrontRear> frontRearList = frontRearService.getAllFrontRear();
-        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
+        return ResponseEntity.ok(new Response( HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
     }
 
     @GetMapping("/getByIdfrontRear/{id}")
@@ -50,48 +50,48 @@ public class FrontRearController {
         validateToken(req);
         FrontRear frontRear = frontRearService.getFrontRearById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FrontRear with ID " + id + " not found"));
-        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRear));
+        return ResponseEntity.ok(new Response( HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRear));
     }
 
     @GetMapping("/getByParallelId/{id}")
     public ResponseEntity<Response> getFrontRearByParallelId(HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
         validateToken(req);
         List<FrontRear> frontRearList = frontRearService.getFrontRearByParallelId(id);
-        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
+        return ResponseEntity.ok(new Response( HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
     }
     
     @GetMapping("/getCheatingfrontRearbyMoId")
     public ResponseEntity<Response> getCheatingFrontRear(HttpServletRequest req, @RequestParam String moId1, @RequestParam String moId2) throws ResourceNotFoundException {
         validateToken(req);
         List<FrontRear> frontRearList = frontRearService.getCheatingFrontRearByMoId(moId1, moId2);
-        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
+        return ResponseEntity.ok(new Response( HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
     }
 
     @GetMapping("/getCheatingfrontRearbyMoIdandVcheating")
     public ResponseEntity<Response> getCheatingFrontRear(HttpServletRequest req, @RequestParam String moId1, @RequestParam String moId2, @RequestParam BigDecimal verCheating) throws ResourceNotFoundException {
         validateToken(req);
         List<FrontRear> frontRearList = frontRearService.getCheatingFrontRear(moId1, moId2, verCheating);
-        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
+        return ResponseEntity.ok(new Response( HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
     }
 
     @GetMapping("/getCheatingbyMoIdandVcheatingWithItemCuring")
     public ResponseEntity<Response> getCheatingFrontRearWithItemCuring(HttpServletRequest req, @RequestParam String moId1, @RequestParam String moId2, @RequestParam BigDecimal verCheating, @RequestParam String itemCuring) throws ResourceNotFoundException {
         validateToken(req);
         List<FrontRear> frontRearList = frontRearService.getCheatingFrontRearWithItemCuring(moId1, moId2, verCheating, itemCuring);
-        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
+        return ResponseEntity.ok(new Response( HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
     }
 
     @GetMapping("/getCheatingbyMoIdandVcheatingWithParallelId")
     public ResponseEntity<Response> getCheatingFrontRearWithParallelId(HttpServletRequest req, @RequestParam String moId1, @RequestParam String moId2, @RequestParam BigDecimal verCheating, @RequestParam BigDecimal parallelId) throws ResourceNotFoundException {
         validateToken(req);
         List<FrontRear> frontRearList = frontRearService.getCheatingFrontRearWithParallelId(moId1, moId2, verCheating, parallelId);
-        return ResponseEntity.ok(new Response(new Date(), HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
+        return ResponseEntity.ok(new Response( HttpStatus.OK.value(), null, "Success", req.getRequestURI(), frontRearList));
     }
 
     @PostMapping("/saveFrontRear")
     public ResponseEntity<Response> saveFrontRear(HttpServletRequest req, @RequestBody String jsonInput) throws ResourceNotFoundException {
         validateToken(req);
         frontRearService.saveFrontRear(jsonInput);
-        return ResponseEntity.ok(new Response(new Date(), HttpStatus.CREATED.value(), null, "Saved Successfully", req.getRequestURI(), null));
+        return ResponseEntity.ok(new Response( HttpStatus.CREATED.value(), null, "Saved Successfully", req.getRequestURI(), null));
     }
 }

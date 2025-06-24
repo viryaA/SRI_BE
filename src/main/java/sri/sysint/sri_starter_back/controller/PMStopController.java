@@ -53,28 +53,28 @@ public class PMStopController {
     public Response getAllPMStops(HttpServletRequest req) throws ResourceNotFoundException {
 //        validateJWT(req);
         List<PMStop> list = pmStopService.getAllPMStops();
-        return new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), list);
+        return new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), list);
     }
 
     @GetMapping("/getActivePMStops")
     public Response getActivePMStops(HttpServletRequest req) throws ResourceNotFoundException {
 //        validateJWT(req);
         List<PMStop> list = pmStopService.getActivePMStops();
-        return new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), list);
+        return new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), list);
     }
 
     @GetMapping("/getPMStopById/{id}")
     public Response getPMStopById(HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
 //        validateJWT(req);
         Optional<PMStop> stop = pmStopService.getPMStopById(id);
-        return new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), stop);
+        return new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), stop);
     }
 
     @GetMapping("/getPMStopByWorkCenter/{name}")
     public Response getPMStopByWorkCenter(HttpServletRequest req, @PathVariable String name) throws ResourceNotFoundException {
 //        validateJWT(req);
         Optional<PMStop> stop = pmStopService.getPMStopByWorkCenter(name);
-        return new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), stop);
+        return new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), stop);
     }
 
     @PostMapping("/insertPMStop")
@@ -89,21 +89,21 @@ public class PMStopController {
             pmStop.getSTART_TIME(),
             pmStop.getEND_TIME()
         );
-        return new Response(new Date(), HttpStatus.OK.value(), null, "PM Stop inserted successfully", req.getRequestURI(), null);
+        return new Response( HttpStatus.OK.value(), null, "PM Stop inserted successfully", req.getRequestURI(), null);
     }
 
     @PostMapping("/softDeletePMStop/{id}")
     public Response softDeletePMStop(HttpServletRequest req, @PathVariable BigDecimal id, @RequestParam String updatedBy) throws ResourceNotFoundException {
 //        validateJWT(req);
         PMStop result = pmStopService.softDeletePMStop(id, updatedBy);
-        return new Response(new Date(), HttpStatus.OK.value(), null, "PM Stop soft-deleted", req.getRequestURI(), result);
+        return new Response( HttpStatus.OK.value(), null, "PM Stop soft-deleted", req.getRequestURI(), result);
     }
 
     @PostMapping("/restorePMStop/{id}")
     public Response restorePMStop(HttpServletRequest req, @PathVariable BigDecimal id, @RequestParam String updatedBy) throws ResourceNotFoundException {
 //        validateJWT(req);
         PMStop result = pmStopService.restorePMStop(id, updatedBy);
-        return new Response(new Date(), HttpStatus.OK.value(), null, "PM Stop restored", req.getRequestURI(), result);
+        return new Response( HttpStatus.OK.value(), null, "PM Stop restored", req.getRequestURI(), result);
     }
 
     @PostMapping("/updatePMStop")
@@ -117,6 +117,6 @@ public class PMStopController {
             pmStop.getSTART_TIME(),
             pmStop.getEND_TIME()
         );
-        return new Response(new Date(), HttpStatus.OK.value(), null, "PM Stop updated or inserted successfully", req.getRequestURI(), null);
+        return new Response( HttpStatus.OK.value(), null, "PM Stop updated or inserted successfully", req.getRequestURI(), null);
     }
 }

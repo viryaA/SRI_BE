@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,322 +57,178 @@ public class PlantController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-//START - GET MAPPING
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/getAllPlant")
 	public Response getAllPlant(final HttpServletRequest req) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		List<Plant> plants = new ArrayList<>();
+		plants = plantServiceImpl.getAllPlant();
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	//function goes here
-	        	List<Plant> plants = new ArrayList<>();
-	    	    plants = plantServiceImpl.getAllPlant();
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        plants
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			plants
+		);
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/getPlantById/{id}")
 	public Response getPlantById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Optional<Plant> plant = Optional.of(new Plant());
+		plant = plantServiceImpl.getPlantById(id);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	Optional<Plant> plant = Optional.of(new Plant());
-	    	    plant = plantServiceImpl.getPlantById(id);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        plant
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			plant
+		);
 	    return response;
 	}
-//END - GET MAPPING
-//START - POST MAPPING
+
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/savePlant")
 	public Response savePlant(final HttpServletRequest req, @RequestBody Plant plant) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Plant savedPlant = plantServiceImpl.savePlant(plant);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	Plant savedPlant = plantServiceImpl.savePlant(plant);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        savedPlant
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			savedPlant
+		);
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/updatePlant")
 	public Response updatePlant(final HttpServletRequest req, @RequestBody Plant plant) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Plant updatedPlant = plantServiceImpl.updatePlant(plant);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	Plant updatedPlant = plantServiceImpl.updatePlant(plant);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        updatedPlant
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			updatedPlant
+		);
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/deletePlant")
 	public Response deletetePlant(final HttpServletRequest req, @RequestBody Plant plant) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Plant deletedPlant = plantServiceImpl.deletePlant(plant);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	Plant deletedPlant = plantServiceImpl.deletePlant(plant);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        deletedPlant
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			deletedPlant
+		);
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/restorePlant")
 	public Response restorePlant(final HttpServletRequest req, @RequestBody Plant plant) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Plant restoredPlant = plantServiceImpl.restorePlant(plant);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	            Plant restoredPlant = plantServiceImpl.restorePlant(plant);
-
-	            response = new Response(
-	                new Date(),
-	                HttpStatus.OK.value(),
-	                null,
-	                HttpStatus.OK.getReasonPhrase(),
-	                req.getRequestURI(),
-	                restoredPlant
-	            );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			restoredPlant
+		);
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/savePlantsExcel")
 	public Response savePlantsExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+			if (file.isEmpty()) {
+				return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+			}
 
-	    String token = header.replace("Bearer ", "");
+			try (InputStream inputStream = file.getInputStream()) {
+				XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+				XSSFSheet sheet = workbook.getSheetAt(0);
 
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
+				List<Plant> plants = new ArrayList<>();
+				List<String> errorMessages = new ArrayList<>();
 
-	        if (user != null) {
-	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
-	            }
+				for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+					Row row = sheet.getRow(i);
 
-	            try (InputStream inputStream = file.getInputStream()) {
-	                XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-	                XSSFSheet sheet = workbook.getSheetAt(0);
+					if (row != null) {
+						boolean isEmptyRow = true;
 
-	                List<Plant> plants = new ArrayList<>();
-	                List<String> errorMessages = new ArrayList<>();
+						for (int j = 0; j < row.getLastCellNum(); j++) {
+							Cell cell = row.getCell(j);
+							if (cell != null && cell.getCellType() != CellType.BLANK) {
+								isEmptyRow = false;
+								break;
+							}
+						}
 
-	                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-	                    Row row = sheet.getRow(i);
+						if (isEmptyRow) {
+							continue;
+						}
 
-	                    if (row != null) {
-	                        boolean isEmptyRow = true;
+						Cell nameCell = row.getCell(2);
 
-	                        for (int j = 0; j < row.getLastCellNum(); j++) {
-	                            Cell cell = row.getCell(j);
-	                            if (cell != null && cell.getCellType() != CellType.BLANK) {
-	                                isEmptyRow = false;
-	                                break;
-	                            }
-	                        }
+						if (nameCell == null || nameCell.getCellType() == CellType.BLANK) {
+							errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Plant Name)");
+							continue;
+						}
 
-	                        if (isEmptyRow) {
-	                            continue;
-	                        }
+						Plant plant = new Plant();
+						plant.setPLANT_ID(plantServiceImpl.getNewId());
+						plant.setPLANT_NAME(nameCell.getStringCellValue());
+						plant.setSTATUS(BigDecimal.valueOf(1));
+						plant.setCREATION_DATE(new Date());
+						plant.setLAST_UPDATE_DATE(new Date());
 
-	                        Cell nameCell = row.getCell(2);
+						plants.add(plant);
+					}
+				}
 
-	                        if (nameCell == null || nameCell.getCellType() == CellType.BLANK) {
-	                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Plant Name)");
-	                            continue;
-	                        }
+				if (!errorMessages.isEmpty()) {
+					return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+				}
 
-	                        Plant plant = new Plant();
-	                        plant.setPLANT_ID(plantServiceImpl.getNewId());
-	                        plant.setPLANT_NAME(nameCell.getStringCellValue());
-	                        plant.setSTATUS(BigDecimal.valueOf(1));
-	                        plant.setCREATION_DATE(new Date());
-	                        plant.setLAST_UPDATE_DATE(new Date());
+				plantServiceImpl.deleteAllPlant();
+				for (Plant plant : plants) {
+					plantServiceImpl.savePlant(plant);
+				}
 
-	                        plants.add(plant);
-	                    }
-	                }
+				return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), plants);
 
-	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
-	                }
-
-	                plantServiceImpl.deleteAllPlant();
-	                for (Plant plant : plants) {
-	                    plantServiceImpl.savePlant(plant);
-	                }
-
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), plants);
-
-	            } catch (IOException e) {
-	                throw new RuntimeException("Error processing file", e);
-	            }
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+			} catch (IOException e) {
+				throw new RuntimeException("Error processing file", e);
+			}
 	}
 
-	
+	@PreAuthorize("isAuthenticated()")
 	@RequestMapping("/exportPlantsExcel")
 	public ResponseEntity<InputStreamResource> exportPLantsExcel() throws IOException {
 	    String filename = "EXPORT_MASTER_PLANT.xlsx";
@@ -384,7 +241,8 @@ public class PlantController {
 	        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
 	        .body(file);
 	}
-	
+
+	@PreAuthorize("isAuthenticated()")
 	@RequestMapping("/layoutPlantsExcel")
 	public ResponseEntity<InputStreamResource> layoutPLantsExcel() throws IOException {
 	    String filename = "LAYOUT_MASTER_PLANT.xlsx";
@@ -397,13 +255,7 @@ public class PlantController {
 	        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
 	        .body(file);
 	}
-//END - POST MAPPING
-//START - PUT MAPPING
-//END - PUT MAPPING
-//START - DELETE MAPPING
-//END - DELETE MAPPING
-//START - PROCEDURE
-//END - PROCEDURE
+	
 }
 
 

@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,392 +58,246 @@ public class ItemCuringController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-	//START - GET MAPPING
-		@GetMapping("/getAllItemCuring")
-		public Response getAllPlant(final HttpServletRequest req) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/getAllItemCuring")
+	public Response getAllPlant(final HttpServletRequest req) throws ResourceNotFoundException {
+		List<ItemCuring> itemCurings = new ArrayList<>();
+		itemCurings = itemCuringServiceImpl.getAllItemCuring();
 
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			itemCurings
+		);
+		return response;
+	}
 
-		    String token = header.replace("Bearer ", "");
+	@PreAuthorize("isAuthenticated()")	
+	@GetMapping("/getItemCuringById/{id}")
+	public Response getPlantById(final HttpServletRequest req, @PathVariable String id) throws ResourceNotFoundException {
 
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
+		Optional<ItemCuring> itemCuring = Optional.of(new ItemCuring());
+		itemCuring = itemCuringServiceImpl.getItemCuringById(id);
 
-		        if (user != null) {
-		        	//function goes here
-		        	List<ItemCuring> itemCurings = new ArrayList<>();
-		        	itemCurings = itemCuringServiceImpl.getAllItemCuring();
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			itemCuring
+		);
 
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        itemCurings
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
+		return response;
+	}
 
-		    return response;
-		}
-		
-		@GetMapping("/getItemCuringById/{id}")
-		public Response getPlantById(final HttpServletRequest req, @PathVariable String id) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
 
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/saveItemCuring")
+	public Response savePlant(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
 
-		    String token = header.replace("Bearer ", "");
+		ItemCuring savedItemCuring = itemCuringServiceImpl.saveItemCuring(itemCuring);
 
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			savedItemCuring
+		);
 
-		        if (user != null) {
-		        	Optional<ItemCuring> itemCuring = Optional.of(new ItemCuring());
-		        	itemCuring = itemCuringServiceImpl.getItemCuringById(id);
+		return response;
+	}
 
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        itemCuring
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
+	@PreAuthorize("isAuthenticated()")	
+	@PostMapping("/updateItemCuring")
+	public Response updatePlant(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
 
-		    return response;
-		}
-	//END - GET MAPPING
-	//START - POST MAPPING
-		@PostMapping("/saveItemCuring")
-		public Response savePlant(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
+		ItemCuring updatedItemCuring = itemCuringServiceImpl.updateItemCuring(itemCuring);
 
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			updatedItemCuring
+		);
 
-		    String token = header.replace("Bearer ", "");
+		return response;
+	}
 
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
+	@PreAuthorize("isAuthenticated()")	
+	@PostMapping("/deleteItemCuring")
+	public Response deletetePlant(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
 
-		        if (user != null) {
-		        	ItemCuring savedItemCuring = itemCuringServiceImpl.saveItemCuring(itemCuring);
+		ItemCuring deletedItemCuring = itemCuringServiceImpl.deleteItemCuring(itemCuring);
 
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        savedItemCuring
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			deletedItemCuring
+		);
 
-		    return response;
-		}
-		
-		@PostMapping("/updateItemCuring")
-		public Response updatePlant(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
+		return response;
+	}
 
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
+	@PreAuthorize("isAuthenticated()")	
+	@PostMapping("/restoreItemCuring")
+	public Response restoreItemCuring(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
 
-		    String token = header.replace("Bearer ", "");
+		ItemCuring restoredItemCuring = itemCuringServiceImpl.restoreItemCuring(itemCuring);
 
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			restoredItemCuring
+		);
 
-		        if (user != null) {
-		        	ItemCuring updatedItemCuring = itemCuringServiceImpl.updateItemCuring(itemCuring);
+		return response;
+	}
 
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        updatedItemCuring
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/saveItemCuringExcel")
+	@Transactional
+	public Response saveItemCuringExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
 
-		    return response;
-		}
-		
-		@PostMapping("/deleteItemCuring")
-		public Response deletetePlant(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
-
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
-
-		    String token = header.replace("Bearer ", "");
-
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
-
-		        if (user != null) {
-		        	ItemCuring deletedItemCuring = itemCuringServiceImpl.deleteItemCuring(itemCuring);
-
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        deletedItemCuring
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
-
-		    return response;
-		}
-		
-		@PostMapping("/restoreItemCuring")
-		public Response restoreItemCuring(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
-
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
-
-		    String token = header.replace("Bearer ", "");
-
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
-
-		        if (user != null) {
-		            ItemCuring restoredItemCuring = itemCuringServiceImpl.restoreItemCuring(itemCuring);
-
-		            response = new Response(
-		                new Date(),
-		                HttpStatus.OK.value(),
-		                null,
-		                HttpStatus.OK.getReasonPhrase(),
-		                req.getRequestURI(),
-		                restoredItemCuring
-		            );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
-
-		    return response;
+		if (file.isEmpty()) {
+			return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 		}
 
-		
-		@PostMapping("/saveItemCuringExcel")
-		@Transactional
-		public Response saveItemCuringExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
+		try (InputStream inputStream = file.getInputStream()) {
+			XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+			XSSFSheet sheet = workbook.getSheetAt(0);
 
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
+			List<ItemCuring> itemCurings = new ArrayList<>();
+			List<String> errorMessages = new ArrayList<>();
 
-		    String token = header.replace("Bearer ", "");
+			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
 
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
+				if (row != null) {
+					boolean isEmptyRow = true;
 
-		        if (user != null) {
-		            if (file.isEmpty()) {
-		                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
-		            }
+					for (int j = 0; j < row.getLastCellNum(); j++) {
+						Cell cell = row.getCell(j);
+						if (cell != null && cell.getCellType() != CellType.BLANK) {
+							isEmptyRow = false;
+							break;
+						}
+					}
 
-		            try (InputStream inputStream = file.getInputStream()) {
-		                XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-		                XSSFSheet sheet = workbook.getSheetAt(0);
+					if (isEmptyRow) {
+						continue;
+					}
 
-		                List<ItemCuring> itemCurings = new ArrayList<>();
-		                List<String> errorMessages = new ArrayList<>();
+					ItemCuring itemCuring = new ItemCuring();
+					Cell itemCuringCell = row.getCell(1);
+					Cell kapaPerMouldCell = row.getCell(2);
+					Cell numberOfMouldCell = row.getCell(3);
+					Cell machineTypeCell = row.getCell(4);
+					Cell spareMould = row.getCell(5);
+					Cell mouldPlan = row.getCell(6);
 
-		                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-		                    Row row = sheet.getRow(i);
+					if (itemCuringCell == null || itemCuringCell.getCellType() == CellType.BLANK) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 2 (Item Curing)");
+						continue;
+					}
 
-		                    if (row != null) {
-		                        boolean isEmptyRow = true;
+					if (kapaPerMouldCell == null || kapaPerMouldCell.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 3 (Kapa Per Mould)");
+						continue;
+					}
 
-		                        for (int j = 0; j < row.getLastCellNum(); j++) {
-		                            Cell cell = row.getCell(j);
-		                            if (cell != null && cell.getCellType() != CellType.BLANK) {
-		                                isEmptyRow = false;
-		                                break;
-		                            }
-		                        }
+					if (numberOfMouldCell == null || numberOfMouldCell.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 4 (Number of Mould)");
+						continue;
+					}
 
-		                        if (isEmptyRow) {
-		                            continue;
-		                        }
+					if (machineTypeCell == null || machineTypeCell.getCellType() == CellType.BLANK) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (Machine Type)");
+						continue;
+					}
 
-		                        ItemCuring itemCuring = new ItemCuring();
-		                        Cell itemCuringCell = row.getCell(1);
-		                        Cell kapaPerMouldCell = row.getCell(2);
-		                        Cell numberOfMouldCell = row.getCell(3);
-		                        Cell machineTypeCell = row.getCell(4);
-		                        Cell spareMould = row.getCell(5);
-		                        Cell mouldPlan = row.getCell(6);
+					if (spareMould == null || spareMould.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 6 (Spare Mould)");
+						continue;
+					}
 
-		                        if (itemCuringCell == null || itemCuringCell.getCellType() == CellType.BLANK) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 2 (Item Curing)");
-		                            continue;
-		                        }
+					if (mouldPlan == null || mouldPlan.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 7 (Mould Monthly Plan)");
+						continue;
+					}
 
-		                        if (kapaPerMouldCell == null || kapaPerMouldCell.getCellType() != CellType.NUMERIC) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 3 (Kapa Per Mould)");
-		                            continue;
-		                        }
+					itemCuring.setITEM_CURING(itemCuringCell.getStringCellValue());
+					itemCuring.setKAPA_PER_MOULD(BigDecimal.valueOf(kapaPerMouldCell.getNumericCellValue()));
+					itemCuring.setNUMBER_OF_MOULD(BigDecimal.valueOf(numberOfMouldCell.getNumericCellValue()));
+					itemCuring.setMACHINE_TYPE(machineTypeCell.getStringCellValue());
+					itemCuring.setSPARE_MOULD(BigDecimal.valueOf(spareMould.getNumericCellValue()));
+					itemCuring.setMOULD_MONTHLY_PLAN(BigDecimal.valueOf(mouldPlan.getNumericCellValue()));
 
-		                        if (numberOfMouldCell == null || numberOfMouldCell.getCellType() != CellType.NUMERIC) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 4 (Number of Mould)");
-		                            continue;
-		                        }
+					itemCuring.setSTATUS(BigDecimal.valueOf(1));
+					itemCuring.setCREATION_DATE(new Date());
+					itemCuring.setLAST_UPDATE_DATE(new Date());
 
-		                        if (machineTypeCell == null || machineTypeCell.getCellType() == CellType.BLANK) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (Machine Type)");
-		                            continue;
-		                        }
+					itemCurings.add(itemCuring);
+				}
+			}
 
-		                        if (spareMould == null || spareMould.getCellType() != CellType.NUMERIC) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 6 (Spare Mould)");
-		                            continue;
-		                        }
+			if (!errorMessages.isEmpty()) {
+				return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+			}
 
-		                        if (mouldPlan == null || mouldPlan.getCellType() != CellType.NUMERIC) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 7 (Mould Monthly Plan)");
-		                            continue;
-		                        }
+			itemCuringServiceImpl.deleteAllItemCuring();
+			for (ItemCuring itemCuring : itemCurings) {
+				itemCuringServiceImpl.saveItemCuring(itemCuring);
+			}
 
-		                        itemCuring.setITEM_CURING(itemCuringCell.getStringCellValue());
-		                        itemCuring.setKAPA_PER_MOULD(BigDecimal.valueOf(kapaPerMouldCell.getNumericCellValue()));
-		                        itemCuring.setNUMBER_OF_MOULD(BigDecimal.valueOf(numberOfMouldCell.getNumericCellValue()));
-		                        itemCuring.setMACHINE_TYPE(machineTypeCell.getStringCellValue());
-		                        itemCuring.setSPARE_MOULD(BigDecimal.valueOf(spareMould.getNumericCellValue()));
-		                        itemCuring.setMOULD_MONTHLY_PLAN(BigDecimal.valueOf(mouldPlan.getNumericCellValue()));
+			return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), itemCurings);
 
-		                        itemCuring.setSTATUS(BigDecimal.valueOf(1));
-		                        itemCuring.setCREATION_DATE(new Date());
-		                        itemCuring.setLAST_UPDATE_DATE(new Date());
-
-		                        itemCurings.add(itemCuring);
-		                    }
-		                }
-
-		                if (!errorMessages.isEmpty()) {
-		                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
-		                }
-
-		                itemCuringServiceImpl.deleteAllItemCuring();
-		                for (ItemCuring itemCuring : itemCurings) {
-		                    itemCuringServiceImpl.saveItemCuring(itemCuring);
-		                }
-
-		                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), itemCurings);
-
-		            } catch (IOException e) {
-		                throw new RuntimeException("Error processing file", e);
-		            }
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (IllegalArgumentException e) {
-		        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
+		} catch (IOException e) {
+			throw new RuntimeException("Error processing file", e);
 		}
+	}
 
-		
-	    @RequestMapping("/exportItemCuringExcel")
-	    public ResponseEntity<InputStreamResource> exportItemCuringExcel() throws IOException {
-	        String filename = "EXPORT_MASTER_ITEM_CURING.xlsx";
+	@PreAuthorize("isAuthenticated()")
+	@RequestMapping("/exportItemCuringExcel")
+	public ResponseEntity<InputStreamResource> exportItemCuringExcel() throws IOException {
+		String filename = "EXPORT_MASTER_ITEM_CURING.xlsx";
 
-	        ByteArrayInputStream data = itemCuringServiceImpl.exportItemCuringsExcel(); 
-	        InputStreamResource file = new InputStreamResource(data);
+		ByteArrayInputStream data = itemCuringServiceImpl.exportItemCuringsExcel(); 
+		InputStreamResource file = new InputStreamResource(data);
 
-	        return ResponseEntity.ok()
-	                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename) 
-	                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-	                .body(file); 
-	    }
-	    
-	    @RequestMapping("/layoutItemCuringExcel")
-	    public ResponseEntity<InputStreamResource> layoutItemCuringExcel() throws IOException {
-	        String filename = "LAYOUT_MASTER_ITEM_CURING.xlsx";
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename) 
+				.contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+				.body(file); 
+	}
 
-	        ByteArrayInputStream data = itemCuringServiceImpl.layoutItemCuringsExcel(); 
-	        InputStreamResource file = new InputStreamResource(data);
+	@PreAuthorize("isAuthenticated()")
+	@RequestMapping("/layoutItemCuringExcel")
+	public ResponseEntity<InputStreamResource> layoutItemCuringExcel() throws IOException {
+		String filename = "LAYOUT_MASTER_ITEM_CURING.xlsx";
 
-	        return ResponseEntity.ok()
-	                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename) 
-	                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-	                .body(file); 
-	    }
+		ByteArrayInputStream data = itemCuringServiceImpl.layoutItemCuringsExcel(); 
+		InputStreamResource file = new InputStreamResource(data);
 
-//END - POST MAPPING
-//START - PUT MAPPING
-//END - PUT MAPPING
-//START - DELETE MAPPING
-//END - DELETE MAPPING
-//START - PROCEDURE
-//END - PROCEDURE
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename) 
+				.contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+				.body(file); 
+	}
+
 }
 
 
