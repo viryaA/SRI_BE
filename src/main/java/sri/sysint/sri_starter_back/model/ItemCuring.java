@@ -34,6 +34,9 @@ public class ItemCuring {
 	@Column(name = "MOULD_MONTHLY_PLAN")
     private BigDecimal MOULD_MONTHLY_PLAN;
 	
+	@Column(name = "MOULD_NOTES")
+    private BigDecimal MOULD_NOTES;
+	
 	@Column(name = "STATUS")
 	private BigDecimal STATUS;
 	@Column(name = "CREATION_DATE")
@@ -60,11 +63,12 @@ public class ItemCuring {
 		this.CREATED_BY = itemCuring.getCREATED_BY();
 		this.LAST_UPDATE_DATE = itemCuring.getLAST_UPDATE_DATE();
 		this.LAST_UPDATED_BY = itemCuring.getLAST_UPDATED_BY();
+		this.MOULD_NOTES = itemCuring.getMOULD_NOTES();
 	}
 
 	public ItemCuring(String iTEM_CURING, BigDecimal kAPA_PER_MOULD, BigDecimal nUMBER_OF_MOULD, String mACHINE_TYPE,
 			BigDecimal sPARE_MOULD, BigDecimal mOULD_MONTHLY_PLAN, BigDecimal sTATUS, Date cREATION_DATE, String cREATED_BY,
-			Date lAST_UPDATE_DATE, String lAST_UPDATED_BY) {
+			Date lAST_UPDATE_DATE, String lAST_UPDATED_BY, BigDecimal mOULD_NOTES) {
 		super();
 		ITEM_CURING = iTEM_CURING;
 		KAPA_PER_MOULD = kAPA_PER_MOULD;
@@ -77,6 +81,7 @@ public class ItemCuring {
 		CREATED_BY = cREATED_BY;
 		LAST_UPDATE_DATE = lAST_UPDATE_DATE;
 		LAST_UPDATED_BY = lAST_UPDATED_BY;
+		MOULD_NOTES = mOULD_NOTES;
 	}
 
 	public String getITEM_CURING() {
@@ -166,6 +171,14 @@ public class ItemCuring {
 
 	public void setLAST_UPDATED_BY(String lAST_UPDATED_BY) {
 		LAST_UPDATED_BY = lAST_UPDATED_BY;
+	}
+	
+	public BigDecimal getMOULD_NOTES() {
+		return MOULD_NOTES;
+	}
+
+	public void setMOULD_NOTES(BigDecimal mOULD_NOTES) {
+		MOULD_NOTES = mOULD_NOTES;
 	}
 	
 }

@@ -60,7 +60,7 @@ public class PatternController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllPattern")
 	public Response getAllPattern(final HttpServletRequest req) throws ResourceNotFoundException {
 		List<Pattern> patterns = new ArrayList<>();
@@ -77,7 +77,7 @@ public class PatternController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getPatternById/{id}")
 	public Response getPatternById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
 
@@ -95,7 +95,7 @@ public class PatternController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/savePattern")
 	public Response savePattern(final HttpServletRequest req, @RequestBody Pattern pattern) throws ResourceNotFoundException {
 
@@ -112,7 +112,7 @@ public class PatternController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/updatePattern")
 	public Response updatePattern(final HttpServletRequest req, @RequestBody Pattern pattern) throws ResourceNotFoundException {
 	
@@ -129,7 +129,7 @@ public class PatternController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/deletePattern")
 	public Response deletetePattern(final HttpServletRequest req, @RequestBody Pattern pattern) throws ResourceNotFoundException {
 
@@ -147,7 +147,7 @@ public class PatternController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/restorePattern")
 	public Response restorePattern(final HttpServletRequest req, @RequestBody Pattern pattern) throws ResourceNotFoundException {
 
@@ -165,7 +165,7 @@ public class PatternController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/savePatternsExcel")
 	@Transactional
 	public Response savePatternsExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -234,7 +234,7 @@ public class PatternController {
 		}
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/exportPatternExcel")
     public ResponseEntity<InputStreamResource> exportPatternExcel() throws IOException {
         String filename = "EXPORT_MASTER_PATTERN.xlsx"; 
@@ -248,7 +248,7 @@ public class PatternController {
                 .body(file); 
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/layoutPatternExcel")
     public ResponseEntity<InputStreamResource> layoutPatternExcel() throws IOException {
         String filename = "LAYOUT_MASTER_PATTERN.xlsx"; 

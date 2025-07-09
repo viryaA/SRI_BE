@@ -59,7 +59,7 @@ public class ProductTypeController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllProductType")
 	public Response getAllProductType(final HttpServletRequest req) throws ResourceNotFoundException {
 		List<ProductType> productTypes = new ArrayList<>();
@@ -76,7 +76,7 @@ public class ProductTypeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@GetMapping("/getProductTypeById/{id}")
 	public Response getProductTypeById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
 
@@ -95,7 +95,7 @@ public class ProductTypeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/saveProductType")
 	public Response saveProductType(final HttpServletRequest req, @RequestBody ProductType productType) throws ResourceNotFoundException {
 
@@ -113,7 +113,7 @@ public class ProductTypeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/updateProductType")
 	public Response updateProductType(final HttpServletRequest req, @RequestBody ProductType productType) throws ResourceNotFoundException {
 
@@ -131,7 +131,7 @@ public class ProductTypeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/deleteProductType")
 	public Response deleteProductType(final HttpServletRequest req, @RequestBody ProductType productType) throws ResourceNotFoundException {
 
@@ -149,7 +149,7 @@ public class ProductTypeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/restoreProductType")
 	public Response activateProductType(final HttpServletRequest req, @RequestBody ProductType productType) throws ResourceNotFoundException {
 
@@ -167,7 +167,7 @@ public class ProductTypeController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveProductTypeExcel")
 	@Transactional
 	public Response saveProductTypeExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -248,7 +248,7 @@ public class ProductTypeController {
 		}
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/exportProductTypesExcel")
     public ResponseEntity<InputStreamResource> exportProductTypesExcel() throws IOException {
         String filename = "EXPORT_MASTER_PRODUCT_TYPE.xlsx";
@@ -262,7 +262,7 @@ public class ProductTypeController {
                 .body(file);
     }
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/layoutProductTypesExcel")
     public ResponseEntity<InputStreamResource> layoutProductTypesExcel() throws IOException {
         String filename = "LAYOUT_MASTER_PRODUCT_TYPE.xlsx";

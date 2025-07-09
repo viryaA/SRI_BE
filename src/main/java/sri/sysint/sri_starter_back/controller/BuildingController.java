@@ -62,7 +62,7 @@ public class BuildingController {
 	@PersistenceContext	
 	private EntityManager em;
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllBuilding")
 	public Response getAllBuilding(final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -80,7 +80,7 @@ public class BuildingController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getBuildingById/{id}")
 	public Response getBuildingById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
 
@@ -98,7 +98,7 @@ public class BuildingController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveBuilding")
 	public Response saveBuilding(final HttpServletRequest req, @RequestBody Building building) throws ResourceNotFoundException {
 		
@@ -115,7 +115,7 @@ public class BuildingController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/updateBuilding")
 	public Response updateBuilding(final HttpServletRequest req, @RequestBody Building building) throws ResourceNotFoundException {
 		
@@ -132,7 +132,7 @@ public class BuildingController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/deleteBuilding")
 	public Response deleteBuilding(final HttpServletRequest req, @RequestBody Building building) throws ResourceNotFoundException {
 		Building deletedBuilding = buildingServiceImpl.deleteBuilding(building);
@@ -148,7 +148,7 @@ public class BuildingController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/restoreBuilding")
 	public Response restoreBuilding(final HttpServletRequest req, @RequestBody Building building) throws ResourceNotFoundException {
 
@@ -165,7 +165,7 @@ public class BuildingController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveBuildingsExcel")
 	@Transactional
 	public Response saveBuildingsExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -245,7 +245,7 @@ public class BuildingController {
 		}
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/layoutBuildingsExcel")
     public ResponseEntity<InputStreamResource> layoutBuildingsExcel() throws IOException {
         String filename = "LAYOUT_MASTER_BUILDING.xlsx";
@@ -258,7 +258,7 @@ public class BuildingController {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(file);
     }
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/exportBuildingsExcel")
     public ResponseEntity<InputStreamResource> exportBuildingsExcel() throws IOException {
         String filename = "EXPORT_MASTER_BUILDING.xlsx";

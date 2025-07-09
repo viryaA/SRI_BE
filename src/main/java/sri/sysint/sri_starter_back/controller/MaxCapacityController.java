@@ -67,7 +67,7 @@ public class MaxCapacityController {
 	@PersistenceContext	
 	private EntityManager em;
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllMaxCapacity")
 	public Response getAllMaxCapacity(final HttpServletRequest req) throws ResourceNotFoundException {
 		List<MaxCapacity> maxCapacities = new ArrayList<>();
@@ -85,7 +85,7 @@ public class MaxCapacityController {
 		return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getMaxCapacityById/{id}")
 	public Response getMaxCapacityById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
 		Optional<MaxCapacity> maxCapacity = Optional.of(new MaxCapacity());
@@ -103,7 +103,7 @@ public class MaxCapacityController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveMaxCapacity")
 	public Response saveMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
 		MaxCapacity savedMaxCapacity = maxCapacityServiceImpl.saveMaxCapacity(maxCapacity);
@@ -120,7 +120,7 @@ public class MaxCapacityController {
 		return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/updateMaxCapacity")
 	public Response updateMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
 		MaxCapacity updatedMaxCapacity = maxCapacityServiceImpl.updateMaxCapacity(maxCapacity);
@@ -137,7 +137,7 @@ public class MaxCapacityController {
 		return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/deleteMaxCapacity")
 	public Response deleteMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
 		MaxCapacity deletedMaxCapacity = maxCapacityServiceImpl.deleteMaxCapacity(maxCapacity);
@@ -154,7 +154,7 @@ public class MaxCapacityController {
 		return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/restoreMaxCapacity")
 	public Response restoreMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
 		MaxCapacity restoredMaxCapacity = maxCapacityServiceImpl.restoreMaxCapacity(maxCapacity);
@@ -170,7 +170,7 @@ public class MaxCapacityController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveMaxCapacitiesExcel")
 	@Transactional
 	public Response saveMaxCapacitiesExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {

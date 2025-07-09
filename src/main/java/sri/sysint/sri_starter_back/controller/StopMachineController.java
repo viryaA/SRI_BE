@@ -72,7 +72,7 @@ public class StopMachineController {
     private EntityManager em;
 
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/getAllStopMachines")
     public Response getAllStopMachines(final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -89,7 +89,7 @@ public class StopMachineController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/getStopMachineById/{id}")
     public Response getStopMachineById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
 
@@ -106,7 +106,7 @@ public class StopMachineController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/saveStopMachine")
     public Response saveStopMachine(final HttpServletRequest req, @RequestBody StopMachine stopMachine) throws ResourceNotFoundException {
 
@@ -139,7 +139,7 @@ public class StopMachineController {
 	    return null;  
 	}
 	
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/updateStopMachine")
     public Response updateStopMachine(final HttpServletRequest req, @RequestBody StopMachine stopMachine) throws ResourceNotFoundException {
 
@@ -159,7 +159,7 @@ public class StopMachineController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/deleteStopMachine")
     public Response deleteStopMachine(final HttpServletRequest req, @RequestBody StopMachine stopMachine) throws ResourceNotFoundException {
 
@@ -176,7 +176,7 @@ public class StopMachineController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/restoreStopMachine")
     public Response restoreStopMachine(final HttpServletRequest req, @RequestBody StopMachine stopMachine) throws ResourceNotFoundException {
 
@@ -193,7 +193,7 @@ public class StopMachineController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/saveStopMachinesExcel")
     @Transactional
     public Response saveStopMachinesExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException, ParseException {
@@ -382,7 +382,7 @@ public class StopMachineController {
 	    return null;
 	}
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/exportStopMachinesExcel")
     public ResponseEntity<InputStreamResource> exportStopMachinesExcel() throws IOException {
         String filename = "EXPORT_MASTER_STOP_MACHINE.xlsx";
@@ -396,7 +396,7 @@ public class StopMachineController {
             .body(file);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/layoutStopMachinesExcel")
     public ResponseEntity<InputStreamResource> layoutStopMachinesExcel() throws IOException {
         String filename = "LAYOUT_MASTER_STOP_MACHINE.xlsx";

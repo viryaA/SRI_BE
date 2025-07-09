@@ -498,50 +498,50 @@ public class WorkDayServiceImpl {
     }
     
     private void updateOffAndSemiOffSU(WorkDay workDay, LocalDate dateWd) {
-        BigDecimal shift1 = workDay.getIWD_SHIFT_1();
-        BigDecimal shift2 = workDay.getIWD_SHIFT_2();
-        BigDecimal shift3 = workDay.getIWD_SHIFT_3();
-
-        DayOfWeek dayOfWeek = dateWd.getDayOfWeek();
-
-        // Logic for Saturday and Sunday
-        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-            workDay.setOFF(BigDecimal.ONE);
-            workDay.setSEMI_OFF(BigDecimal.ZERO);
-            return;
-        }
-
-        // Logic for Monday
-        if (dayOfWeek == DayOfWeek.MONDAY) {
-            if (shift1.compareTo(BigDecimal.ONE) == 0 && shift2.compareTo(BigDecimal.ONE) == 0) {
-                workDay.setOFF(BigDecimal.ZERO);
-                workDay.setSEMI_OFF(BigDecimal.ZERO);
-            } else if (shift1.compareTo(BigDecimal.ZERO) == 0 && shift2.compareTo(BigDecimal.ZERO) == 0) {
-                workDay.setOFF(BigDecimal.ONE);
-                workDay.setSEMI_OFF(BigDecimal.ZERO);
-            } else {
-                workDay.setOFF(BigDecimal.ZERO);
-                workDay.setSEMI_OFF(BigDecimal.ONE);
-            }
-            return;
-        }
-
-        // Logic for Tuesday - Friday
-        if (dayOfWeek.getValue() >= DayOfWeek.TUESDAY.getValue() && dayOfWeek.getValue() <= DayOfWeek.FRIDAY.getValue()) {
-            if (shift1.compareTo(BigDecimal.ZERO) == 0 && shift2.compareTo(BigDecimal.ZERO) == 0 && shift3.compareTo(BigDecimal.ZERO) == 0) {
-                // All shifts inactive
-                workDay.setOFF(BigDecimal.ONE);
-                workDay.setSEMI_OFF(BigDecimal.ZERO);
-            } else if (shift1.compareTo(BigDecimal.ONE) == 0 && shift2.compareTo(BigDecimal.ONE) == 0 && shift3.compareTo(BigDecimal.ONE) == 0) {
-                // All shifts active
-                workDay.setOFF(BigDecimal.ZERO);
-                workDay.setSEMI_OFF(BigDecimal.ZERO);
-            } else {
-                // Mixed active/inactive shifts
-                workDay.setOFF(BigDecimal.ZERO);
-                workDay.setSEMI_OFF(BigDecimal.ONE);
-            }
-        }
+//        BigDecimal shift1 = workDay.getIWD_SHIFT_1();
+//        BigDecimal shift2 = workDay.getIWD_SHIFT_2();
+//        BigDecimal shift3 = workDay.getIWD_SHIFT_3();
+//
+//        DayOfWeek dayOfWeek = dateWd.getDayOfWeek();
+//
+//        // Logic for Saturday and Sunday
+//        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+//            workDay.setOFF(BigDecimal.ONE);
+//            workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            return;
+//        }
+//
+//        // Logic for Monday
+//        if (dayOfWeek == DayOfWeek.MONDAY) {
+//            if (shift1.compareTo(BigDecimal.ONE) == 0 && shift2.compareTo(BigDecimal.ONE) == 0) {
+//                workDay.setOFF(BigDecimal.ZERO);
+//                workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            } else if (shift1.compareTo(BigDecimal.ZERO) == 0 && shift2.compareTo(BigDecimal.ZERO) == 0) {
+//                workDay.setOFF(BigDecimal.ONE);
+//                workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            } else {
+//                workDay.setOFF(BigDecimal.ZERO);
+//                workDay.setSEMI_OFF(BigDecimal.ONE);
+//            }
+//            return;
+//        }
+//
+//        // Logic for Tuesday - Friday
+//        if (dayOfWeek.getValue() >= DayOfWeek.TUESDAY.getValue() && dayOfWeek.getValue() <= DayOfWeek.FRIDAY.getValue()) {
+//            if (shift1.compareTo(BigDecimal.ZERO) == 0 && shift2.compareTo(BigDecimal.ZERO) == 0 && shift3.compareTo(BigDecimal.ZERO) == 0) {
+//                // All shifts inactive
+//                workDay.setOFF(BigDecimal.ONE);
+//                workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            } else if (shift1.compareTo(BigDecimal.ONE) == 0 && shift2.compareTo(BigDecimal.ONE) == 0 && shift3.compareTo(BigDecimal.ONE) == 0) {
+//                // All shifts active
+//                workDay.setOFF(BigDecimal.ZERO);
+//                workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            } else {
+//                // Mixed active/inactive shifts
+//                workDay.setOFF(BigDecimal.ZERO);
+//                workDay.setSEMI_OFF(BigDecimal.ONE);
+//            }
+//        }
     }
 
     private void updateOffAndSemiOff(WorkDay workDay, String dateWd) throws Exception {

@@ -67,7 +67,7 @@ public class CTCuringController {
 	@PersistenceContext	
 	private EntityManager em;
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllCTCuring")
 	public Response getAllCTCuring(final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -86,7 +86,7 @@ public class CTCuringController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@GetMapping("/getCTCuringById/{id}")
 	public Response getCTCuringById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
 
@@ -105,7 +105,7 @@ public class CTCuringController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/saveCTCuring")
 	public Response saveCTCuring(final HttpServletRequest req, @RequestBody CTCuring ctCuring) throws ResourceNotFoundException {
 
@@ -123,7 +123,7 @@ public class CTCuringController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/updateCTCuring")
 	public Response updateCTCuring(final HttpServletRequest req, @RequestBody CTCuring ctCuring) throws ResourceNotFoundException {
 
@@ -141,7 +141,7 @@ public class CTCuringController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/deleteCTCuring")
 	public Response deleteCTCuring(final HttpServletRequest req, @RequestBody CTCuring ctCuring) throws ResourceNotFoundException {
 
@@ -159,7 +159,7 @@ public class CTCuringController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/restoreCTCuring")
 	public Response activateCTCuring(final HttpServletRequest req, @RequestBody CTCuring ctCuring) throws ResourceNotFoundException {
 
@@ -407,7 +407,7 @@ public class CTCuringController {
 	    return cell.getStringCellValue();
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/exportCTCuringExcel")
     public ResponseEntity<InputStreamResource> exportCTCuringExcel() throws IOException {
         String filename = "MASTER_CT_CURING_DATA.xlsx";
@@ -422,7 +422,7 @@ public class CTCuringController {
                 .body(file);
     }
     
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/layoutCTCuringsExcel")
     public ResponseEntity<InputStreamResource> layoutCTCuringsExcel() throws IOException {
         String filename = "LAYOUT_MASTER_CT_CURING.xlsx";

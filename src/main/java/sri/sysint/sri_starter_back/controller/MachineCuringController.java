@@ -65,7 +65,7 @@ public class MachineCuringController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllMachineCuring")
 	public Response getAllMachineCuring(final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -85,7 +85,7 @@ public class MachineCuringController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getMachineCuringById/{id}")
 	public Response getMachineCuringById(final HttpServletRequest req, @PathVariable String id) throws ResourceNotFoundException {
 
@@ -104,7 +104,7 @@ public class MachineCuringController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveMachineCuring")
 	public Response saveMachineCuring(final HttpServletRequest req, @RequestBody MachineCuring machineCuring) throws ResourceNotFoundException {
 
@@ -122,7 +122,7 @@ public class MachineCuringController {
 		return response;
 	}
 		
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/updateMachineCuring")
 	public Response updateMachineCuring(final HttpServletRequest req, @RequestBody MachineCuring machineCuring) throws ResourceNotFoundException {
 
@@ -140,7 +140,7 @@ public class MachineCuringController {
 		return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/deleteMachineCuring")
 	public Response deleteteMachineCuring(final HttpServletRequest req, @RequestBody MachineCuring machineCuring) throws ResourceNotFoundException {
 
@@ -158,7 +158,7 @@ public class MachineCuringController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/restoreMachineCuring")
 	public Response restoreMachineCuring(final HttpServletRequest req, @RequestBody MachineCuring machineCuring) throws ResourceNotFoundException {
 
@@ -176,7 +176,7 @@ public class MachineCuringController {
 		return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveMachineCuringExcel")
 	@Transactional
 	public Response saveMachineCuringExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -287,7 +287,7 @@ public class MachineCuringController {
 		}
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@RequestMapping("/exportMachineCuringExcel")
 	public ResponseEntity<InputStreamResource> exportMachineCuringExcel() throws IOException {
 		String filename = "MASTER_MACHINE_CURING.xlsx";
@@ -301,7 +301,7 @@ public class MachineCuringController {
 				.body(file); 
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@RequestMapping("/layoutMachineCuringExcel")
 	public ResponseEntity<InputStreamResource> layoutMachineCuringExcel() throws IOException {
 		String filename = "LAYOUT_MACHINE_CURING.xlsx";

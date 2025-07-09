@@ -59,7 +59,7 @@ public class SettingController {
 	private EntityManager em;
 	
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllSettings")
     public Response getAllSettings(final HttpServletRequest req) throws ResourceNotFoundException {
  
@@ -78,7 +78,7 @@ public class SettingController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")	
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@GetMapping("/getSettingById/{id}")
     public Response getSettingById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
  
@@ -99,7 +99,7 @@ public class SettingController {
 	
 
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveSetting")
     public Response saveSetting(final HttpServletRequest req, @RequestBody Setting setting) throws ResourceNotFoundException {
  
@@ -118,7 +118,7 @@ public class SettingController {
     }
     
 
-    @PreAuthorize("isAuthenticated()")	
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/updateSetting")
     public Response updateSetting(final HttpServletRequest req, @RequestBody Setting setting) throws ResourceNotFoundException {
  
@@ -136,7 +136,7 @@ public class SettingController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")	
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/deleteSetting")
     public Response deleteSetting(final HttpServletRequest req, @RequestBody Setting setting) throws ResourceNotFoundException {
  
@@ -154,7 +154,7 @@ public class SettingController {
         return response;
     }
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/restoreSetting")
 	public Response restoreSetting(final HttpServletRequest req, @RequestBody Setting setting) throws ResourceNotFoundException {
 
@@ -172,7 +172,7 @@ public class SettingController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveSettingsExcel")
 	@Transactional
 	public Response saveSettingsExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -263,7 +263,7 @@ public class SettingController {
 
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/exportSettingsExcel")
     public ResponseEntity<InputStreamResource> exportBuildingsExcel() throws IOException {
         String filename = "EXPORT_MASTER_SETTING.xlsx";
@@ -277,7 +277,7 @@ public class SettingController {
                 .body(file);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/layoutSettingsExcel")
     public ResponseEntity<InputStreamResource> layoutSettingsExcel() throws IOException {
         String filename = "LAYOUT_MASTER_SETTING.xlsx";

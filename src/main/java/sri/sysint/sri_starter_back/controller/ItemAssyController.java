@@ -57,7 +57,7 @@ public class ItemAssyController {
     @PersistenceContext    
     private EntityManager em;
     
-    @PreAuthorize("isAuthenticated()")    
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
     @GetMapping("/getAllItemAssy")
     public Response getAllPlant(final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -77,7 +77,7 @@ public class ItemAssyController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")    
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
     @GetMapping("/getItemAssyById/{id}")
     public Response getPlantById(final HttpServletRequest req, @PathVariable String id) throws ResourceNotFoundException {
 
@@ -97,7 +97,7 @@ public class ItemAssyController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/saveItemAssy")
     public Response savePlant(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
 
@@ -115,7 +115,7 @@ public class ItemAssyController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")    
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
     @PostMapping("/updateItemAssy")
     public Response updatePlant(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
 
@@ -133,7 +133,7 @@ public class ItemAssyController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")    
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
     @PostMapping("/deleteItemAssy")
     public Response deletePlant(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
 
@@ -151,7 +151,7 @@ public class ItemAssyController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")    
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
     @PostMapping("/restoreItemAssy")
     public Response restoreItemAssy(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
 
@@ -169,7 +169,7 @@ public class ItemAssyController {
 
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/saveItemAssyExcel")
     @Transactional
     public Response saveItemAssyExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -236,7 +236,7 @@ public class ItemAssyController {
         }
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/exportItemAssyExcel")
     public ResponseEntity<InputStreamResource> exportItemAssyExcel() throws IOException {
         String filename = "EXPORT_MASTER_ITEM_ASSY.xlsx";
@@ -250,7 +250,7 @@ public class ItemAssyController {
                 .body(file);
     }
     
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/layoutItemAssyExcel")
     public ResponseEntity<InputStreamResource> layoutItemAssyExcel() throws IOException {
         String filename = "LAYOUT_MASTER_ITEM_ASSY.xlsx";

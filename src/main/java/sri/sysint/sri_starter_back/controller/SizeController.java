@@ -63,7 +63,7 @@ public class SizeController {
 	@PersistenceContext	
 	private EntityManager em;
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllSize")
 	public Response getAllSize(final HttpServletRequest req) throws ResourceNotFoundException {
 		List<Size> sizes = new ArrayList<>();
@@ -80,7 +80,7 @@ public class SizeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getSizeById/{id}")
 	public Response getSizeById(final HttpServletRequest req, @PathVariable String id) throws ResourceNotFoundException {
 		Optional<Size> size = Optional.of(new Size());
@@ -97,7 +97,7 @@ public class SizeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveSize")
 	public Response saveSize(final HttpServletRequest req, @RequestBody Size size) throws ResourceNotFoundException {
 	        	Size savedSize = sizeServiceImpl.saveSize(size);
@@ -114,7 +114,7 @@ public class SizeController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/updateSize")
 	public Response updateSize(final HttpServletRequest req, @RequestBody Size size) throws ResourceNotFoundException {
 	        	Size updatedSize = sizeServiceImpl.updateSize(size);
@@ -131,7 +131,7 @@ public class SizeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/deleteSize")
 	public Response deleteSize(final HttpServletRequest req, @RequestBody Size size) throws ResourceNotFoundException {
 	        	Size deletedSize = sizeServiceImpl.deleteSize(size);
@@ -147,7 +147,7 @@ public class SizeController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/restoreSize")
 	public Response restoreSize(final HttpServletRequest req, @RequestBody Size size) throws ResourceNotFoundException {
 	            Size restoredSize = sizeServiceImpl.restoreSize(size);
@@ -163,7 +163,7 @@ public class SizeController {
 	            return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveSizeExcel")
 	@Transactional
 	public Response saveSizeExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -240,7 +240,7 @@ public class SizeController {
 	    }
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/exportSizeexcel")
     public ResponseEntity<InputStreamResource> exportSizesExcel() throws IOException {
         String filename = "EXPORT_MASTER_SIZE.xlsx";
@@ -254,7 +254,7 @@ public class SizeController {
                 .body(file); 
     }
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/layoutSizeexcel")
     public ResponseEntity<InputStreamResource> layoutSizeexcel() throws IOException {
         String filename = "LAYOUT_MASTER_SIZE.xlsx";

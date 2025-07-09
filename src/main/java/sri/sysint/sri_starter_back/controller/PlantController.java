@@ -57,7 +57,7 @@ public class PlantController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllPlant")
 	public Response getAllPlant(final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -75,7 +75,7 @@ public class PlantController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getPlantById/{id}")
 	public Response getPlantById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
 
@@ -93,7 +93,7 @@ public class PlantController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/savePlant")
 	public Response savePlant(final HttpServletRequest req, @RequestBody Plant plant) throws ResourceNotFoundException {
 
@@ -110,7 +110,7 @@ public class PlantController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/updatePlant")
 	public Response updatePlant(final HttpServletRequest req, @RequestBody Plant plant) throws ResourceNotFoundException {
 
@@ -127,7 +127,7 @@ public class PlantController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/deletePlant")
 	public Response deletetePlant(final HttpServletRequest req, @RequestBody Plant plant) throws ResourceNotFoundException {
 
@@ -144,7 +144,7 @@ public class PlantController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/restorePlant")
 	public Response restorePlant(final HttpServletRequest req, @RequestBody Plant plant) throws ResourceNotFoundException {
 
@@ -161,7 +161,7 @@ public class PlantController {
 	    return response;
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/savePlantsExcel")
 	public Response savePlantsExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -228,7 +228,7 @@ public class PlantController {
 			}
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@RequestMapping("/exportPlantsExcel")
 	public ResponseEntity<InputStreamResource> exportPLantsExcel() throws IOException {
 	    String filename = "EXPORT_MASTER_PLANT.xlsx";
@@ -242,7 +242,7 @@ public class PlantController {
 	        .body(file);
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@RequestMapping("/layoutPlantsExcel")
 	public ResponseEntity<InputStreamResource> layoutPLantsExcel() throws IOException {
 	    String filename = "LAYOUT_MASTER_PLANT.xlsx";

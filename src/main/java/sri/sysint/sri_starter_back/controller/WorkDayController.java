@@ -44,6 +44,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -89,7 +90,7 @@ public class WorkDayController {
     @PersistenceContext
     private EntityManager em;
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/getAllWorkDays")
     public Response getAllWorkDays(final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -107,7 +108,7 @@ public class WorkDayController {
         return response;
     }
     
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/getAllWorkDaysByDateRange")
     public Response getAllWorkDaysByDateRange(final HttpServletRequest req, 
                                             @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
@@ -148,29 +149,44 @@ public class WorkDayController {
 
 
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/getWorkDayByDate")
     public Response getWorkDayByDate(final HttpServletRequest req, @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
 
         String date = requestBody.get("date"); // Extract date from body
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        Date parsedDate = dateFormat.parse(date);
+        Date parsedDate;
+		try {
+			parsedDate = dateFormat.parse(date);
+			
+			Optional<WorkDay> workDay = workDayServiceImpl.getWorkDayByDate(parsedDate);
+			
+			return new Response(
+					
+					HttpStatus.OK.value(),
+					null,
+					HttpStatus.OK.getReasonPhrase(),
+					req.getRequestURI(),
+					workDay
+					);
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return new Response(
+					
+					HttpStatus.CONFLICT.value(),
+					null,
+					HttpStatus.CONFLICT.getReasonPhrase(),
+					req.getRequestURI(),
+					null
+					);
+		}
 
-        Optional<WorkDay> workDay = workDayServiceImpl.getWorkDayByDate(parsedDate);
-
-        return new Response(
-            
-            HttpStatus.OK.value(),
-            null,
-            HttpStatus.OK.getReasonPhrase(),
-            req.getRequestURI(),
-            workDay
-        );
     }
 
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/saveWorkDay")
     public Response saveWorkDay(final HttpServletRequest req, @RequestBody WorkDay workDay) throws ResourceNotFoundException {
 
@@ -188,25 +204,38 @@ public class WorkDayController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/updateWorkDay")
     public Response updateWorkDay(final HttpServletRequest req, @RequestBody WorkDay workDay) throws ResourceNotFoundException {
 
-        WorkDay updatedWorkDay = workDayServiceImpl.updateWorkDay(workDay);
+        WorkDay updatedWorkDay;
+		try {
+			updatedWorkDay = workDayServiceImpl.updateWorkDay(workDay);
+	        response = new Response(
+	                
+	                HttpStatus.OK.value(),
+	                null,
+	                HttpStatus.OK.getReasonPhrase(),
+	                req.getRequestURI(),
+	                updatedWorkDay
+	            );
+		} catch (Exception e) {
+			
+	        response = new Response(
+	                
+	                HttpStatus.CONFLICT.value(),
+	                null,
+	                HttpStatus.CONFLICT.getReasonPhrase(),
+	                req.getRequestURI(),
+	                null
+            );
+		}
 
-        response = new Response(
-            
-            HttpStatus.OK.value(),
-            null,
-            HttpStatus.OK.getReasonPhrase(),
-            req.getRequestURI(),
-            updatedWorkDay
-        );
 
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/deleteWorkDay")
     public Response deleteWorkDay(final HttpServletRequest req, @RequestBody WorkDay workDay) throws ResourceNotFoundException {
 
@@ -224,7 +253,7 @@ public class WorkDayController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/restoreWorkDay")
     public Response restoreWorkDay(final HttpServletRequest req, @RequestBody WorkDay workDay) throws ResourceNotFoundException {
 
@@ -242,7 +271,7 @@ public class WorkDayController {
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/saveWorkDaysExcel")
     public Response saveWorkDaysExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -370,61 +399,101 @@ public class WorkDayController {
         return true; 
     }
 
-    @PreAuthorize("isAuthenticated()")    
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
     @PostMapping("/turnOnOvertime")
     public Response turnOnOvertime(final HttpServletRequest req, @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
 
-                String dateWd = requestBody.get("dateWd"); // Extract dateWd from JSON request body
+                String dateWd = requestBody.get("dateWd");
 
-                WorkDay updatedWorkDay = workDayServiceImpl.turnOnOvertime(dateWd);
+                WorkDay updatedWorkDay;
+				try {
+					updatedWorkDay = workDayServiceImpl.turnOnOvertime(dateWd);
+					return new Response(
+							
+							HttpStatus.OK.value(),
+							null,
+							HttpStatus.OK.getReasonPhrase(),
+							req.getRequestURI(),
+							updatedWorkDay
+							);
+				} catch (Exception e) {
+//					e.printStackTrace();
+					return new Response(
+							
+							HttpStatus.CONFLICT.value(),
+							null,
+							HttpStatus.CONFLICT.getReasonPhrase(),
+							req.getRequestURI(),
+							null
+							);
+				}
 
-                return new Response(
-                    
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    updatedWorkDay
-                );
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/turnOnShift/{dateWd}/{shift}")
     public Response turnOnShift(final HttpServletRequest req, @PathVariable String dateWd, @PathVariable String shift) throws ResourceNotFoundException {
 
-        WorkDay updatedWorkDay = workDayServiceImpl.turnOnShift(dateWd, shift);
+        WorkDay updatedWorkDay;
+		try {
+			updatedWorkDay = workDayServiceImpl.turnOnShift(dateWd, shift);
+			response = new Response(
+					
+					HttpStatus.OK.value(),
+					null,
+					HttpStatus.OK.getReasonPhrase(),
+					req.getRequestURI(),
+					updatedWorkDay
+					);
+		} catch (Exception e) {
+//			e.printStackTrace();
+			response = new Response(
+					
+					HttpStatus.CONFLICT.value(),
+					null,
+					HttpStatus.CONFLICT.getReasonPhrase(),
+					req.getRequestURI(),
+					null
+					);
 
-        response = new Response(
-            
-            HttpStatus.OK.value(),
-            null,
-            HttpStatus.OK.getReasonPhrase(),
-            req.getRequestURI(),
-            updatedWorkDay
-        );
+		}
+
 
         return response;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/turnOffShift/{dateWd}/{shift}")
     public Response turnOffShift(final HttpServletRequest req, @PathVariable String dateWd, @PathVariable String shift) throws ResourceNotFoundException {
 
-        WorkDay updatedWorkDay = workDayServiceImpl.turnOffShift(dateWd, shift);
+        WorkDay updatedWorkDay;
+		try {
+			updatedWorkDay = workDayServiceImpl.turnOffShift(dateWd, shift);
+			response = new Response(
+					
+					HttpStatus.OK.value(),
+					null,
+					HttpStatus.OK.getReasonPhrase(),
+					req.getRequestURI(),
+					updatedWorkDay
+					);
+		} catch (Exception e) {
+			e.printStackTrace();
+	        response = new Response(
+	                
+	                HttpStatus.CONFLICT.value(),
+	                null,
+	                HttpStatus.CONFLICT.getReasonPhrase(),
+	                req.getRequestURI(),
+	                null
+	            );
+		}
 
-        response = new Response(
-            
-            HttpStatus.OK.value(),
-            null,
-            HttpStatus.OK.getReasonPhrase(),
-            req.getRequestURI(),
-            updatedWorkDay
-        );
 
         return response;
     }
     
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/exportWorkDaysExcel/{year}/{month}")
     public ResponseEntity<byte[]> exportTemplateExcel(
             @PathVariable("month") int month,
@@ -464,7 +533,7 @@ public class WorkDayController {
         }
     }
 
-    @PreAuthorize("isAuthenticated()")
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/importWDExcel")
 	public Response importWorkDaysExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
 	    if (file.isEmpty()) {

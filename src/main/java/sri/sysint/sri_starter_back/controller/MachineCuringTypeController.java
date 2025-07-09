@@ -60,7 +60,7 @@ public class MachineCuringTypeController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllMachineCuringType")
 	public Response getAllPlant(final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -78,7 +78,7 @@ public class MachineCuringTypeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getMachineCuringTypeById/{id}")
 	public Response getPlantById(final HttpServletRequest req, @PathVariable String id) throws ResourceNotFoundException {
 		Optional<MachineCuringType> machineCuringType = Optional.of(new MachineCuringType());
@@ -110,7 +110,7 @@ public class MachineCuringTypeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/updateMachineCuringType")
 	public Response updatePlant(final HttpServletRequest req, @RequestBody MachineCuringType machineCuringType) throws ResourceNotFoundException {
 		MachineCuringType updatedMachineCuringType = machineCuringTypeServiceImpl.updateMachineCuringType(machineCuringType);
@@ -126,7 +126,7 @@ public class MachineCuringTypeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/deleteMachineCuringType")
 	public Response deletetePlant(final HttpServletRequest req, @RequestBody MachineCuringType machineCuringType) throws ResourceNotFoundException {
 		MachineCuringType deletedMachineCuringType = machineCuringTypeServiceImpl.deleteMachineCuringType(machineCuringType);
@@ -142,7 +142,7 @@ public class MachineCuringTypeController {
 	    return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/restoreMachineCuringType")
 	public Response restoreMachineCuringType(final HttpServletRequest req, @RequestBody MachineCuringType machineCuringType) throws ResourceNotFoundException {
 		MachineCuringType restoredMachineCuringType = machineCuringTypeServiceImpl.restoreMachineCuringType(machineCuringType);
@@ -158,7 +158,7 @@ public class MachineCuringTypeController {
 		return response;	
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveMachineCuringTypeExcel")	
 	@Transactional
 	public Response saveMachineCuringTypesExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -262,7 +262,7 @@ public class MachineCuringTypeController {
 		}
 	}
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/exportMachineCuringTypeexcel")
     public ResponseEntity<InputStreamResource> exportMachineCuringTypesExcel() throws IOException {
         String filename = "EXPORT_MASTER_MACHINE_CURING_TYPE.xlsx";
@@ -276,7 +276,7 @@ public class MachineCuringTypeController {
                 .body(file);
     }
     
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/layoutMachineCuringTypeexcel")
     public ResponseEntity<InputStreamResource> layoutMachineCuringTypeexcel() throws IOException {
         String filename = "LAYOUT_MASTER_MACHINE_CURING_TYPE.xlsx";

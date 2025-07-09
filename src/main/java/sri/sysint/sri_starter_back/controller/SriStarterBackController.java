@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,17 +53,7 @@ public class SriStarterBackController {
 				req.getRequestURI(), sys);
 		return response;
 	}
-	@GetMapping("/username/{userName}")
-	public Response getUserByUserName(final HttpServletRequest req, @PathVariable("userName") String userName) throws ResourceNotFoundException{
-		Users users = userRepo.findByUserName(userName);
-		if(users == null) {
-			response = new Response( HttpStatus.NOT_FOUND.value(), null, "DATA NOT FOUND", req.getRequestURI(), users);
-		}
-		else {
-			response = new Response( HttpStatus.OK.value(), null, "DATA EXIST", req.getRequestURI(), users);
-		}
-		return response;
-	}	
+	
 	@RequestMapping(value = "/insertDataWithGet", method = RequestMethod.GET, headers = "Accept=application/json")
 	public Response insertDataDummyWithGet(@RequestParam("code") String code, @RequestParam("desc") String desc, final HttpServletRequest req) {
 		Dummy res = dummyRepo.findByCode(code);

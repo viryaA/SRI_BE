@@ -63,7 +63,7 @@ public class UserController {
 	    return response;
 	}
 
-//	@PreAuthorize("isAuthenticated() && #userName == principal.username")
+	@PreAuthorize("isAuthenticated() && #userName == principal.username")
 	@GetMapping("/getUsername/{userName}")
 	public Response getUserByUsername(@PathVariable String userName, HttpServletRequest req) throws ResourceNotFoundException {
 		

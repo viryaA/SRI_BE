@@ -29,6 +29,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -79,31 +80,11 @@ public class MarketingOrderController {
 	
 	@PersistenceContext	
 	private EntityManager em;
-	
-	//ini coment
-    private String validateToken(HttpServletRequest req) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found");
-        }
-        return user;
-    }
-    
     
     //------------------------------------------MARKETING ORDER-------------------------------------
     
     
-    //Get Distinct Month
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/getDistinctMonthMo")
     public Response getDistinctMonthMo(final HttpServletRequest req) {
     	try {
@@ -119,7 +100,7 @@ public class MarketingOrderController {
     	return response;
     }
     
-    //Export Resume
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping("/exportResumeMO/{month0}/{month1}/{month2}")
 	public ResponseEntity<InputStreamResource> exportResume(@PathVariable String month0, @PathVariable String month1, @PathVariable String month2) throws IOException {
     	String MM = "";
@@ -145,10 +126,10 @@ public class MarketingOrderController {
 	        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
 	        .body(file);
 	}
-    
+
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/arRejectDefectMo")
     public Response arDefectReject(final HttpServletRequest req, @RequestBody SaveFinalMarketingOrder mo) throws ResourceNotFoundException{
-    	validateToken(req);
 
     	int statusSaved = marketingOrderServiceImpl.saveArDefectReject(mo);
     	
@@ -159,10 +140,10 @@ public class MarketingOrderController {
     	}
     	return response;
     }
-    
+
+	@PreAuthorize("isAuthenticated()")
     @PostMapping("/getAllTypeMarketingOrder")
     public Response getAllTypeMarketingOrder(final HttpServletRequest req, @RequestBody Map<String, Object> object) throws ResourceNotFoundException{
-    	validateToken(req);
     	
     	String moMonth0 = object.get("moMonth0").toString();
     	String moMonth1 = object.get("moMonth1").toString();
@@ -173,26 +154,25 @@ public class MarketingOrderController {
         return response;
     }
     
-    //GET CAPACITY 
+	@PreAuthorize("isAuthenticated()")
     @GetMapping("/getCapacity")
     public Response getCapacity(final HttpServletRequest req) throws ResourceNotFoundException {
-    	validateToken(req);
     	String capacity = marketingOrderServiceImpl.getCapacityValue();
     	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), capacity);
     	return response;
     }
-    
+
+	@PreAuthorize("isAuthenticated()")
     @GetMapping("/getLastIdMo")
     public Response getLastIdMo(final HttpServletRequest req) throws ResourceNotFoundException {
-    	validateToken(req);
     	String lastId = marketingOrderServiceImpl.getLastIdMo();
     	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), lastId);
     	return response;
     }
     
+	@PreAuthorize("isAuthenticated()")
     @PostMapping("/saveMarketingOrderPPC")
     public Response saveMarketingOrderPPC(final HttpServletRequest req, @RequestBody SaveMarketingOrderPPC saveMarketingOrderPPC)throws ResourceNotFoundException {
-    	validateToken(req);
     	int statusSaved = marketingOrderServiceImpl.saveMarketingOrderPPC(saveMarketingOrderPPC);
     	if(statusSaved == 1) {
     		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
@@ -202,23 +182,23 @@ public class MarketingOrderController {
     	return response;
     }
     
+	@PreAuthorize("isAuthenticated()")
     @GetMapping("/getAllMarketingOrderLatest")
 	public Response getAllMarketingOrderLatest(final HttpServletRequest req) throws ResourceNotFoundException {
-    	validateToken(req);
     	List<MarketingOrder> data = marketingOrderServiceImpl.getAllMarketingOrderLatest();
     	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	    return response;
 	}
     
+	@PreAuthorize("isAuthenticated()")
     @GetMapping("/getAllMoOnlyMonth")
 	public Response getAllMoOnlyMonth(final HttpServletRequest req) throws ResourceNotFoundException {
-    	validateToken(req);
     	List<Map<String, Object>> data = marketingOrderServiceImpl.getAllMoOnlyMonth();
     	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 	    return response;
 	}
     
-    //GET ALL MARKETING ORDER LATEST BY ROLE
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/getAllMarketingOrderMarketing")
     public Response getAllMarketingOrdersMarketing(@RequestParam("role") String role,final HttpServletRequest req) {
         
@@ -229,9 +209,9 @@ public class MarketingOrderController {
         return response;
     }
 
+	@PreAuthorize("isAuthenticated()")
     @PostMapping("/getMonthAvailable")
     public Response getMonthAvailable(final HttpServletRequest req, @RequestBody Map<String, Object> object) throws ResourceNotFoundException{
-    	validateToken(req);
     	
     	String month1 = object.get("month1").toString();
     	String month2 = object.get("month2").toString();
@@ -248,10 +228,10 @@ public class MarketingOrderController {
         return response;
     }
     
+	@PreAuthorize("isAuthenticated()")
     @GetMapping("/getAllDetailRevisionMo")
     public Response getAllDetailRevisionMo(final HttpServletRequest req, @RequestParam("month0") String month0Str, @RequestParam("month1") String month1Str, @RequestParam("month2") String month2Str, @RequestParam("type") String type) throws ResourceNotFoundException {
     	
-    	validateToken(req);
 
         List<MarketingOrder> data = marketingOrderServiceImpl.getAllMarketingOrder(month0Str, month1Str, month2Str, type);
         
@@ -260,9 +240,9 @@ public class MarketingOrderController {
     }
 
 	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/disableMarketingOrder")
 	public Response disableMarketingOrder(final HttpServletRequest req, @RequestBody MarketingOrder marketingOrder) throws ResourceNotFoundException {
-    	validateToken(req);
 
 	    marketingOrderServiceImpl.disableMarketingOrder(marketingOrder);
 
@@ -270,9 +250,9 @@ public class MarketingOrderController {
 	    return response;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/enableMarketingOrder")
 	public Response enableMarketingOrder(final HttpServletRequest req, @RequestBody MarketingOrder marketingOrder) throws ResourceNotFoundException {
-    	validateToken(req);
 
 	    marketingOrderServiceImpl.enableMarketingOrder(marketingOrder);
 
@@ -281,10 +261,9 @@ public class MarketingOrderController {
 	}
 	
 	//--------------------------------HEADER MARKETING ORDER-------------------------------------
-     
+	@PreAuthorize("isAuthenticated()")
     @GetMapping("/getHeaderMOById/{id}")
     public Response getHeaderMOById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
-        validateToken(req);
 
         Optional<HeaderMarketingOrder> headerMO = marketingOrderServiceImpl.getHeaderMOById(id);
         if (headerMO.isPresent()) {
@@ -296,208 +275,212 @@ public class MarketingOrderController {
     }
 
     //--------------------------------DETAIL MARKETING ORDER-------------------------------------
-    
-    	@PostMapping("/getDetailMarketingOrders")
-	    public Response getDetailMarketingOrders(@RequestBody Map<String, Object> params, final HttpServletRequest req) throws ResourceNotFoundException {
-	        validateToken(req);
 	
-	        // Extract the necessary values from the map
-	        String monthYear0 = (String) params.get("monthYear0");
-	        String monthYear1 = (String) params.get("monthYear1");
-	        String monthYear2 = (String) params.get("monthYear2");
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/getDetailMarketingOrders")
+	public Response getDetailMarketingOrders(@RequestBody Map<String, Object> params, final HttpServletRequest req) throws ResourceNotFoundException {
 
-	        BigDecimal totalWdTtM0 = new BigDecimal((String) params.get("totalHKTT1"));
-	        BigDecimal totalWdTtM1 = new BigDecimal((String) params.get("totalHKTT2"));
-	        BigDecimal totalWdTtM2 = new BigDecimal((String) params.get("totalHKTT3"));
-	        BigDecimal totalWdTlM0 = new BigDecimal((String) params.get("totalHKTL1"));
-	        BigDecimal totalWdTlM1 = new BigDecimal((String) params.get("totalHKTL2"));
-	        BigDecimal totalWdTlM2 = new BigDecimal((String) params.get("totalHKTL3"));
-	        String typeMo = (String) params.get("productMerk");
-	
-	        List<ViewDetailMarketingOrder> detailMarketingOrders = marketingOrderServiceImpl.getDetailMarketingOrders(
-	                totalWdTtM0, totalWdTtM1, totalWdTtM2,
-	                totalWdTlM0, totalWdTlM1, totalWdTlM2,
-	                typeMo, monthYear0, monthYear1, monthYear2
-	        );
-	
-	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), detailMarketingOrders);
-	        return response;
-	    }
+		// Extract the necessary values from the map
+		String monthYear0 = (String) params.get("monthYear0");
+		String monthYear1 = (String) params.get("monthYear1");
+		String monthYear2 = (String) params.get("monthYear2");
 
-	    
-	    @PostMapping("/saveMarketingOrderMarketing")
-	    public Response saveMarketingOrderMarketing(final HttpServletRequest req, @RequestBody List<ViewDetailMarketingOrder> detailMOList) throws ResourceNotFoundException {
-	        validateToken(req);
+		BigDecimal totalWdTtM0 = new BigDecimal((String) params.get("totalHKTT1"));
+		BigDecimal totalWdTtM1 = new BigDecimal((String) params.get("totalHKTT2"));
+		BigDecimal totalWdTtM2 = new BigDecimal((String) params.get("totalHKTT3"));
+		BigDecimal totalWdTlM0 = new BigDecimal((String) params.get("totalHKTL1"));
+		BigDecimal totalWdTlM1 = new BigDecimal((String) params.get("totalHKTL2"));
+		BigDecimal totalWdTlM2 = new BigDecimal((String) params.get("totalHKTL3"));
+		String typeMo = (String) params.get("productMerk");
 
-	        for (ViewDetailMarketingOrder detail : detailMOList) {
-	            System.out.println("Ini lock status dari db" + detail.toString());
-	        }
-	        
-	        // Create a list to hold the response data
-	        List<DetailMarketingOrder> MOListProducts = new ArrayList<>();
+		List<ViewDetailMarketingOrder> detailMarketingOrders = marketingOrderServiceImpl.getDetailMarketingOrders(
+				totalWdTtM0, totalWdTtM1, totalWdTtM2,
+				totalWdTlM0, totalWdTlM1, totalWdTlM2,
+				typeMo, monthYear0, monthYear1, monthYear2
+		);
 
-	        // Map DetailMarketingOrder to ViewMO_ListProduct
-	        for (ViewDetailMarketingOrder viewMO : detailMOList) {
-	            DetailMarketingOrder detail = new DetailMarketingOrder();
-	            
-	            // Assign fields from the view model to the entity
-	            detail.setDetailId(viewMO.getDetailId());
-	            detail.setMoId(viewMO.getMoId());
-	            detail.setCategory(viewMO.getCategory());
-	            detail.setPartNumber(viewMO.getPartNumber());
-	            detail.setDescription(viewMO.getDescription());
-	            detail.setMachineType(viewMO.getMachineType());
-	            detail.setCapacity(viewMO.getCapacity());
-	            detail.setQtyPerMould(viewMO.getQtyPerMould());
-	            detail.setQtyPerRak(viewMO.getQtyPerRak());
-	            detail.setMinOrder(viewMO.getMinOrder());
-	            detail.setMaxCapMonth0(viewMO.getMaxCapMonth0());
-	            detail.setMaxCapMonth1(viewMO.getMaxCapMonth1());
-	            detail.setMaxCapMonth2(viewMO.getMaxCapMonth2());
-	            detail.setInitialStock(viewMO.getInitialStock());
-	            detail.setSfMonth0(viewMO.getSfMonth0());
-	            detail.setSfMonth1(viewMO.getSfMonth1());
-	            detail.setSfMonth2(viewMO.getSfMonth2());
-	            detail.setMoMonth0(viewMO.getMoMonth0());
-	            detail.setMoMonth1(viewMO.getMoMonth1());
-	            detail.setMoMonth2(viewMO.getMoMonth2());
-	            detail.setPpd(viewMO.getPpd());
-	            detail.setCav(viewMO.getCav());
-	            detail.setLockStatusM0(viewMO.getLockStatusM0());
-	            detail.setLockStatusM1(viewMO.getLockStatusM1());
-	            detail.setLockStatusM2(viewMO.getLockStatusM2());
-	            MOListProducts.add(detail);
-	            
-	        }
-	        marketingOrderServiceImpl.updateDetailMOById(MOListProducts);
+		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), detailMarketingOrders);
+		return response;
+	}
 
-	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
-	        return response;
-	    }
-	    
-	    @PostMapping("/revisiMarketingOrderMarketing")
-	    public Response revisiDetailMOMarketing(final HttpServletRequest req, @RequestBody EditMarketingOrderMarketing marketingOrderData) throws ResourceNotFoundException{
-	    	validateToken(req);
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/saveMarketingOrderMarketing")
+	public Response saveMarketingOrderMarketing(final HttpServletRequest req, @RequestBody List<ViewDetailMarketingOrder> detailMOList) throws ResourceNotFoundException {
 
-	    	int statusSaved = marketingOrderServiceImpl.editMarketingOrderMarketing(marketingOrderData);
-	    	
-	    	if(statusSaved == 1) {
-	    		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
-	    	}else {
-	    		response = new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), req.getRequestURI(), null);
-	    	}
-	    	return response;
-	    }
-	    
-	    
-		@GetMapping("/getAllMoById/{moId}")
-		public Response getAllMoById(final HttpServletRequest req, @PathVariable String moId) throws ResourceNotFoundException {
-		validateToken(req);
-		
-		ViewMarketingOrder marketingOrderDetail = marketingOrderServiceImpl.getAllMoById(moId);
-			     
-			if (marketingOrderDetail != null) {
-				response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), marketingOrderDetail);
-			} else {
-				throw new ResourceNotFoundException("DetailMarketingOrder not found with moId " + moId);
-			}
-			     
-			return response;
-		 }
-
-		@PostMapping("/getWorkday")
-	    public Response getMonthlyWorkData(@RequestBody Map<String, Object> requestBody, final HttpServletRequest req) throws ResourceNotFoundException {
-	        validateToken(req);
-
-	        // Mengambil bulan dan tahun dari requestBody
-	        int month1 = (int) requestBody.get("month1");
-	        int year1 = (int) requestBody.get("year1");
-	        int month2 = (int) requestBody.get("month2");
-	        int year2 = (int) requestBody.get("year2");
-	        int month3 = (int) requestBody.get("month3");
-	        int year3 = (int) requestBody.get("year3");
-
-	        // Memanggil service dengan parameter yang diambil dari requestBody
-	        List<Map<String, Object>> workDays = marketingOrderServiceImpl.getWorkDay(month1, year1, month2, year2, month3, year3);
-
-	        Response response = new Response(HttpStatus.OK.value(),null, HttpStatus.OK.getReasonPhrase(),req.getRequestURI(),workDays);
-
-	        return response;
-	    }
-	    
-	    
-	    //EXPORT MARKETING ORDER
-	    @RequestMapping("/exportMOExcel/{id}")
-		public ResponseEntity<InputStreamResource> exportPLantsExcel(@PathVariable String id) throws IOException {
-		 	Optional<MarketingOrder> optionalMarketingOrder = marketingOrderServiceImpl.getMarketingOrderById(id);
-	    	MarketingOrder marketingOrder = optionalMarketingOrder.get();
-	    	
-	        SimpleDateFormat monthFormat = new SimpleDateFormat("MMM");
-	        String MOmonth = monthFormat.format(marketingOrder.getDateValid());
-		    String filename = "MO_FED " + "- " + MOmonth + " R" + marketingOrder.getRevisionPpc().toString() + ".xlsx";
-		    
-		    ByteArrayInputStream data = marketingOrderServiceImpl.exportMOExcel(id);
-		    InputStreamResource file = new InputStreamResource(data);
-		    
-		    return ResponseEntity.ok()
-		        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-		        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-		        .body(file);
+		for (ViewDetailMarketingOrder detail : detailMOList) {
+			System.out.println("Ini lock status dari db" + detail.toString());
 		}
-	    
-	    
-	    //------------------------------------------MONTHLY PLANNING-------------------------------------
-	    
-	    
-	    @GetMapping("/getAllMonthlyPlanning")
-	    public Response getAllMonthlyPlanning(final HttpServletRequest req) throws ResourceNotFoundException {
+		
+		// Create a list to hold the response data
+		List<DetailMarketingOrder> MOListProducts = new ArrayList<>();
+
+		// Map DetailMarketingOrder to ViewMO_ListProduct
+		for (ViewDetailMarketingOrder viewMO : detailMOList) {
+			DetailMarketingOrder detail = new DetailMarketingOrder();
+			
+			// Assign fields from the view model to the entity
+			detail.setDetailId(viewMO.getDetailId());
+			detail.setMoId(viewMO.getMoId());
+			detail.setCategory(viewMO.getCategory());
+			detail.setPartNumber(viewMO.getPartNumber());
+			detail.setDescription(viewMO.getDescription());
+			detail.setMachineType(viewMO.getMachineType());
+			detail.setCapacity(viewMO.getCapacity());
+			detail.setQtyPerMould(viewMO.getQtyPerMould());
+			detail.setQtyPerRak(viewMO.getQtyPerRak());
+			detail.setMinOrder(viewMO.getMinOrder());
+			detail.setMaxCapMonth0(viewMO.getMaxCapMonth0());
+			detail.setMaxCapMonth1(viewMO.getMaxCapMonth1());
+			detail.setMaxCapMonth2(viewMO.getMaxCapMonth2());
+			detail.setInitialStock(viewMO.getInitialStock());
+			detail.setSfMonth0(viewMO.getSfMonth0());
+			detail.setSfMonth1(viewMO.getSfMonth1());
+			detail.setSfMonth2(viewMO.getSfMonth2());
+			detail.setMoMonth0(viewMO.getMoMonth0());
+			detail.setMoMonth1(viewMO.getMoMonth1());
+			detail.setMoMonth2(viewMO.getMoMonth2());
+			detail.setPpd(viewMO.getPpd());
+			detail.setCav(viewMO.getCav());
+			detail.setLockStatusM0(viewMO.getLockStatusM0());
+			detail.setLockStatusM1(viewMO.getLockStatusM1());
+			detail.setLockStatusM2(viewMO.getLockStatusM2());
+			MOListProducts.add(detail);
+			
+		}
+		marketingOrderServiceImpl.updateDetailMOById(MOListProducts);
+
+		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+		return response;
+	}
+	
+
+	@PreAuthorize("isAuthenticated()")	    
+	@PostMapping("/revisiMarketingOrderMarketing")
+	public Response revisiDetailMOMarketing(final HttpServletRequest req, @RequestBody EditMarketingOrderMarketing marketingOrderData) throws ResourceNotFoundException{
+
+
+		int statusSaved = marketingOrderServiceImpl.editMarketingOrderMarketing(marketingOrderData);
+		
+		if(statusSaved == 1) {
+			response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+		}else {
+			response = new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), req.getRequestURI(), null);
+		}
+		return response;
+	}
+	
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/getAllMoById/{moId}")
+	public Response getAllMoById(final HttpServletRequest req, @PathVariable String moId) throws ResourceNotFoundException {
+	
+		ViewMarketingOrder marketingOrderDetail = marketingOrderServiceImpl.getAllMoById(moId);
+				
+		if (marketingOrderDetail != null) {
+			response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), marketingOrderDetail);
+		} else {
+			throw new ResourceNotFoundException("DetailMarketingOrder not found with moId " + moId);
+		}
+				
+		return response;
+	}
+	
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/getWorkday")
+	public Response getMonthlyWorkData(@RequestBody Map<String, Object> requestBody, final HttpServletRequest req) throws ResourceNotFoundException {
+
+		// Mengambil bulan dan tahun dari requestBody
+		int month1 = (int) requestBody.get("month1");
+		int year1 = (int) requestBody.get("year1");
+		int month2 = (int) requestBody.get("month2");
+		int year2 = (int) requestBody.get("year2");
+		int month3 = (int) requestBody.get("month3");
+		int year3 = (int) requestBody.get("year3");
+
+		// Memanggil service dengan parameter yang diambil dari requestBody
+		List<Map<String, Object>> workDays = marketingOrderServiceImpl.getWorkDay(month1, year1, month2, year2, month3, year3);
+
+		Response response = new Response(HttpStatus.OK.value(),null, HttpStatus.OK.getReasonPhrase(),req.getRequestURI(),workDays);
+
+		return response;
+	}
+	
+	
+	@PreAuthorize("isAuthenticated()")
+	@RequestMapping("/exportMOExcel/{id}")
+	public ResponseEntity<InputStreamResource> exportPLantsExcel(@PathVariable String id) throws IOException {
+		Optional<MarketingOrder> optionalMarketingOrder = marketingOrderServiceImpl.getMarketingOrderById(id);
+		MarketingOrder marketingOrder = optionalMarketingOrder.get();
+		
+		SimpleDateFormat monthFormat = new SimpleDateFormat("MMM");
+		String MOmonth = monthFormat.format(marketingOrder.getDateValid());
+		String filename = "MO_FED " + "- " + MOmonth + " R" + marketingOrder.getRevisionPpc().toString() + ".xlsx";
+		
+		ByteArrayInputStream data = marketingOrderServiceImpl.exportMOExcel(id);
+		InputStreamResource file = new InputStreamResource(data);
+		
+		return ResponseEntity.ok()
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+			.contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+			.body(file);
+	}
+	
+	
+	//------------------------------------------MONTHLY PLANNING-------------------------------------
+	
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@GetMapping("/getAllMonthlyPlanning")
+	public Response getAllMonthlyPlanning(final HttpServletRequest req) throws ResourceNotFoundException {
 
 //	    	List <MonthlyPlan> data = marketingOrderServiceImpl.getAllMp();
-	    	response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
-	    	return response;
-	    }
-	    
-	    @GetMapping("/getMachineByItemCuring")
-	    public Response getMachineByItemCuring(@RequestParam("itemCuring") String itemCuring, final HttpServletRequest req) throws ResourceNotFoundException {
-	        
-	        List<ViewMachineCuring> data = marketingOrderServiceImpl.getMachinesByItemCuring(itemCuring);
-	        
-	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
-	        
-	        return response;
-	    }
-	    
-	    @GetMapping("/getDetailMonthlyPlan")
-	    public Response getMonthlyPlan( final HttpServletRequest req) throws ResourceNotFoundException {
-	        
-	    	ViewMonthlyPlanning data = marketingOrderServiceImpl.getDetailMonthlyPlan();
-	        
-	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
-	        
-	        return response;
-	    }
-	    
-	    @GetMapping("/getDetailMonthlyPlanById/{docNum}")
-	    public Response getDetailMonthlyPlanById(  @PathVariable String docNum, final HttpServletRequest req) throws ResourceNotFoundException {
-	        
-	    	ViewMonthlyPlanning data = marketingOrderServiceImpl.getDetailMonthlyPlanById(docNum);
-	        
-	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
-	        
-	        return response;
-	    }
+		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+		return response;
+	}
+	
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@GetMapping("/getMachineByItemCuring")
+	public Response getMachineByItemCuring(@RequestParam("itemCuring") String itemCuring, final HttpServletRequest req) throws ResourceNotFoundException {
+		
+		List<ViewMachineCuring> data = marketingOrderServiceImpl.getMachinesByItemCuring(itemCuring);
+		
+		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+		
+		return response;
+	}
+	
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@GetMapping("/getDetailMonthlyPlan")
+	public Response getMonthlyPlan( final HttpServletRequest req) throws ResourceNotFoundException {
+		
+		ViewMonthlyPlanning data = marketingOrderServiceImpl.getDetailMonthlyPlan();
+		
+		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+		
+		return response;
+	}
+	
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@GetMapping("/getDetailMonthlyPlanById/{docNum}")
+	public Response getDetailMonthlyPlanById(  @PathVariable String docNum, final HttpServletRequest req) throws ResourceNotFoundException {
+		
+		ViewMonthlyPlanning data = marketingOrderServiceImpl.getDetailMonthlyPlanById(docNum);
+		
+		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+		
+		return response;
+	}
 
-	    @GetMapping("/getDetailShiftMonthlyPlan")
-	    public Response getDetailShiftMonthlyPlan(@RequestParam("detailDailyId") BigDecimal detailDailyId,
-	            @RequestParam("actualDate") @DateTimeFormat(pattern = "dd-MM-yyyy") Date actualDate, final HttpServletRequest req) throws ResourceNotFoundException {
-	        
-	    	List <ViewDetailShiftMonthlyPlan> data = marketingOrderServiceImpl.getShiftMonthlyPlan(actualDate, detailDailyId);
-	        
-	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
-	        
-	        return response;
-	    }
-	    
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@GetMapping("/getDetailShiftMonthlyPlan")
+	public Response getDetailShiftMonthlyPlan(@RequestParam("detailDailyId") BigDecimal detailDailyId,
+			@RequestParam("actualDate") @DateTimeFormat(pattern = "dd-MM-yyyy") Date actualDate, final HttpServletRequest req) throws ResourceNotFoundException {
+		
+		List <ViewDetailShiftMonthlyPlan> data = marketingOrderServiceImpl.getShiftMonthlyPlan(actualDate, detailDailyId);
+		
+		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+		
+		return response;
+	}
+	
 //	    @GetMapping("/generateMp")
 //	    public Response generateMP() throws ResourceNotFoundException {
 //	    	List<ShiftMonthlyPlan> marketingOrder = monthlyPlanServiceImpl.MonthlyPlan(11, 2024, new BigDecimal(5), 4);
@@ -510,97 +493,104 @@ public class MarketingOrderController {
 //	        return response;
 //	    }
 //	    
-	    @PostMapping("/generate")
-	    public Response generate(@RequestBody String inputJson) {
-	        try {
-	        	List<Map<String, Object>> result = monthlyPlanServiceImpl.generateMp(inputJson);
-		        response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
-		        return response;
-	        } catch (Exception e) {
-		        response = new Response( HttpStatus.BAD_REQUEST.value(), null, HttpStatus.OK.getReasonPhrase(), null,"Error: " + e.getMessage());
-		        return response;
-	        }
-	    }
-	    
-	    @GetMapping("/generateDetailMp")
-	    public Response getMonthlyPlan( 
-	    		@RequestParam int month,
-	            @RequestParam int year,
-	            @RequestParam int limitChange, 
-	            @RequestParam BigDecimal minA, @RequestParam BigDecimal maxA,
-	            @RequestParam BigDecimal minB, @RequestParam BigDecimal maxB,
-	            @RequestParam BigDecimal minC, @RequestParam BigDecimal maxC,
-	            @RequestParam BigDecimal minD, @RequestParam BigDecimal maxD,
-	            final HttpServletRequest req) throws ResourceNotFoundException {
-	    	
-	    	ViewMonthlyPlanning data = monthlyPlanServiceImpl.getDetailMonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
-	        
-	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
-	        
-	        return response;
-	    }
-	    
-	    @PostMapping("/getDetailMp")
-	    public Response generateMonthlyPlan(@RequestBody MoIdRequest request) {
-	    	List<String> data = request.getMoIds();
-	    	System.out.println(data.get(0) + " " + data.get(1));
-	        List<Map<String, Object>> result = monthlyPlanServiceImpl.getSummaryByMoIds(request.getMoIds());
-	        response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
-	        return response;
-	    }
-
-		@GetMapping("/changemould")
-	    public Response generateMonthlyPlan() {
-			BigDecimal a = BigDecimal.ZERO;
-
-	        return monthlyPlanServiceImpl.exportExcelR(11,2024,1,BigDecimal.valueOf(2),a);
-	    }
-	    
-	    @RequestMapping("/exportMPExcel")
-		public ResponseEntity<InputStreamResource> exportPLantsExcel(@RequestParam int month,
-	            @RequestParam int year,
-	            @RequestParam int limitChange, 
-	            @RequestParam BigDecimal minA, @RequestParam BigDecimal maxA,
-	            @RequestParam BigDecimal minB, @RequestParam BigDecimal maxB,
-	            @RequestParam BigDecimal minC, @RequestParam BigDecimal maxC,
-	            @RequestParam BigDecimal minD, @RequestParam BigDecimal maxD,
-	            @RequestParam BigDecimal versionMO, @RequestParam BigDecimal versionGenerate) throws IOException {
-	    	
-	        String monthName = Month.of(month).getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase(); 
-	        String filename = "PREPARE PROD " + monthName + " " + year + ".xlsx";
-		    
-		    ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD,versionMO,versionGenerate);
-			//ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel();
-		    InputStreamResource file = new InputStreamResource(data);
-		    
-		    return ResponseEntity.ok()
-		        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-		        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-		        .body(file);
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@PostMapping("/generate")
+	public Response generate(@RequestBody String inputJson) {
+		try {
+			List<Map<String, Object>> result = monthlyPlanServiceImpl.generateMp(inputJson);
+			response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
+			return response;
+		} catch (Exception e) {
+			response = new Response( HttpStatus.BAD_REQUEST.value(), null, HttpStatus.OK.getReasonPhrase(), null,"Error: " + e.getMessage());
+			return response;
 		}
-	    
-	    @PostMapping("/getAllTypeMarketingOrderCuring")
-	    public Response getAllTypeMarketingOrderCuring(final HttpServletRequest req, @RequestBody Map<String, Object> object) throws ResourceNotFoundException{
-	    	validateToken(req);
-	    	
-	    	String moMonth0 = object.get("moMonth0").toString();
-	    	String moMonth1 = object.get("moMonth1").toString();
-	    	String moMonth2 = object.get("moMonth2").toString();
+	}
 
-			Object versionAfterArDfRjObject = object.get("versionAfterArDfRj");
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@GetMapping("/generateDetailMp")
+	public Response getMonthlyPlan( 
+			@RequestParam int month,
+			@RequestParam int year,
+			@RequestParam int limitChange, 
+			@RequestParam BigDecimal minA, @RequestParam BigDecimal maxA,
+			@RequestParam BigDecimal minB, @RequestParam BigDecimal maxB,
+			@RequestParam BigDecimal minC, @RequestParam BigDecimal maxC,
+			@RequestParam BigDecimal minD, @RequestParam BigDecimal maxD,
+			final HttpServletRequest req) throws ResourceNotFoundException {
+		
+		ViewMonthlyPlanning data = monthlyPlanServiceImpl.getDetailMonthlyPlan(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD);
+		
+		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+		
+		return response;
+	}
+	
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@PostMapping("/getDetailMp")
+	public Response generateMonthlyPlan(@RequestBody MoIdRequest request) {
+		List<String> data = request.getMoIds();
+		System.out.println(data.get(0) + " " + data.get(1));
+		List<Map<String, Object>> result = monthlyPlanServiceImpl.getSummaryByMoIds(request.getMoIds());
+		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
+		return response;
+	}
 
-			BigDecimal versionAfterArDfRj;
-			if (versionAfterArDfRjObject instanceof Integer) {
-				versionAfterArDfRj = new BigDecimal((Integer) versionAfterArDfRjObject);
-			} else if (versionAfterArDfRjObject instanceof BigDecimal) {
-				versionAfterArDfRj = (BigDecimal) versionAfterArDfRjObject;
-			} else {
-				throw new IllegalArgumentException("Invalid type for versionAfterArDfRj");
-			}
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@GetMapping("/changemould")
+	public Response generateMonthlyPlan() {
+		BigDecimal a = BigDecimal.ZERO;
 
-	    	GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllMarketingOrderGroupCuring(moMonth0, moMonth1, moMonth2, versionAfterArDfRj);
-	        Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
-	        return response;
-	    }
+		return monthlyPlanServiceImpl.exportExcelR(11,2024,1,BigDecimal.valueOf(2),a);
+	}
+	
+//	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@RequestMapping("/exportMPExcel")
+	public ResponseEntity<InputStreamResource> exportPLantsExcel(@RequestParam int month,
+			@RequestParam int year,
+			@RequestParam int limitChange, 
+			@RequestParam BigDecimal minA, @RequestParam BigDecimal maxA,
+			@RequestParam BigDecimal minB, @RequestParam BigDecimal maxB,
+			@RequestParam BigDecimal minC, @RequestParam BigDecimal maxC,
+			@RequestParam BigDecimal minD, @RequestParam BigDecimal maxD,
+			@RequestParam BigDecimal versionMO, @RequestParam BigDecimal versionGenerate) throws IOException {
+		
+		String monthName = Month.of(month).getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase(); 
+		String filename = "PREPARE PROD " + monthName + " " + year + ".xlsx";
+		
+		ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel(month, year, limitChange, minA, maxA, minB, maxB, minC, maxC, minD, maxD,versionMO,versionGenerate);
+		//ByteArrayInputStream data = monthlyPlanServiceImpl.exportExcel();
+		InputStreamResource file = new InputStreamResource(data);
+		
+		return ResponseEntity.ok()
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+			.contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+			.body(file);
+	}
+	
+
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")	    
+	@PostMapping("/getAllTypeMarketingOrderCuring")
+	public Response getAllTypeMarketingOrderCuring(final HttpServletRequest req, @RequestBody Map<String, Object> object) throws ResourceNotFoundException{
+
+		
+		String moMonth0 = object.get("moMonth0").toString();
+		String moMonth1 = object.get("moMonth1").toString();
+		String moMonth2 = object.get("moMonth2").toString();
+
+		Object versionAfterArDfRjObject = object.get("versionAfterArDfRj");
+
+		BigDecimal versionAfterArDfRj;
+		if (versionAfterArDfRjObject instanceof Integer) {
+			versionAfterArDfRj = new BigDecimal((Integer) versionAfterArDfRjObject);
+		} else if (versionAfterArDfRjObject instanceof BigDecimal) {
+			versionAfterArDfRj = (BigDecimal) versionAfterArDfRjObject;
+		} else {
+			throw new IllegalArgumentException("Invalid type for versionAfterArDfRj");
+		}
+
+		GetAllTypeMarketingOrder data = marketingOrderServiceImpl.getAllMarketingOrderGroupCuring(moMonth0, moMonth1, moMonth2, versionAfterArDfRj);
+		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
+		return response;
+	}
 
 }

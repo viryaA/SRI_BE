@@ -58,7 +58,7 @@ public class ItemCuringController {
 	@PersistenceContext	
 	private EntityManager em;
 	
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllItemCuring")
 	public Response getAllPlant(final HttpServletRequest req) throws ResourceNotFoundException {
 		List<ItemCuring> itemCurings = new ArrayList<>();
@@ -75,7 +75,7 @@ public class ItemCuringController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@GetMapping("/getItemCuringById/{id}")
 	public Response getPlantById(final HttpServletRequest req, @PathVariable String id) throws ResourceNotFoundException {
 
@@ -95,7 +95,7 @@ public class ItemCuringController {
 	}
 
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveItemCuring")
 	public Response savePlant(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
 
@@ -113,7 +113,7 @@ public class ItemCuringController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/updateItemCuring")
 	public Response updatePlant(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
 
@@ -131,7 +131,7 @@ public class ItemCuringController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/deleteItemCuring")
 	public Response deletetePlant(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
 
@@ -149,7 +149,7 @@ public class ItemCuringController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/restoreItemCuring")
 	public Response restoreItemCuring(final HttpServletRequest req, @RequestBody ItemCuring itemCuring) throws ResourceNotFoundException {
 
@@ -167,7 +167,7 @@ public class ItemCuringController {
 		return response;
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveItemCuringExcel")
 	@Transactional
 	public Response saveItemCuringExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -208,6 +208,7 @@ public class ItemCuringController {
 					Cell machineTypeCell = row.getCell(4);
 					Cell spareMould = row.getCell(5);
 					Cell mouldPlan = row.getCell(6);
+					Cell mouldNotes = row.getCell(7);
 
 					if (itemCuringCell == null || itemCuringCell.getCellType() == CellType.BLANK) {
 						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 2 (Item Curing)");
@@ -238,6 +239,11 @@ public class ItemCuringController {
 						errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 7 (Mould Monthly Plan)");
 						continue;
 					}
+					
+					if (mouldNotes == null || mouldNotes.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 7 (Mould Notes)");
+						continue;
+					}
 
 					itemCuring.setITEM_CURING(itemCuringCell.getStringCellValue());
 					itemCuring.setKAPA_PER_MOULD(BigDecimal.valueOf(kapaPerMouldCell.getNumericCellValue()));
@@ -245,6 +251,7 @@ public class ItemCuringController {
 					itemCuring.setMACHINE_TYPE(machineTypeCell.getStringCellValue());
 					itemCuring.setSPARE_MOULD(BigDecimal.valueOf(spareMould.getNumericCellValue()));
 					itemCuring.setMOULD_MONTHLY_PLAN(BigDecimal.valueOf(mouldPlan.getNumericCellValue()));
+					itemCuring.setMOULD_MONTHLY_PLAN(BigDecimal.valueOf(mouldNotes.getNumericCellValue()));
 
 					itemCuring.setSTATUS(BigDecimal.valueOf(1));
 					itemCuring.setCREATION_DATE(new Date());
@@ -270,7 +277,7 @@ public class ItemCuringController {
 		}
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@RequestMapping("/exportItemCuringExcel")
 	public ResponseEntity<InputStreamResource> exportItemCuringExcel() throws IOException {
 		String filename = "EXPORT_MASTER_ITEM_CURING.xlsx";
@@ -284,7 +291,7 @@ public class ItemCuringController {
 				.body(file); 
 	}
 
-	@PreAuthorize("isAuthenticated()")
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@RequestMapping("/layoutItemCuringExcel")
 	public ResponseEntity<InputStreamResource> layoutItemCuringExcel() throws IOException {
 		String filename = "LAYOUT_MASTER_ITEM_CURING.xlsx";

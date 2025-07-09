@@ -60,6 +60,10 @@ public class DWorkDayServiceImpl {
     public List<DWorkDay> getDWorkDayByDate(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         String formattedDate = dateFormat.format(date);
+
+        // Debugging output
+//        System.out.println("Getting DWorkDay for date: " + formattedDate);
+
         return dWorkDayRepo.findByDate(formattedDate);
     }
 
