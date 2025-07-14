@@ -1081,6 +1081,7 @@ public class WorkDayServiceImpl {
                 boolean isWeekday = day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY;
                 boolean isSaturday = day == DayOfWeek.SATURDAY;
                 boolean isSunday = day == DayOfWeek.SUNDAY;
+                boolean isMonday = day == DayOfWeek.MONDAY;
 
                 // --- Shift 1 ---
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "No" : "Yes"); // S1 OFF NORMAL
@@ -1088,12 +1089,12 @@ public class WorkDayServiceImpl {
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "15:50" : "00:00"); // END NORMAL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON NORMAL
 
-                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "Yes" : "No"); // OFF TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TT
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TT
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TT
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TT
 
-                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "Yes" : "No"); // OFF TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TL
@@ -1104,32 +1105,32 @@ public class WorkDayServiceImpl {
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "23:30" : "00:00"); // END NORMAL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON NORMAL
 
-                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "Yes" : "No"); // OFF TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TT
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TT
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TT
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TT
 
-                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "Yes" : "No"); // OFF TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TL
 
                 // --- Shift 3 ---
-                String s3NormalOff = (isWeekday || isSaturday) ? "No" : "Yes";
-                String s3Start = (isWeekday || isSaturday) ? "23:30" : "00:00";
-                String s3End = (isWeekday || isSaturday) ? "07:10" : "00:00";
+                String s3NormalOff = (isWeekday && !isMonday || isSaturday) ? "No" : "Yes";
+                String s3Start = (isWeekday && !isMonday || isSaturday) ? "23:30" : "00:00";
+                String s3End = (isWeekday && !isMonday || isSaturday) ? "07:10" : "00:00";
 
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3NormalOff); // S3 OFF NORMAL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Start); // START NORMAL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3End); // END NORMAL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON NORMAL
 
-                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue((isWeekday || isSaturday) ? "Yes" : "No"); // OFF TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TT
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TT
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TT
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TT
 
-                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue((isWeekday || isSaturday) ? "Yes" : "No"); // OFF TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TL
                 sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TL

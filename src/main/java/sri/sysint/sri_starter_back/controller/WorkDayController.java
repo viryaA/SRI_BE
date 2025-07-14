@@ -533,7 +533,7 @@ public class WorkDayController {
         }
     }
 
-    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/importWDExcel")
 	public Response importWorkDaysExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
 	    if (file.isEmpty()) {
@@ -795,6 +795,9 @@ public class WorkDayController {
                         System.out.println("All shifts are ON -> OFF: 0, SEMI_OFF: 0");
                         updateWorkDay.setOFF(BigDecimal.ZERO);
                         updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
+                        if(dayWeek.getDayOfWeek() == DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                        	updateWorkDay.setOFF(BigDecimal.ONE);
+                        }
                     } else if (!s1 && !s2 && !s3) {
                         System.out.println("All shifts are OFF -> OFF: 1, SEMI_OFF: 0");
                         updateWorkDay.setOFF(BigDecimal.ONE);
@@ -803,6 +806,9 @@ public class WorkDayController {
                         System.out.println("Mixed shift states -> OFF: 0, SEMI_OFF: 1");
                         updateWorkDay.setOFF(BigDecimal.ZERO);
                         updateWorkDay.setSEMI_OFF(BigDecimal.ONE);
+                        if(dayWeek.getDayOfWeek() == DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                        	updateWorkDay.setOFF(BigDecimal.ONE);
+                        }
                     }
                 } else {
                     LocalDate nextDateLocal = dayWeek.plusDays(1);
@@ -831,6 +837,9 @@ public class WorkDayController {
                             System.out.println("All shifts are ON -> OFF: 0, SEMI_OFF: 0");
                             updateWorkDay.setOFF(BigDecimal.ZERO);
                             updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
+                            if(dayWeek.getDayOfWeek() == DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                            	updateWorkDay.setOFF(BigDecimal.ONE);
+                            }
                         } else if (!s1 && !s2 && !s3) {
                             System.out.println("All shifts are OFF -> OFF: 1, SEMI_OFF: 0");
                             updateWorkDay.setOFF(BigDecimal.ONE);
@@ -844,6 +853,9 @@ public class WorkDayController {
                         System.out.println("Next day's data not found in DB, defaulting to OFF: 0, SEMI_OFF: 0");
                         updateWorkDay.setOFF(BigDecimal.ZERO);
                         updateWorkDay.setSEMI_OFF(BigDecimal.ZERO);
+                        if(dayWeek.getDayOfWeek() == DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                        	updateWorkDay.setOFF(BigDecimal.ONE);
+                        }
                     }
                 }
 

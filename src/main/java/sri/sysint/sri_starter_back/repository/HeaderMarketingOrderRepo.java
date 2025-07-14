@@ -39,97 +39,49 @@ public interface HeaderMarketingOrderRepo extends JpaRepository <HeaderMarketing
 		    "SELECT " +
 		    "    ROUND(SUM(CASE " +
 		    "        WHEN DESCRIPTION = 'WD_NORMAL' THEN " +
-		    "            (CASE " +
-		    "                WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') + INTERVAL '1' MONTH THEN " +
-		    "                    SHIFT3_TOTAL_TIME " +
-		    "                WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') THEN " +
-		    "                    (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME) " +
-		    "                ELSE " +
-		    "                    (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) " +
-		    "            END) / 60 / 24 " +
+		    "            (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) / 60 / 24 " +
 		    "        ELSE 0 " +
 		    "    END), 2) AS FINAL_WD, " +
 
 		    "    ROUND(SUM(CASE " +
 		    "        WHEN DESCRIPTION = 'OT_TT' THEN " +
-		    "            (CASE " +
-		    "                WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') + INTERVAL '1' MONTH THEN " +
-		    "                    SHIFT3_TOTAL_TIME " +
-		    "                WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') THEN " +
-		    "                    (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME) " +
-		    "                ELSE " +
-		    "                    (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) " +
-		    "            END) / 60 / 24 " +
+		    "            (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) / 60 / 24 " +
 		    "        ELSE 0 " +
 		    "    END), 2) AS FINAL_OT_TT, " +
 
 		    "    ROUND(SUM(CASE " +
 		    "        WHEN DESCRIPTION = 'OT_TL' THEN " +
-		    "            (CASE " +
-		    "                WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') + INTERVAL '1' MONTH THEN " +
-		    "                    SHIFT3_TOTAL_TIME " +
-		    "                WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') THEN " +
-		    "                    (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME) " +
-		    "                ELSE " +
-		    "                    (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) " +
-		    "            END) / 60 / 24 " +
+		    "            (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) / 60 / 24 " +
 		    "        ELSE 0 " +
 		    "    END), 2) AS FINAL_OT_TL, " +
 
-		    "    ROUND(" +
+		    "    ROUND( " +
 		    "        SUM(CASE " +
 		    "            WHEN DESCRIPTION = 'WD_NORMAL' THEN " +
-		    "                (CASE " +
-		    "                    WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') + INTERVAL '1' MONTH THEN " +
-		    "                        SHIFT3_TOTAL_TIME " +
-		    "                    WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') THEN " +
-		    "                        (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME) " +
-		    "                    ELSE " +
-		    "                        (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) " +
-		    "                END) / 60 / 24 " +
+		    "                (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) / 60 / 24 " +
 		    "            ELSE 0 " +
 		    "        END) + " +
 		    "        SUM(CASE " +
 		    "            WHEN DESCRIPTION = 'OT_TT' THEN " +
-		    "                (CASE " +
-		    "                    WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') + INTERVAL '1' MONTH THEN " +
-		    "                        SHIFT3_TOTAL_TIME " +
-		    "                    WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') THEN " +
-		    "                        (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME) " +
-		    "                    ELSE " +
-		    "                        (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) " +
-		    "                END) / 60 / 24 " +
+		    "                (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) / 60 / 24 " +
 		    "            ELSE 0 " +
 		    "        END), 2) AS TOTAL_OT_TT, " +
 
-		    "    ROUND(" +
+		    "    ROUND( " +
 		    "        SUM(CASE " +
 		    "            WHEN DESCRIPTION = 'WD_NORMAL' THEN " +
-		    "                (CASE " +
-		    "                    WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') + INTERVAL '1' MONTH THEN " +
-		    "                        SHIFT3_TOTAL_TIME " +
-		    "                    WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') THEN " +
-		    "                        (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME) " +
-		    "                    ELSE " +
-		    "                        (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) " +
-		    "                END) / 60 / 24 " +
+		    "                (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) / 60 / 24 " +
 		    "            ELSE 0 " +
 		    "        END) + " +
 		    "        SUM(CASE " +
 		    "            WHEN DESCRIPTION = 'OT_TL' THEN " +
-		    "                (CASE " +
-		    "                    WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') + INTERVAL '1' MONTH THEN " +
-		    "                        SHIFT3_TOTAL_TIME " +
-		    "                    WHEN TRUNC(DATE_WD) = TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') THEN " +
-		    "                        (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME) " +
-		    "                    ELSE " +
-		    "                        (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) " +
-		    "                END) / 60 / 24 " +
+		    "                (SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) / 60 / 24 " +
 		    "            ELSE 0 " +
 		    "        END), 2) AS TOTAL_OT_TL " +
+
 		    "FROM SRI_IMPP_D_WD_HOURS_SPECIFIC " +
 		    "WHERE DATE_WD >= TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') " +
-		    "AND DATE_WD < TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') + INTERVAL '1' MONTH + INTERVAL '1' DAY", 
+		    "AND DATE_WD < TO_DATE(:year || '-' || :month || '-01', 'YYYY-MM-DD') + INTERVAL '1' MONTH", 
 		    nativeQuery = true)
 		Map<String, Object> getMonthlyWorkData(@Param("month") int month, @Param("year") int year);
 
