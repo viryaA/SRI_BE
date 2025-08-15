@@ -22,7 +22,7 @@ public interface HeaderMarketingOrderRepo extends JpaRepository <HeaderMarketing
     BigDecimal getNewId();
 	
 
-	@Query(value = "SELECT * FROM SRI_IMPP_D_HEADERMO  WHERE MO_ID = :moId ORDER BY MONTH ASC", nativeQuery = true)
+	@Query(value = "SELECT * FROM SRI_IMPP_D_HEADERMO WHERE MO_ID = :moId ORDER BY MONTH ASC", nativeQuery = true)
 	List<HeaderMarketingOrder> findByMoId(@Param("moId") String moId);
 
 //    @Query(value = "SELECT ROUND(SUM(IWD_SHIFT_1 + IWD_SHIFT_2 + IWD_SHIFT_3) / 3, 2) AS FINAL_WD, "

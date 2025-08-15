@@ -213,7 +213,6 @@ public class ProductController {
 
 			List<Product> products = new ArrayList<>();
 			List<String> errorMessages = new ArrayList<>();
-
 			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
 				Row row = sheet.getRow(i);
 
@@ -233,25 +232,47 @@ public class ProductController {
 					}
 
 					Product product = new Product();
+//					Cell partnumberCell = row.getCell(1);
+//					Cell itemCuringCell = row.getCell(2);
+//					Cell patternNameCell = row.getCell(3);
+//					Cell sizeCell = row.getCell(4);
+//					Cell productTypeCell = row.getCell(5);
+//					Cell descriptionCell = row.getCell(6);
+//					Cell rimCell = row.getCell(7);
+//					Cell wibTubeCell = row.getCell(8);
+//					Cell itemAssyCell = row.getCell(9);
+//					Cell itemExtCell = row.getCell(10);
+//					Cell extDescriptionCell = row.getCell(11);
+//					Cell qtyPerRakCell = row.getCell(12);
+//					Cell upperConstantCell = row.getCell(13);
+//					Cell lowerConstantCell = row.getCell(14);
+					
 					Cell partnumberCell = row.getCell(1);
 					Cell itemCuringCell = row.getCell(2);
-					Cell patternNameCell = row.getCell(3);
-					Cell sizeCell = row.getCell(4);
-					Cell productTypeCell = row.getCell(5);
-					Cell itemAssyCell = row.getCell(9);
-					Cell descriptionCell = row.getCell(6);
-					Cell rimCell = row.getCell(7);
-					Cell wibTubeCell = row.getCell(8);
-					Cell itemExtCell = row.getCell(10);
-					Cell extDescriptionCell = row.getCell(11);
-					Cell qtyPerRakCell = row.getCell(12);
-					Cell upperConstantCell = row.getCell(13);
-					Cell lowerConstantCell = row.getCell(14);
+					Cell sizeCell = row.getCell(3);
+					Cell productTypeCell = row.getCell(4);
+					Cell descriptionCell = row.getCell(5);
+					Cell rimCell = row.getCell(6);
+					Cell wibTubeCell = row.getCell(7);
+					Cell itemAssyCell = row.getCell(8);
+					Cell itemExtCell = row.getCell(9);
+					Cell extDescriptionCell = row.getCell(10);
+					Cell qtyPerRakCell = row.getCell(11);
+					Cell upperConstantCell = row.getCell(12);
+					Cell lowerConstantCell = row.getCell(13);
 
 					
-					if (partnumberCell == null || partnumberCell.getCellType() != CellType.NUMERIC) {
-						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 2 (Part Number)");
+					if (partnumberCell == null) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 2 (Part Number)");
 						continue;
+					}
+
+					if (partnumberCell.getCellType() != CellType.NUMERIC) {
+						String val = partnumberCell.getStringCellValue().trim();
+						if (!val.matches("\\d+")) { // only digits allowed
+							errorMessages.add("Data Tidak Valid, Tidak Valid pada Baris " + (i + 1) + " Kolom 2 (Part Number)");
+							continue;
+						}
 					}
 
 					if (itemCuringCell == null || itemCuringCell.getCellType() == CellType.BLANK) {
@@ -261,55 +282,64 @@ public class ProductController {
 
 					String itemCuring = itemCuringCell.getStringCellValue();
 					Optional<ItemCuring> itemCuringOpt = itemCuringRepo.findById(itemCuring);
-					if (!itemCuringOpt.isPresent()) {
-						errorMessages.add("Item Curing tidak ditemukan pada Baris " + (i + 1));
-						continue;
-					}
+					// if (!itemCuringOpt.isPresent()) {
+					// 	errorMessages.add("Item Curing tidak ditemukan pada Baris " + (i + 1));
+					// 	continue;
+					// }
 
-					if (patternNameCell == null || patternNameCell.getCellType() == CellType.BLANK) {
-						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 4 (Pattern Name)");
-						continue;
-					}
+//					if (patternNameCell == null || patternNameCell.getCellType() == CellType.BLANK) {
+//						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 4 (Pattern Name)");
+//						continue;
+//					}
 
-					if (sizeCell == null || sizeCell.getCellType() == CellType.BLANK) {
-						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (Size)");
-						continue;
-					}
+					// if (sizeCell == null || sizeCell.getCellType() == CellType.BLANK) {
+					// 	errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (Size)");
+					// 	continue;
+					// }
 
 					if (productTypeCell == null || productTypeCell.getCellType() == CellType.BLANK) {
 						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 6 (Product Type)");
 						continue;
 					}
 
-					if (itemAssyCell == null || itemAssyCell.getCellType() == CellType.BLANK) {
-						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 10 (Item Assy)");
-						continue;
-					}
+					// if (itemAssyCell == null || itemAssyCell.getCellType() == CellType.BLANK) {
+					// 	errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 9 (Item Assy)");
+					// 	continue;
+					// }
 
 					if (descriptionCell == null || descriptionCell.getCellType() == CellType.BLANK) {
 						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 6 (Description)");
 						continue;
 					}
 
+					if (rimCell == null) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 7 (Rim)");
+						continue;
+					}
+
 					if (rimCell == null || rimCell.getCellType() != CellType.NUMERIC) {
-						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 7 (Rim)");
-						continue;
+						String val = rimCell.getStringCellValue().trim();
+						if (!val.matches("\\d+")) { // only digits allowed
+							errorMessages.add("Data Tidak Valid, Terdapat Data Tidak Valid pada Baris " + (i + 1) + " Kolom 7 (Rim)");
+							continue;
+						}
 					}
 
-					if (wibTubeCell == null || wibTubeCell.getCellType() == CellType.BLANK) {
-						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 8 (Wib Tube)");
-						continue;
-					}
 
-					if (itemExtCell == null || itemExtCell.getCellType() == CellType.BLANK) {
-						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 10 (Item Ext)");
-						continue;
-					}
+					// if (wibTubeCell == null || wibTubeCell.getCellType() == CellType.BLANK) {
+					// 	errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 8 (Wib Tube)");
+					// 	continue;
+					// }
 
-					if (extDescriptionCell == null || extDescriptionCell.getCellType() == CellType.BLANK) {
-						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 11 (Ext Description)");
-						continue;
-					}
+					// if (itemExtCell == null || itemExtCell.getCellType() == CellType.BLANK) {
+					// 	errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 10 (Item Ext)");
+					// 	continue;
+					// }
+
+					// if (extDescriptionCell == null || extDescriptionCell.getCellType() == CellType.BLANK) {
+					// 	errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 11 (Ext Description)");
+					// 	continue;
+					// }
 
 					if (qtyPerRakCell == null || qtyPerRakCell.getCellType() != CellType.NUMERIC) {
 						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 12 (Qty Per Rak)");
@@ -321,24 +351,24 @@ public class ProductController {
 						continue;
 					}
 
-					if (lowerConstantCell == null || lowerConstantCell.getCellType() != CellType.NUMERIC) {
-						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 14 (Lower Constant)");
-						continue;
-					}
+					// if (lowerConstantCell == null || lowerConstantCell.getCellType() != CellType.NUMERIC) {
+					// 	errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 14 (Lower Constant)");
+					// 	continue;
+					// }
 
-					String patternName = patternNameCell.getStringCellValue();
-					Optional<Pattern> patternOpt = patternRepo.findByName(patternName);
-					if (!patternOpt.isPresent()) {
-						errorMessages.add("Pattern Name tidak ditemukan pada Baris " + (i + 1));
-						continue;
-					}
+//					String patternName = patternNameCell.getStringCellValue();
+//					Optional<Pattern> patternOpt = patternRepo.findByName(patternName);
+//					if (!patternOpt.isPresent()) {
+//						errorMessages.add("Pattern Name tidak ditemukan pada Baris " + (i + 1));
+//						continue;
+//					}
 
 					String size = sizeCell.getStringCellValue();
 					Optional<Size> sizeOpt = sizeRepo.findById(size);
-					if (!sizeOpt.isPresent()) {
-						errorMessages.add("Size tidak ditemukan pada Baris " + (i + 1));
-						continue;
-					}
+					// if (!sizeOpt.isPresent()) {
+					// 	errorMessages.add("Size tidak ditemukan pada Baris " + (i + 1));
+					// 	continue;
+					// }
 
 					String productType = productTypeCell.getStringCellValue();
 					Optional<ProductType> productTypeOpt = productTypeRepo.findByCategory(productType);
@@ -349,14 +379,15 @@ public class ProductController {
 
 					String itemAssy = itemAssyCell.getStringCellValue();
 					Optional<ItemAssy> itemAssyOpt = itemAssyRepo.findById(itemAssy);
-					if (!itemAssyOpt.isPresent()) {
-						errorMessages.add("Item Assy tidak ditemukan pada Baris " + (i + 1));
-						continue;
-					}
-
+					// if (!itemAssyOpt.isPresent()) {
+					// 	errorMessages.add("Item Assy tidak ditemukan pada Baris " + (i + 1));
+					// 	continue;
+					// }
+					
+					product.setID(BigDecimal.valueOf(i));
 					product.setPART_NUMBER(getBigDecimalFromCell(partnumberCell));
 					product.setITEM_CURING(itemCuring);
-					product.setPATTERN_ID(patternOpt.get().getPATTERN_ID());
+//					product.setPATTERN_ID(patternOpt.get().getPATTERN_ID());
 					product.setSIZE_ID(size);
 					product.setPRODUCT_TYPE_ID(productTypeOpt.get().getPRODUCT_TYPE_ID());
 					product.setDESCRIPTION(getStringFromCell(descriptionCell));

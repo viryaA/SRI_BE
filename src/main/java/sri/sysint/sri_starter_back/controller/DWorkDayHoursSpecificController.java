@@ -41,6 +41,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,38 +74,24 @@ public class DWorkDayHoursSpecificController {
     @PersistenceContext
     private EntityManager em;
 
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/getAllDWorkDayHoursSpecific")
     public Response getAllDWorkDayHoursSpecific(final HttpServletRequest req) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
 
         try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
 
-            if (user != null) {
-            	List<DWorkDayHoursSpesific> dWorkDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.getAllWorkDayHoursSpecific();
-            	System.out.println("Data fetched: " + dWorkDayHoursSpecific);
-            	
-            	response = new Response(
-            	    
-            	    HttpStatus.OK.value(),
-            	    null,
-            	    HttpStatus.OK.getReasonPhrase(),
-            	    req.getRequestURI(),
-            	    dWorkDayHoursSpecific
-            	);
+        	List<DWorkDayHoursSpesific> dWorkDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.getAllWorkDayHoursSpecific();
+        	System.out.println("Data fetched: " + dWorkDayHoursSpecific);
+        	
+        	response = new Response(
+        	    
+        	    HttpStatus.OK.value(),
+        	    null,
+        	    HttpStatus.OK.getReasonPhrase(),
+        	    req.getRequestURI(),
+        	    dWorkDayHoursSpecific
+        	);
 
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
@@ -112,131 +99,69 @@ public class DWorkDayHoursSpecificController {
         return response;
     }
 
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/getDWorkDayHoursSpecificByDate/{date}")
     public Response getDWorkDayHoursSpecificByDate(final HttpServletRequest req, @PathVariable String date) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
 
         try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
 
-            if (user != null) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                Date parsedDate = dateFormat.parse(date);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            Date parsedDate = dateFormat.parse(date);
 
-                Optional<DWorkDayHoursSpesific> dWorkDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificByDate(parsedDate);
+            Optional<DWorkDayHoursSpesific> dWorkDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificByDate(parsedDate);
 
-                response = new Response(
-                    
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    dWorkDayHoursSpecific
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
+            response = new Response(
+                
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                dWorkDayHoursSpecific
+            );
+
         } catch (ParseException e) {
             throw new ResourceNotFoundException("Invalid date format, expected format is dd-MM-yyyy");
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
-
         return response;
     }
     
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @GetMapping("/getDWorkDayHoursSpecificListByDate/{date}")
     public Response getDWorkDayHoursSpecificListByDate(final HttpServletRequest req, @PathVariable String date) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
         try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            Date parsedDate = dateFormat.parse(date);
 
-            if (user != null) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                Date parsedDate = dateFormat.parse(date);
+            List<DWorkDayHoursSpesific> dWorkDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificListByDate(parsedDate);
 
-                List<DWorkDayHoursSpesific> dWorkDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificListByDate(parsedDate);
-
-                response = new Response(
-                    
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    dWorkDayHoursSpecific
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
+            response = new Response(
+                
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                dWorkDayHoursSpecific
+            );
         } catch (ParseException e) {
             throw new ResourceNotFoundException("Invalid date format, expected format is dd-MM-yyyy");
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
 
         return response;
     }
     
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/getDWDSpec")
     public Response getWorkDayByDateDesc(
             final HttpServletRequest req,
             @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
         
-        String header = req.getHeader("Authorization");
-        System.out.println("[DEBUG] Authorization Header: " + header);
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            System.out.println("[ERROR] JWT token is missing or does not start with 'Bearer '");
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-        System.out.println("[DEBUG] Extracted Token: " + token);
-
-        Response response;
-        try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            System.out.println("[DEBUG] Token Subject (User): " + user);
-
-            if (user != null) {
                 String dateStr = requestBody.get("date");
                 String description = requestBody.get("description");
-
-                System.out.println("[DEBUG] Request Body - date: " + dateStr + ", description: " + description);
-
-                if (dateStr == null || description == null) {
-                    System.out.println("[ERROR] Missing required fields in request body");
-                    throw new ResourceNotFoundException("Missing required fields: 'date' or 'description'");
-                }
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 Date parsedDate;
                 try {
                     parsedDate = dateFormat.parse(dateStr);
-                    System.out.println("[DEBUG] Parsed Date: " + parsedDate);
                 } catch (ParseException e) {
                     System.out.println("[ERROR] Date parsing failed: " + e.getMessage());
                     throw new ResourceNotFoundException("Invalid date format, expected format is dd-MM-yyyy");
@@ -244,14 +169,6 @@ public class DWorkDayHoursSpecificController {
 
                 Optional<DWorkDayHoursSpesific> workDayHoursSpecific = 
                     dWorkDayHoursSpecificServiceImpl.getWorkDayHoursSpecificByDateDesc(parsedDate, description);
-
-                System.out.println("[DEBUG] Fetched WorkDayHoursSpesific: " + workDayHoursSpecific);
-                
-                if (workDayHoursSpecific.isPresent()) {
-                    System.out.println("[DEBUG] WorkDayHoursSpesific is present: " + workDayHoursSpecific.get());
-                } else {
-                    System.out.println("[DEBUG] WorkDayHoursSpesific is EMPTY");
-                }
 
                 response = new Response(
                         
@@ -261,98 +178,51 @@ public class DWorkDayHoursSpecificController {
                         req.getRequestURI(),
                         workDayHoursSpecific
                 );
-
-            } else {
-                System.out.println("[ERROR] Token subject (user) is null");
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            System.out.println("[ERROR] Exception occurred: " + e.getMessage());
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
-
         System.out.println("[DEBUG] Response Ready: " + response);
         return response;
     }
 
-
-    
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")    
     @GetMapping("/getWorkDayHoursByMonthYear/{month}/{year}")
     public Response getWorkDayHoursByMonthYear(final HttpServletRequest req, 
                                                 @PathVariable int month, 
                                                 @PathVariable int year) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
 
-        // Verifikasi header Authorization dan token JWT
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
+        // Panggil service untuk mengambil data berdasarkan bulan dan tahun
+        List<DWorkDayHoursSpesific> workDayHoursSpecificList = 
+        		dWorkDayHoursSpecificServiceImpl.getWorkDayHoursByMonthAndYear(month, year);
 
-        String token = header.replace("Bearer ", "");
-
-        Response response;
-        try {
-            // Verifikasi token JWT dan ambil subject (username atau user ID)
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
-
-            if (user != null) {
-                // Panggil service untuk mengambil data berdasarkan bulan dan tahun
-                List<DWorkDayHoursSpesific> workDayHoursSpecificList = 
-                		dWorkDayHoursSpecificServiceImpl.getWorkDayHoursByMonthAndYear(month, year);
-
-                // Membentuk response sukses
-                response = new Response(
-                        
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        workDayHoursSpecificList
-                    );
+        // Membentuk response sukses
+        response = new Response(
                 
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("JWT token is not valid or expired");
-        }
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                workDayHoursSpecificList
+            );
+
 
         return response;
     }
 
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/saveDWorkDayHoursSpecific")
     public Response saveDWorkDayHoursSpecific(final HttpServletRequest req, @RequestBody DWorkDayHoursSpesific dWorkDayHours) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
 
         try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
 
-            if (user != null) {
-            	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.saveWorkDayHoursSpecific(dWorkDayHours); 
+        	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.saveWorkDayHoursSpecific(dWorkDayHours); 
 
-                response = new Response(
-                    
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    workDayHoursSpecific
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
+            response = new Response(
+                
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                workDayHoursSpecific
+            );
+
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
@@ -360,36 +230,23 @@ public class DWorkDayHoursSpecificController {
         return response;
     }
 
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/updateDWorkDayHoursSpecific")
     public Response updateDWorkDayHoursSpecific(final HttpServletRequest req, @RequestBody DWorkDayHoursSpesific dWorkDayHours) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
 
         try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
 
-            if (user != null) {
-            	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.updateWorkDayHoursSpecific(dWorkDayHours); 
+        	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.updateWorkDayHoursSpecific(dWorkDayHours); 
 
-                response = new Response(
-                    
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    workDayHoursSpecific
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
+            response = new Response(
+                
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                workDayHoursSpecific
+            );
+
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
@@ -397,36 +254,23 @@ public class DWorkDayHoursSpecificController {
         return response;
     }
 
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/deleteDWorkDayHoursSpecific")
     public Response deleteDWorkDayHoursSpecific(final HttpServletRequest req, @RequestBody DWorkDayHoursSpesific dWorkDayHours) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
 
         try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
 
-            if (user != null) {
-            	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.deleteWorkDayHoursSpecific(dWorkDayHours); 
+        	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.deleteWorkDayHoursSpecific(dWorkDayHours); 
 
-                response = new Response(
-                    
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    workDayHoursSpecific
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
+            response = new Response(
+                
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                workDayHoursSpecific
+            );
+
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
@@ -434,36 +278,20 @@ public class DWorkDayHoursSpecificController {
         return response;
     }
     
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/restoreDWorkDayHoursSpecific")
     public Response restoreDWorkDayHoursSpecific(final HttpServletRequest req, @RequestBody DWorkDayHoursSpesific dWorkDayHours) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
-
         try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
+        	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.restoreWorkDayHoursSpecific(dWorkDayHours); 
 
-            if (user != null) {
-            	DWorkDayHoursSpesific workDayHoursSpecific = dWorkDayHoursSpecificServiceImpl.restoreWorkDayHoursSpecific(dWorkDayHours); 
-
-                response = new Response(
-                    
-                    HttpStatus.OK.value(),
-                    null,
-                    HttpStatus.OK.getReasonPhrase(),
-                    req.getRequestURI(),
-                    workDayHoursSpecific
-                );
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
+            response = new Response(
+                
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                workDayHoursSpecific
+            );
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
@@ -471,25 +299,12 @@ public class DWorkDayHoursSpecificController {
         return response;
     }
     
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/updateShiftTimes")
     public Response updateShiftTimes(final HttpServletRequest req, @RequestBody Map<String, Object> request) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        // Check if Authorization header is present and valid
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-        }
-
-        String token = header.replace("Bearer ", "");
 
         try {
-            // Extract the user from the JWT token
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token)
-                .getSubject();
 
-            if (user != null) {
                 // Extract values from the request map
                 String startTime = (String) request.get("startTime");
                 String endTime = (String) request.get("endTime");
@@ -522,32 +337,17 @@ public class DWorkDayHoursSpecificController {
                         null
                     );
                 }
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
     }
 
-    
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @PostMapping("/saveDWorkDayHoursSpecificExcel")
     public Response saveDWorkDayHoursSpecificExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new ResourceNotFoundException("JWT token not found or invalid");
-        }
-
-        String token = header.replace("Bearer ", "");
 
         try {
-            String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
 
-            if (user != null) {
                 if (file.isEmpty()) {
                     return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
                 }
@@ -673,9 +473,7 @@ public class DWorkDayHoursSpecificController {
                 } catch (IOException e) {
                     return new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file: " + e.getMessage(), req.getRequestURI(), null);
                 }
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
+
         } catch (Exception e) {
             throw new ResourceNotFoundException("JWT token is not valid or expired");
         }
@@ -728,7 +526,7 @@ public class DWorkDayHoursSpecificController {
         return hours * 60 + minutes;
     }
 
-    
+    @PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/exportDWorkDayHoursSpecificExcel")
     public ResponseEntity<InputStreamResource> exportDWorkDayHoursSpecificExcel() throws IOException {
         String filename = "MASTER_WORKDAY_HOURS.xlsx";

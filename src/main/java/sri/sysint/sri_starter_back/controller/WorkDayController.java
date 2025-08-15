@@ -680,6 +680,10 @@ public class WorkDayController {
                 Map<String, Object> s3NORMAL = (Map<String, Object>) normalData.get("S3_NORMAL");
                 Map<String, Object> s3TT = (Map<String, Object>) ttData.get("S3_TT");
 	            Map<String, Object> s3TL = (Map<String, Object>) tlData.get("S3_TL");
+	            
+	            Boolean resetS1 = false;
+	            Boolean resetS2 = false;
+	            Boolean resetS3 = false;
 
 		        Date wdIsDate = (Date) normalData.get("DATE_WD");
 
@@ -708,63 +712,114 @@ public class WorkDayController {
                 String reasonValue = s1NORMAL.get("REASON") != null ? s1NORMAL.get("REASON").toString() : "";
 
                 System.out.println("🔍 Parsing SHIFT 1 | OFF: \"" + offValue + "\" | REASON: \"" + reasonValue + "\" | Date: " + wdIsDate);
+                if(dayWeek.getDayOfWeek() != DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                	updateWorkDay.setIWD_SHIFT_1(yesNoToBigDecimal(
+            			getStringFromMap(s1NORMAL, "OFF"),
+            			getStringFromMap(s1NORMAL, "REASON"),
+            			"SHIFT 1", wdIsDate
+        			));
+                	
+                	updateWorkDay.setIWD_SHIFT_2(yesNoToBigDecimal(
+            			getStringFromMap(s2NORMAL, "OFF"),
+            			getStringFromMap(s2NORMAL, "REASON"),
+            			"SHIFT 2", wdIsDate
+        			));
+                	
+                }else {
+                	updateWorkDay.setIWD_SHIFT_1(BigDecimal.ZERO);
+                	updateWorkDay.setIWD_SHIFT_2(BigDecimal.ZERO);
+                }
+                
+                if("Yes".equalsIgnoreCase(s1NORMAL.get("OFF").toString()) || dayWeek.getDayOfWeek() == DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                	
+                	updateWorkDay.setIOT_TT_1(yesNoToBigDecimal(
+                			getStringFromMap(s1TT, "OFF"),
+                			getStringFromMap(s1TT, "REASON"),
+                			"OT TT SHIFT 1", wdIsDate
+                			));
+                	
+                	updateWorkDay.setIOT_TL_1(yesNoToBigDecimal(
+                			getStringFromMap(s1TL, "OFF"),
+                			getStringFromMap(s1TL, "REASON"),
+                			"OT TL SHIFT 1", wdIsDate
+                			));
+                	
+                }else {
+                	resetS1 = true;
+                	updateWorkDay.setIOT_TL_1(BigDecimal.ZERO);
+                	updateWorkDay.setIOT_TT_1(BigDecimal.ZERO);
+                }
+                
+                if("Yes".equalsIgnoreCase(s2NORMAL.get("OFF").toString()) || dayWeek.getDayOfWeek() == DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                	// Set TL shifts
+                	updateWorkDay.setIOT_TT_2(yesNoToBigDecimal(
+                			getStringFromMap(s1TT, "OFF"),
+                			getStringFromMap(s1TT, "REASON"),
+                			"OT TT SHIFT 2", wdIsDate
+                			));
+                	
+                	updateWorkDay.setIOT_TL_2(yesNoToBigDecimal(
+                			getStringFromMap(s2TL, "OFF"),
+                			getStringFromMap(s2TL, "REASON"),
+                			"OT TL SHIFT 2", wdIsDate
+                			));	
+                }else {
+                	resetS2 = true;
+                	updateWorkDay.setIOT_TT_2(BigDecimal.ZERO);
+                	updateWorkDay.setIOT_TL_2(BigDecimal.ZERO);
+                }
 
-                // Set NORMAL shifts
-                updateWorkDay.setIWD_SHIFT_1(yesNoToBigDecimal(
-                    getStringFromMap(s1NORMAL, "OFF"),
-                    getStringFromMap(s1NORMAL, "REASON"),
-                    "SHIFT 1", wdIsDate
-                ));
-
-                updateWorkDay.setIWD_SHIFT_2(yesNoToBigDecimal(
-                    getStringFromMap(s2NORMAL, "OFF"),
-                    getStringFromMap(s2NORMAL, "REASON"),
-                    "SHIFT 2", wdIsDate
-                ));
-
-                updateWorkDay.setIWD_SHIFT_3(yesNoToBigDecimal(
-                    getStringFromMap(s3NORMAL, "OFF"),
-                    getStringFromMap(s3NORMAL, "REASON"),
-                    "SHIFT 3", wdIsDate
-                ));
-
-                // Set TL shifts
-                updateWorkDay.setIOT_TL_1(yesNoToBigDecimal(
-                    getStringFromMap(s1TL, "OFF"),
-                    getStringFromMap(s1TL, "REASON"),
-                    "OT TL SHIFT 1", wdIsDate
-                ));
-
-                updateWorkDay.setIOT_TL_2(yesNoToBigDecimal(
-                    getStringFromMap(s2TL, "OFF"),
-                    getStringFromMap(s2TL, "REASON"),
-                    "OT TL SHIFT 2", wdIsDate
-                ));
-
-                updateWorkDay.setIOT_TL_3(yesNoToBigDecimal(
-                    getStringFromMap(s3TL, "OFF"),
-                    getStringFromMap(s3TL, "REASON"),
-                    "OT TL SHIFT 3", wdIsDate
-                ));
-
-                // Set TT shifts
-                updateWorkDay.setIOT_TT_1(yesNoToBigDecimal(
-                    getStringFromMap(s1TT, "OFF"),
-                    getStringFromMap(s1TT, "REASON"),
-                    "OT TT SHIFT 1", wdIsDate
-                ));
-
-                updateWorkDay.setIOT_TT_2(yesNoToBigDecimal(
-                    getStringFromMap(s2TT, "OFF"),
-                    getStringFromMap(s2TT, "REASON"),
-                    "OT TT SHIFT 2", wdIsDate
-                ));
-
-                updateWorkDay.setIOT_TT_3(yesNoToBigDecimal(
-                    getStringFromMap(s3TT, "OFF"),
-                    getStringFromMap(s3TT, "REASON"),
-                    "OT TT SHIFT 3", wdIsDate
-                ));
+                
+                if(dayWeek.getDayOfWeek() != DayOfWeek.MONDAY) {
+                	
+                	if(dayWeek.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                		updateWorkDay.setIWD_SHIFT_3(yesNoToBigDecimal(
+            				getStringFromMap(s3NORMAL, "OFF"),
+            				getStringFromMap(s3NORMAL, "REASON"),
+            				"SHIFT 3", wdIsDate
+        				));
+                		
+                	}else {
+                		updateWorkDay.setIWD_SHIFT_3(BigDecimal.ZERO);
+                	}
+                	
+                	
+                    if("Yes".equalsIgnoreCase(s3NORMAL.get("OFF").toString()) || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                    	updateWorkDay.setIOT_TL_3(yesNoToBigDecimal(
+                			getStringFromMap(s3TL, "OFF"),
+                			getStringFromMap(s3TL, "REASON"),
+                			"OT TL SHIFT 3", wdIsDate
+            			));
+                    	
+                    	updateWorkDay.setIOT_TT_3(yesNoToBigDecimal(
+                			getStringFromMap(s3TT, "OFF"),
+                			getStringFromMap(s3TT, "REASON"),
+                			"OT TT SHIFT 3", wdIsDate
+            			));
+                    	
+                    }else {
+                    	resetS3 = true;
+                    	updateWorkDay.setIOT_TT_3(BigDecimal.ZERO);
+                    	updateWorkDay.setIOT_TL_3(BigDecimal.ZERO);
+                    }
+                	
+                	
+                }else {
+                	updateWorkDay.setIWD_SHIFT_3(BigDecimal.ZERO);
+                	
+                	updateWorkDay.setIOT_TL_3(yesNoToBigDecimal(
+            			getStringFromMap(s3TL, "OFF"),
+            			getStringFromMap(s3TL, "REASON"),
+            			"OT TL SHIFT 3", wdIsDate
+        			));
+                	
+                	updateWorkDay.setIOT_TT_3(yesNoToBigDecimal(
+            			getStringFromMap(s3TT, "OFF"),
+            			getStringFromMap(s3TT, "REASON"),
+            			"OT TT SHIFT 3", wdIsDate
+        			));
+                	
+                }
                 System.out.println("data lama udah ganti baru");
 
                 if(dayWeek.getDayOfWeek() == DayOfWeek.SATURDAY || dayWeek.getDayOfWeek() == DayOfWeek.SUNDAY) {
@@ -875,6 +930,7 @@ public class WorkDayController {
                             updateNORMAL = item;
                         }
 		            }
+		            canUpdateDetail = true;
 		        } else {
                     System.out.println("Data Detail tidak ada, membuat baru");
                     
@@ -911,7 +967,12 @@ public class WorkDayController {
                     canUpdateDetail = true;
 
                 }
-
+		        
+		        System.out.println("updateTT: " + updateTT);
+		        System.out.println("updateTL: " + updateTL);
+		        System.out.println("updateNORMAL: " + updateNORMAL);
+		        System.out.println("canUpdateDetail: " + canUpdateDetail);
+		        
                 if (updateTT != null && updateTL != null && updateNORMAL != null && canUpdateDetail) {
                     System.out.println("Siap update");
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -920,57 +981,58 @@ public class WorkDayController {
 
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
                     // === NORMAL Updates ===
-                    if (updateShift(updateNORMAL, "NORMAL", s1NORMAL, 1, formatter,isFriday)) {
+                    
+                    if (updateShift(updateNORMAL, "NORMAL", s1NORMAL, 1, formatter, isFriday, false)) {
                         errors.add("Shift 1 NORMAL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 1 NORMAL updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateNORMAL, "NORMAL", s2NORMAL, 2, formatter, isFriday)) {
+                    if (updateShift(updateNORMAL, "NORMAL", s2NORMAL, 2, formatter, isFriday, false)) {
                         errors.add("Shift 2 NORMAL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 2 NORMAL updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateNORMAL, "NORMAL", s3NORMAL, 3, formatter, isFriday)) {
+                    if (updateShift(updateNORMAL, "NORMAL", s3NORMAL, 3, formatter, isFriday, false)) {
                         errors.add("Shift 3 NORMAL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 3 NORMAL updated successfully on date: " + dateStr);
                     }
 
                     // === TT Updates ===
-                    if (updateShift(updateTT, "TT", s1TT, 1, formatter, isFriday)) {
+                    if (updateShift(updateTT, "TT", s1TT, 1, formatter, isFriday, resetS1)) {
                         errors.add("Shift 1 TT has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 1 TT updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateTT, "TT", s2TT, 2, formatter, isFriday)) {
+                    if (updateShift(updateTT, "TT", s2TT, 2, formatter, isFriday, resetS2)) {
                         errors.add("Shift 2 TT has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 2 TT updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateTT, "TT", s3TT, 3, formatter, isFriday)) {
+                    if (updateShift(updateTT, "TT", s3TT, 3, formatter, isFriday, resetS3)) {
                         errors.add("Shift 3 TT has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 3 TT updated successfully on date: " + dateStr);
                     }
 
                     // === TL Updates ===
-                    if (updateShift(updateTL, "TL", s1TL, 1, formatter, isFriday)) {
+                    if (updateShift(updateTL, "TL", s1TL, 1, formatter, isFriday, resetS1)) {
                         errors.add("Shift 1 TL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 1 TL updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateTL, "TL", s2TL, 2, formatter, isFriday)) {
+                    if (updateShift(updateTL, "TL", s2TL, 2, formatter, isFriday, resetS2)) {
                         errors.add("Shift 2 TL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 2 TL updated successfully on date: " + dateStr);
                     }
 
-                    if (updateShift(updateTL, "TL", s3TL, 3, formatter, isFriday)) {
+                    if (updateShift(updateTL, "TL", s3TL, 3, formatter, isFriday, resetS3)) {
                         errors.add("Shift 3 TL has an error on date: " + dateStr);
                     } else {
                         successes.add("Shift 3 TL updated successfully on date: " + dateStr);
@@ -1117,7 +1179,7 @@ public class WorkDayController {
     }
 
 
-    private boolean updateShift(DWorkDayHoursSpesific updateObj, String label, Map<String, Object> shiftMap, int shiftNumber, DateTimeFormatter formatter, boolean isFriday) {
+    private boolean updateShift(DWorkDayHoursSpesific updateObj, String label, Map<String, Object> shiftMap, int shiftNumber, DateTimeFormatter formatter, boolean isFriday,boolean reset) {
         boolean hasError = false;
 
         // Default time and allowed range per shift
@@ -1171,7 +1233,29 @@ public class WorkDayController {
 
         BigDecimal dur = calculateDurationInMinutes(start, end, formatter,isFriday, shiftNumber);
         System.out.printf("%s Shift %d DURATION: %s minutes%n", label, shiftNumber, dur);
-        if(!hasError) {
+        
+        if(reset) {
+        	switch (shiftNumber) {
+	        	case 1:
+	        		updateObj.setSHIFT1_START_TIME("00:00");
+	        		updateObj.setSHIFT1_END_TIME("00:00");
+	        		updateObj.setSHIFT1_TOTAL_TIME(BigDecimal.ZERO);
+	        		break;
+	        	case 2:
+	        		updateObj.setSHIFT2_START_TIME("00:00");
+	        		updateObj.setSHIFT2_END_TIME("00:00");
+	        		updateObj.setSHIFT2_TOTAL_TIME(BigDecimal.ZERO);
+	        		break;
+	        	case 3:
+	        		updateObj.setSHIFT3_START_TIME("00:00");
+	        		updateObj.setSHIFT3_END_TIME("00:00");
+	        		updateObj.setSHIFT3_TOTAL_TIME(BigDecimal.ZERO);
+	        		break;
+	    	}
+        	
+        }
+        
+        if(!hasError && "No".equalsIgnoreCase(shiftMap.get("OFF").toString())) {
         	switch (shiftNumber) {
 	        	case 1:
 	        		updateObj.setSHIFT1_START_TIME(start);
@@ -1187,6 +1271,27 @@ public class WorkDayController {
 	        		updateObj.setSHIFT3_START_TIME(start);
 	        		updateObj.setSHIFT3_END_TIME(end);
 	        		updateObj.setSHIFT3_TOTAL_TIME(dur);
+	        		break;
+        	}
+        	
+        }
+        
+        if(!hasError && "Yes".equalsIgnoreCase(shiftMap.get("OFF").toString())) {
+        	switch (shiftNumber) {
+	        	case 1:
+	        		updateObj.setSHIFT1_START_TIME("00:00");
+	        		updateObj.setSHIFT1_END_TIME("00:00");
+	        		updateObj.setSHIFT1_TOTAL_TIME(BigDecimal.ZERO);
+	        		break;
+	        	case 2:
+	        		updateObj.setSHIFT2_START_TIME("00:00");
+	        		updateObj.setSHIFT2_END_TIME("00:00");
+	        		updateObj.setSHIFT2_TOTAL_TIME(BigDecimal.ZERO);
+	        		break;
+	        	case 3:
+	        		updateObj.setSHIFT3_START_TIME("00:00");
+	        		updateObj.setSHIFT3_END_TIME("00:00");
+	        		updateObj.setSHIFT3_TOTAL_TIME(BigDecimal.ZERO);
 	        		break;
         	}
         	
@@ -1272,14 +1377,42 @@ public class WorkDayController {
     }
 
     private boolean isValidTime(String timeStr, DateTimeFormatter formatter) {
-        if (timeStr == null) return false;
+        System.out.println("Checking timeStr: " + timeStr);
+        if (timeStr == null || timeStr.isBlank()) {
+            System.out.println("timeStr is null or blank -> return false");
+            return false;
+        }
+
         try {
-            LocalTime.parse(timeStr, formatter);
+            String timeOnly;
+
+            if (timeStr.contains(" ")) {
+                // Format: "Sun Dec 31 23:31:00 UTC 1899"
+                String[] parts = timeStr.split(" ");
+                if (parts.length >= 4) {
+                    timeOnly = parts[3].substring(0, 5);
+                } else {
+                    System.out.println("Not enough parts for date-time -> return false");
+                    return false;
+                }
+            } else {
+                // Format: "07:10"
+                timeOnly = timeStr;
+            }
+
+            System.out.println("Extracted timeOnly: " + timeOnly);
+            LocalTime parsedTime = LocalTime.parse(timeOnly, formatter);
+            System.out.println("Parsed time: " + parsedTime);
             return true;
-        } catch (DateTimeParseException e) {
+
+        } catch (Exception e) {
+            System.out.println("Failed to parse: " + e.getMessage());
             return false;
         }
     }
+
+
+
 
     private boolean isWithinShiftRange(String timeStr, String rangeStartStr, String rangeEndStr, DateTimeFormatter formatter) {
         try {

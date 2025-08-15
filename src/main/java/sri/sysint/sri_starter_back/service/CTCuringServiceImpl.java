@@ -348,7 +348,8 @@ public class CTCuringServiceImpl {
                 dataRow.createCell(2).setCellValue(c.getVAR_GROUP_COUNTER() != null ? c.getVAR_GROUP_COUNTER() : "");
 
                 // SEQUENCE
-                dataRow.createCell(3).setCellValue(c.getSEQUENCE() != null ? c.getSEQUENCE().doubleValue() : null);
+//                System.out.println("SEQUENCE: " + c.getSEQUENCE());
+                dataRow.createCell(3).setCellValue(c.getSEQUENCE() != null ? c.getSEQUENCE().doubleValue() : 0);
 
                 // WCT
                 dataRow.createCell(4).setCellValue(c.getWCT() != null ? c.getWCT() : "");
@@ -360,94 +361,122 @@ public class CTCuringServiceImpl {
                 dataRow.createCell(6).setCellValue(c.getOPERATION_UNIT() != null ? c.getOPERATION_UNIT() : "");
 
                 // BASE_QUANTITY
-                dataRow.createCell(7).setCellValue(c.getBASE_QUANTITY() != null ? c.getBASE_QUANTITY().doubleValue() : null);
+//                System.out.println("BASE_QUANTITY: " + c.getBASE_QUANTITY());
+                dataRow.createCell(7).setCellValue(c.getBASE_QUANTITY() != null ? c.getBASE_QUANTITY().doubleValue() : 0);
 
                 // STANDARD_VALUE_UNIT
                 dataRow.createCell(8).setCellValue(c.getSTANDART_VALUE_UNIT() != null ? c.getSTANDART_VALUE_UNIT() : "");
 
                 // CT_SEC_1
-                dataRow.createCell(9).setCellValue(c.getCT_SEC1() != null ? c.getCT_SEC1().doubleValue() : null);
+//                System.out.println("CT_SEC1: " + c.getCT_SEC1());
+                dataRow.createCell(9).setCellValue(c.getCT_SEC1() != null ? c.getCT_SEC1().doubleValue() : 0);
 
                 // CT_HR_1000
-                dataRow.createCell(10).setCellValue(c.getCT_HR1000() != null ? c.getCT_HR1000().doubleValue() : null);
+//                System.out.println("CT_HR1000: " + c.getCT_HR1000());
+                dataRow.createCell(10).setCellValue(c.getCT_HR1000() != null ? c.getCT_HR1000().doubleValue() : 0);
 
                 // WH_NORMAL_SHIFT_0
-                dataRow.createCell(11).setCellValue(c.getWH_NORMAL_SHIFT_0() != null ? c.getWH_NORMAL_SHIFT_0().doubleValue() : null);
+//                System.out.println("WH_NORMAL_SHIFT_0: " + c.getWH_NORMAL_SHIFT_0());
+                dataRow.createCell(11).setCellValue(c.getWH_NORMAL_SHIFT_0() != null ? c.getWH_NORMAL_SHIFT_0().doubleValue() : 0);
 
                 // WH_NORMAL_SHIFT_1
-                dataRow.createCell(12).setCellValue(c.getWH_NORMAL_SHIFT_1() != null ? c.getWH_NORMAL_SHIFT_1().doubleValue() : null);
+//                System.out.println("WH_NORMAL_SHIFT_1: " + c.getWH_NORMAL_SHIFT_1());
+                dataRow.createCell(12).setCellValue(c.getWH_NORMAL_SHIFT_1() != null ? c.getWH_NORMAL_SHIFT_1().doubleValue() : 0);
 
                 // WH_NORMAL_SHIFT_2
-                dataRow.createCell(13).setCellValue(c.getWH_NORMAL_SHIFT_2() != null ? c.getWH_NORMAL_SHIFT_2().doubleValue() : null);
+//                System.out.println("WH_NORMAL_SHIFT_2: " + c.getWH_NORMAL_SHIFT_2());
+                dataRow.createCell(13).setCellValue(c.getWH_NORMAL_SHIFT_2() != null ? c.getWH_NORMAL_SHIFT_2().doubleValue() : 0);
 
                 // WH_SHIFT_FRIDAY
-                dataRow.createCell(14).setCellValue(c.getWH_SHIFT_FRIDAY() != null ? c.getWH_SHIFT_FRIDAY().doubleValue() : null);
+//                System.out.println("WH_SHIFT_FRIDAY: " + c.getWH_SHIFT_FRIDAY());
+                dataRow.createCell(14).setCellValue(c.getWH_SHIFT_FRIDAY() != null ? c.getWH_SHIFT_FRIDAY().doubleValue() : 0);
 
                 // WH_TOTAL_NORMAL_SHIFT
-                dataRow.createCell(15).setCellValue(c.getWH_TOTAL_NORMAL_SHIFT() != null ? c.getWH_TOTAL_NORMAL_SHIFT().doubleValue() : null);
+//                System.out.println("WH_TOTAL_NORMAL_SHIFT: " + c.getWH_TOTAL_NORMAL_SHIFT());
+                dataRow.createCell(15).setCellValue(c.getWH_TOTAL_NORMAL_SHIFT() != null ? c.getWH_TOTAL_NORMAL_SHIFT().doubleValue() : 0);
 
                 // WH_TOTAL_SHIFT_FRIDAY
-                dataRow.createCell(16).setCellValue(c.getWH_TOTAL_SHIFT_FRIDAY() != null ? c.getWH_TOTAL_SHIFT_FRIDAY().doubleValue() : null);
+//                System.out.println("WH_TOTAL_SHIFT_FRIDAY: " + c.getWH_TOTAL_SHIFT_FRIDAY());
+                dataRow.createCell(16).setCellValue(c.getWH_TOTAL_SHIFT_FRIDAY() != null ? c.getWH_TOTAL_SHIFT_FRIDAY().doubleValue() : 0);
 
                 // ALLOW_NORMAL_SHIFT_0
-                dataRow.createCell(17).setCellValue(c.getALLOW_NORMAL_SHIFT_0() != null ? c.getALLOW_NORMAL_SHIFT_0().doubleValue() : null);
+//                System.out.println("ALLOW_NORMAL_SHIFT_0: " + c.getALLOW_NORMAL_SHIFT_0());
+                dataRow.createCell(17).setCellValue(c.getALLOW_NORMAL_SHIFT_0() != null ? c.getALLOW_NORMAL_SHIFT_0().doubleValue() : 0);
 
                 // ALLOW_NORMAL_SHIFT_1
-                dataRow.createCell(18).setCellValue(c.getALLOW_NORMAL_SHIFT_1() != null ? c.getALLOW_NORMAL_SHIFT_1().doubleValue() : null);
+//                System.out.println("ALLOW_NORMAL_SHIFT_1: " + c.getALLOW_NORMAL_SHIFT_1());
+                dataRow.createCell(18).setCellValue(c.getALLOW_NORMAL_SHIFT_1() != null ? c.getALLOW_NORMAL_SHIFT_1().doubleValue() : 0);
 
                 // ALLOW_NORMAL_SHIFT_2
-                dataRow.createCell(19).setCellValue(c.getALLOW_NORMAL_SHIFT_2() != null ? c.getALLOW_NORMAL_SHIFT_2().doubleValue() : null);
+//                System.out.println("ALLOW_NORMAL_SHIFT_2: " + c.getALLOW_NORMAL_SHIFT_2());
+                dataRow.createCell(19).setCellValue(c.getALLOW_NORMAL_SHIFT_2() != null ? c.getALLOW_NORMAL_SHIFT_2().doubleValue() : 0);
 
                 // ALLOW_TOTAL
-                dataRow.createCell(20).setCellValue(c.getALLOW_TOTAL() != null ? c.getALLOW_TOTAL().doubleValue() : null);
+//                System.out.println("ALLOW_TOTAL: " + c.getALLOW_TOTAL());
+                dataRow.createCell(20).setCellValue(c.getALLOW_TOTAL() != null ? c.getALLOW_TOTAL().doubleValue() : 0);
 
                 // OP_TIME_NORMAL_SHIFT_0
-                dataRow.createCell(21).setCellValue(c.getOP_TIME_NORMAL_SHIFT_0() != null ? c.getOP_TIME_NORMAL_SHIFT_0().doubleValue() : null);
+//                System.out.println("OP_TIME_NORMAL_SHIFT_0: " + c.getOP_TIME_NORMAL_SHIFT_0());
+                dataRow.createCell(21).setCellValue(c.getOP_TIME_NORMAL_SHIFT_0() != null ? c.getOP_TIME_NORMAL_SHIFT_0().doubleValue() : 0);
 
                 // OP_TIME_NORMAL_SHIFT_1
-                dataRow.createCell(22).setCellValue(c.getOP_TIME_NORMAL_SHIFT_1() != null ? c.getOP_TIME_NORMAL_SHIFT_1().doubleValue() : null);
+//                System.out.println("OP_TIME_NORMAL_SHIFT_1: " + c.getOP_TIME_NORMAL_SHIFT_1());
+                dataRow.createCell(22).setCellValue(c.getOP_TIME_NORMAL_SHIFT_1() != null ? c.getOP_TIME_NORMAL_SHIFT_1().doubleValue() : 0);
 
                 // OP_TIME_NORMAL_SHIFT_2
-                dataRow.createCell(23).setCellValue(c.getOP_TIME_NORMAL_SHIFT_2() != null ? c.getOP_TIME_NORMAL_SHIFT_2().doubleValue() : null);
+//                System.out.println("OP_TIME_NORMAL_SHIFT_2: " + c.getOP_TIME_NORMAL_SHIFT_2());
+                dataRow.createCell(23).setCellValue(c.getOP_TIME_NORMAL_SHIFT_2() != null ? c.getOP_TIME_NORMAL_SHIFT_2().doubleValue() : 0);
 
                 // OP_TIME_SHIFT_FRIDAY
-                dataRow.createCell(24).setCellValue(c.getOP_TIME_SHIFT_FRIDAY() != null ? c.getOP_TIME_SHIFT_FRIDAY().doubleValue() : null);
+//                System.out.println("OP_TIME_SHIFT_FRIDAY: " + c.getOP_TIME_SHIFT_FRIDAY());
+                dataRow.createCell(24).setCellValue(c.getOP_TIME_SHIFT_FRIDAY() != null ? c.getOP_TIME_SHIFT_FRIDAY().doubleValue() : 0);
 
                 // OP_TIME_TOTAL_NORMAL_SHIFT
-                dataRow.createCell(25).setCellValue(c.getOP_TIME_NORMAL_SHIFT() != null ? c.getOP_TIME_NORMAL_SHIFT().doubleValue() : null);
+//                System.out.println("OP_TIME_NORMAL_SHIFT: " + c.getOP_TIME_NORMAL_SHIFT());
+                dataRow.createCell(25).setCellValue(c.getOP_TIME_NORMAL_SHIFT() != null ? c.getOP_TIME_NORMAL_SHIFT().doubleValue() : 0);
 
                 // OP_TIME_TOTAL_SHIFT_FRIDAY
-                dataRow.createCell(26).setCellValue(c.getOP_TIME_TOTAL_SHIFT_FRIDAY() != null ? c.getOP_TIME_TOTAL_SHIFT_FRIDAY().doubleValue() : null);
+//                System.out.println("OP_TIME_TOTAL_SHIFT_FRIDAY: " + c.getOP_TIME_TOTAL_SHIFT_FRIDAY());
+                dataRow.createCell(26).setCellValue(c.getOP_TIME_TOTAL_SHIFT_FRIDAY() != null ? c.getOP_TIME_TOTAL_SHIFT_FRIDAY().doubleValue() : 0);
 
                 // KAPS_NORMAL_SHIFT_0
-                dataRow.createCell(27).setCellValue(c.getKAPS_NORMAL_SHIFT_0() != null ? c.getKAPS_NORMAL_SHIFT_0().doubleValue() : null);
+//                System.out.println("KAPS_NORMAL_SHIFT_0: " + c.getKAPS_NORMAL_SHIFT_0());
+                dataRow.createCell(27).setCellValue(c.getKAPS_NORMAL_SHIFT_0() != null ? c.getKAPS_NORMAL_SHIFT_0().doubleValue() : 0);
 
                 // KAPS_NORMAL_SHIFT_1
-                dataRow.createCell(28).setCellValue(c.getKAPS_NORMAL_SHIFT_1() != null ? c.getKAPS_NORMAL_SHIFT_1().doubleValue() : null);
+//                System.out.println("KAPS_NORMAL_SHIFT_1: " + c.getKAPS_NORMAL_SHIFT_1());
+                dataRow.createCell(28).setCellValue(c.getKAPS_NORMAL_SHIFT_1() != null ? c.getKAPS_NORMAL_SHIFT_1().doubleValue() : 0);
 
                 // KAPS_NORMAL_SHIFT_2
-                dataRow.createCell(29).setCellValue(c.getKAPS_NORMAL_SHIFT_2() != null ? c.getKAPS_NORMAL_SHIFT_2().doubleValue() : null);
+//                System.out.println("KAPS_NORMAL_SHIFT_2: " + c.getKAPS_NORMAL_SHIFT_2());
+                dataRow.createCell(29).setCellValue(c.getKAPS_NORMAL_SHIFT_2() != null ? c.getKAPS_NORMAL_SHIFT_2().doubleValue() : 0);
 
                 // KAPS_SHIFT_FRIDAY
-                dataRow.createCell(30).setCellValue(c.getKAPS_SHIFT_FRIDAY() != null ? c.getKAPS_SHIFT_FRIDAY().doubleValue() : null);
+//                System.out.println("KAPS_SHIFT_FRIDAY: " + c.getKAPS_SHIFT_FRIDAY());
+                dataRow.createCell(30).setCellValue(c.getKAPS_SHIFT_FRIDAY() != null ? c.getKAPS_SHIFT_FRIDAY().doubleValue() : 0);
 
                 // KAPS_TOTAL_NORMAL_SHIFT
-                dataRow.createCell(31).setCellValue(c.getKAPS_TOTAL_NORMAL_SHIFT() != null ? c.getKAPS_TOTAL_NORMAL_SHIFT().doubleValue() : null);
+//                System.out.println("KAPS_TOTAL_NORMAL_SHIFT: " + c.getKAPS_TOTAL_NORMAL_SHIFT());
+                dataRow.createCell(31).setCellValue(c.getKAPS_TOTAL_NORMAL_SHIFT() != null ? c.getKAPS_TOTAL_NORMAL_SHIFT().doubleValue() : 0);
 
                 // KAPS_TOTAL_SHIFT_FRIDAY
-                dataRow.createCell(32).setCellValue(c.getKAPS_TOTAL_SHIFT_FRIDAY() != null ? c.getKAPS_TOTAL_SHIFT_FRIDAY().doubleValue() : null);
+//                System.out.println("KAPS_TOTAL_SHIFT_FRIDAY: " + c.getKAPS_TOTAL_SHIFT_FRIDAY());
+                dataRow.createCell(32).setCellValue(c.getKAPS_TOTAL_SHIFT_FRIDAY() != null ? c.getKAPS_TOTAL_SHIFT_FRIDAY().doubleValue() : 0);
 
                 // WAKTU_TOTAL_CT_NORMAL
-                dataRow.createCell(33).setCellValue(c.getWAKTU_TOTAL_CT_NORMAL() != null ? c.getWAKTU_TOTAL_CT_NORMAL().doubleValue() : null);
+//                System.out.println("WAKTU_TOTAL_CT_NORMAL: " + c.getWAKTU_TOTAL_CT_NORMAL());
+                dataRow.createCell(33).setCellValue(c.getWAKTU_TOTAL_CT_NORMAL() != null ? c.getWAKTU_TOTAL_CT_NORMAL().doubleValue() : 0);
 
                 // WAKTU_TOTAL_CT_FRIDAY
-                dataRow.createCell(34).setCellValue(c.getWAKTU_TOTAL_CT_FRIDAY() != null ? c.getWAKTU_TOTAL_CT_FRIDAY().doubleValue() : null);
+//                System.out.println("WAKTU_TOTAL_CT_FRIDAY: " + c.getWAKTU_TOTAL_CT_FRIDAY());
+                dataRow.createCell(34).setCellValue(c.getWAKTU_TOTAL_CT_FRIDAY() != null ? c.getWAKTU_TOTAL_CT_FRIDAY().doubleValue() : 0);
 
                 // Apply border style to each cell in the data row
                 for (int i = 0; i <= 34; i++) {
                     dataRow.getCell(i).setCellStyle(borderStyle);
                 }
             }
+
             sheet.setColumnWidth(0, 20 * 256);
             sheet.setColumnWidth(1, 20 * 256);  // Kolom C: Group Counter
             sheet.setColumnWidth(2, 20 * 256);  // Kolom D: Var Group Counter

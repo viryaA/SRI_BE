@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -1939,7 +1941,11 @@ public class MonthlyPlanServiceImpl {
 			transformed.put("CHEATING_ID",cheatingID.asText());
 			String withCheatingMO = objectMapper.writeValueAsString(transformed);
 			System.out.println("Transformed JSON with cheating: " + withCheatingMO );
-			monthlyPlanNewRepo.callGenerateMp1(withCheatingMO);
+			ExecutorService executor = Executors.newSingleThreadExecutor();
+		    Future<?> future = executor.submit(() -> {
+		    	monthlyPlanNewRepo.callGenerateMp1(withCheatingMO);
+		        return null;
+		    });
 			// while(callSpBuatMp9WithOutput(transformedJson)) {
 			// 	System.out.println("jalan bang");
 			// }
@@ -2578,13 +2584,6 @@ public class MonthlyPlanServiceImpl {
 	 // Step 1: Sort the list by getDateMp()
 	   	shiftMonthlyPlan.sort(Comparator.comparing(MonthlyPlanningNew::getDateMp));
 
-	   	// Step 2: Loop through the sorted list
-	   	for (MonthlyPlanningNew plan : shiftMonthlyPlan) {
-	   	    System.out.println("Date: " + plan.getDateMp());
-	   	    // add your logic here
-	   	}
-//	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdIn(moids);
-		
 	   	System.out.println(shiftMonthlyPlan.size());
 	   	// List<String> productDescription = new ArrayList<>();
 		List<TotalPlan> totalPlanList = totalPlanRepo.findAll();
@@ -2755,7 +2754,7 @@ public class MonthlyPlanServiceImpl {
             String[] curingHeaderLabels = {"Tanggal", "Nomor", "Cavity", "Work Center Text", "Item Curing", "Deskripsi", "Shift 1", "Shift 2", "Shift 3", "Total","Mould Use","Kapa Per Mould"};
             CellStyle[] curingHeaderStyles = {calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, 
             		calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder, calibriBold11CenterBorder,calibriBold11CenterBorder};
-
+            System.out.println("Check point 1");
             // Loop untuk kolom 0-5
             for (int col = 0; col < curingHeaderLabels.length; col++) {
             	tableHeadCuringCell = tableHeadCuringRow.createCell(col+1);
@@ -2901,6 +2900,7 @@ public class MonthlyPlanServiceImpl {
             Date date = new Date();
 
             // Loop untuk menambah tanggal (kolom 6 ke atas)
+            System.out.println("Check point 2");
             for (i = 0; i < jumlahHariBulanIni; i++) {
                 int col = i + 6;
                 prepareProdSheet.addMergedRegion(new CellRangeAddress(16, 17, col, col));
@@ -3025,8 +3025,11 @@ public class MonthlyPlanServiceImpl {
                     mpDatarow++;
                 }
             }
+			System.out.println("Check point 4");
 	        List<Map<String, Object>> dataListDetail = totalPlanRepo.getDetailTotalPlan(moids.get(1).toString(),moids.get(0).toString(),version);
+	        System.out.println("Check point 4.1");
 	        List<Map<String, Object>> resultChangeMould = changemouldR(shiftMonthlyPlan);
+	        System.out.println("Check point 5");
 			List<Map<String, Object>> resultMouldUsed = monthlyPlanNewRepo.findDailyMouldUseSummaryAsMap(moids,version);
 	        System.out.println("sudah dapetindata");
 			Map<Object, Long> counts = resultChangeMould.stream()
@@ -3049,6 +3052,7 @@ public class MonthlyPlanServiceImpl {
 			String[] headersName = {"Total Mould Used per Day", "Total Day per Date", 
 									"Total Day TT", "Total Day TL", "Percentage TT", "Percentage TL","Change Mould"};
 			// Write Headers
+			System.out.println("Check point 6");
 			int headerRowIndex = mpDatarow;
 			for (int j = 0; j < headersName.length; j++) {
 				mpDataRow = prepareProdSheet.createRow(mpDatarow++);

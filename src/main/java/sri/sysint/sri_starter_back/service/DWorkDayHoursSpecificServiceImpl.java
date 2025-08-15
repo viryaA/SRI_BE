@@ -80,21 +80,21 @@ public class DWorkDayHoursSpecificServiceImpl {
 	    
 	    // Mengambil jam kerja berdasarkan tanggal dan deskripsi
         public Optional<DWorkDayHoursSpesific> getWorkDayHoursSpecificByDateDesc(Date date, String description) {
-            System.out.println("[DEBUG] Raw input - date: " + date + ", description: " + description);
+//            System.out.println("[DEBUG] Raw input - date: " + date + ", description: " + description);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             String formattedDate = dateFormat.format(date);
 
-            System.out.println("[DEBUG] Formatted date: " + formattedDate);
-            System.out.println("[DEBUG] Sending to repository - date: " + formattedDate + ", description: " + description);
+//            System.out.println("[DEBUG] Formatted date: " + formattedDate);
+//            System.out.println("[DEBUG] Sending to repository - date: " + formattedDate + ", description: " + description);
 
             Optional<DWorkDayHoursSpesific> result = dWorkDayHoursSpecificRepo.findDWdHoursByDateAndDescription(formattedDate, description);
 
-            if (result.isPresent()) {
-                System.out.println("[DEBUG] Repository returned data: " + result.get());
-            } else {
-                System.out.println("[DEBUG] Repository returned EMPTY result.");
-            }
+//            if (result.isPresent()) {
+//                System.out.println("[DEBUG] Repository returned data: " + result.get());
+//            } else {
+//                System.out.println("[DEBUG] Repository returned EMPTY result.");
+//            }
 
             return result;
         }

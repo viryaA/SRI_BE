@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -158,15 +159,19 @@ public class MarketingOrderServiceImpl {
     
   //EXPORT RESUME
     public ByteArrayInputStream resumeMO(String month0, String month1, String month2) throws IOException {
+        System.out.println("chekpoint 0.1");
     	List<MarketingOrder> marketingOrder = marketingOrderRepo.findMoAllTypeByMonth(month0, month1, month2);
+        System.out.println("chekpoint 0.2");
     	List<HeaderMarketingOrder> headerMarketingOrder = headerMarketingOrderRepo.findByTwoMoId(marketingOrder.get(0).getMoId(), marketingOrder.get(1).getMoId());
+        System.out.println("chekpoint 0.3");
     	List<DetailMarketingOrder> detailMarketingOrder = detailMarketingOrderRepo.findByTwoMoId(marketingOrder.get(0).getMoId(), marketingOrder.get(1).getMoId());
-    	
+        System.out.println("chekpoint 0.4");
     	String bulan0 = month0;
     	String bulan1 = month1;
     	String bulan2 = month2;
     	
     	SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        System.out.println("chekpoint 1");
     	try {
             Date date0 = dateFormat.parse(month0);
             Date date1 = dateFormat.parse(month1);
@@ -194,7 +199,7 @@ public class MarketingOrderServiceImpl {
     	
         Workbook workbook = new XSSFWorkbook();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-
+        System.out.println("chekpoint 2");
         try {
             Sheet sheet = workbook.createSheet("Sheet 1");
             
@@ -459,6 +464,7 @@ public class MarketingOrderServiceImpl {
             //end style
 
             // Header
+            System.out.println("chekpoint 3");
             int row = 1;
             Row headerTableRow = sheet.createRow(row);
             headerTableRow.setHeight((short) 500);
@@ -470,6 +476,7 @@ public class MarketingOrderServiceImpl {
             }
             
             // Daftar urutan kategori utama dan subkategori
+            System.out.println("chekpoint 4");
             Map<String, List<String>> categoryOrder = new LinkedHashMap<>();
             categoryOrder.put("TUBE1", Collections.singletonList("FED TB NR"));
             categoryOrder.put("OEM", Arrays.asList("OEM TT", "OEM TL"));
@@ -482,6 +489,7 @@ public class MarketingOrderServiceImpl {
             Map<String, List<DetailMarketingOrder>> groupedData = new LinkedHashMap<>();
 
             // Kelompokkan data
+            System.out.println("chekpoint 5");
             for (DetailMarketingOrder order : detailMarketingOrder) {
                 String mainCategory = categoryOrder.keySet().stream()
                     .filter(key -> categoryOrder.get(key).contains(order.getCategory()))
@@ -492,14 +500,20 @@ public class MarketingOrderServiceImpl {
 
             // Iterasi dan buat baris di Excel
             int currentRow = 2; // Baris pertama setelah header
+            System.out.println("chekpoint 6");
             for (String mainCategory : categoryOrder.keySet()) {
                 if (!groupedData.containsKey(mainCategory)) continue; // Lewati kategori tanpa data
                 
                 List<DetailMarketingOrder> orders = groupedData.get(mainCategory);
                 Map<String, Double> totals = new HashMap<>(); // Menyimpan total untuk kategori utama
+                System.out.println("chekpoint 6.1");
                 
                 for (String subCategory : categoryOrder.get(mainCategory)) {
+                    System.out.println("chekpoint 6.1.1");
+
                     for (DetailMarketingOrder order : orders) {
+                        System.out.println("chekpoint 6.1.1.1");
+
                         if (!order.getCategory().equals(subCategory)) continue;
 
                         Row dataRow = sheet.createRow(currentRow++);
@@ -564,7 +578,7 @@ public class MarketingOrderServiceImpl {
                         totals.merge("MoMonth2", moMonth2, Double::sum);
                     }
                 }
-
+                System.out.println("chekpoint 6.2");
                 // Tambahkan baris jumlah setelah subkategori selesai
                 Row totalRow = sheet.createRow(currentRow++);
                 Cell totalCell = totalRow.createCell(0);
@@ -607,6 +621,8 @@ public class MarketingOrderServiceImpl {
                 totalCell.setCellValue(totals.getOrDefault("MoMonth2", 0.0));
                 totalCell.setCellStyle(calibri12BoldBorderNumLightOrange);
             }
+
+            System.out.println("chekpoint 7");
             
             String[] summaryHeader = {
 		            "BRAND", "", "", "", "SF " + month0, "MO " + month0, "SF " + month1, "MO " + month1, "SF " + month2, "MO " + month2
@@ -648,6 +664,7 @@ public class MarketingOrderServiceImpl {
 		        };
             
             currentRow += 4;
+            System.out.println("chekpoint 8");
             Row tireRow = sheet.createRow(currentRow);
             Cell tireCell = tireRow.createCell(0);
             tireCell.setCellValue("TIRE");
@@ -655,11 +672,13 @@ public class MarketingOrderServiceImpl {
             
             currentRow += 1;
             Row summaryRow = sheet.createRow(currentRow);
+            System.out.println("chekpoint 9");
             for(int i=0;i<summaryHeader.length;i++) {
             	Cell summaryCell = summaryRow.createCell(i);
                 summaryCell.setCellValue(summaryHeader[i]);
                 summaryCell.setCellStyle(summaryStyleHeader[i]);
             }
+            System.out.println("chekpoint 10");
             
             currentRow += 1;
             for(int i=0;i<tireSummary.length;i++) {
@@ -680,575 +699,219 @@ public class MarketingOrderServiceImpl {
                 summaryCell.setCellValue("");
                 summaryCell.setCellStyle(tireSummaryStyle[i]);
                 
+                System.out.println("chekpoint 11");
+                // Enhanced debug version of your template
                 if (i == 2) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0));
+                    System.out.println("=== DEBUG: Processing i=2 (OEM Summary) ===");
+                    System.out.println("checkpoint 11.1.1");
+                    
+                    // Debug the sumTotal calls
+                    double oemTtSf0 = sumTotal(detailMarketingOrder, "OEM TT", "sf", 0);
+                    double oemTlSf0 = sumTotal(detailMarketingOrder, "OEM TL", "sf", 0);
+                    System.out.println("OEM TT sf 0: " + oemTtSf0 + ", OEM TL sf 0: " + oemTlSf0 + ", Sum: " + (oemTtSf0 + oemTlSf0));
+                    
+                    summaryCell = summaryRow.createCell(4);
+                    summaryCell.setCellValue(oemTtSf0 + oemTlSf0);
                     summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    System.out.println("checkpoint 11.1.2 - Cell 4 set with value: " + (oemTtSf0 + oemTlSf0));
+                    
+                    double oemTtMo0 = sumTotal(detailMarketingOrder, "OEM TT", "mo", 0);
+                    double oemTlMo0 = sumTotal(detailMarketingOrder, "OEM TL", "mo", 0);
+                    System.out.println("OEM TT mo 0: " + oemTtMo0 + ", OEM TL mo 0: " + oemTlMo0 + ", Sum: " + (oemTtMo0 + oemTlMo0));
                     
                     summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0));
+                    summaryCell.setCellValue(oemTtMo0 + oemTlMo0);
                     summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    System.out.println("Cell 5 set with value: " + (oemTtMo0 + oemTlMo0));
+                    
+                    // Continue with period 1
+                    double oemTtSf1 = sumTotal(detailMarketingOrder, "OEM TT", "sf", 1);
+                    double oemTlSf1 = sumTotal(detailMarketingOrder, "OEM TL", "sf", 1);
+                    System.out.println("Period 1 - OEM TT sf: " + oemTtSf1 + ", OEM TL sf: " + oemTlSf1);
                     
                     summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 1));
+                    summaryCell.setCellValue(oemTtSf1 + oemTlSf1);
                     summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    
+                    double oemTtMo1 = sumTotal(detailMarketingOrder, "OEM TT", "mo", 1);
+                    double oemTlMo1 = sumTotal(detailMarketingOrder, "OEM TL", "mo", 1);
+                    System.out.println("Period 1 - OEM TT mo: " + oemTtMo1 + ", OEM TL mo: " + oemTlMo1);
                     
                     summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 1));
+                    summaryCell.setCellValue(oemTtMo1 + oemTlMo1);
                     summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    
+                    // Continue with period 2
+                    double oemTtSf2 = sumTotal(detailMarketingOrder, "OEM TT", "sf", 2);
+                    double oemTlSf2 = sumTotal(detailMarketingOrder, "OEM TL", "sf", 2);
+                    System.out.println("Period 2 - OEM TT sf: " + oemTtSf2 + ", OEM TL sf: " + oemTlSf2);
                     
                     summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 2));
+                    summaryCell.setCellValue(oemTtSf2 + oemTlSf2);
                     summaryCell.setCellStyle(tireNumSummaryStyle[i]);
                     
+                    double oemTtMo2 = sumTotal(detailMarketingOrder, "OEM TT", "mo", 2);
+                    double oemTlMo2 = sumTotal(detailMarketingOrder, "OEM TL", "mo", 2);
+                    System.out.println("Period 2 - OEM TT mo: " + oemTtMo2 + ", OEM TL mo: " + oemTlMo2);
+                    
                     summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 2));
+                    summaryCell.setCellValue(oemTtMo2 + oemTlMo2);
                     summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    
+                    System.out.println("=== END DEBUG i=2 ===\n");
+                    
                 } else if (i == 5) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0));
+                    System.out.println("=== DEBUG: Processing i=5 (HGP Summary) ===");
+                    System.out.println("checkpoint 11.2.1");
+                    
+                    // Debug HGP calculations
+                    double hgpTtSf0 = sumTotal(detailMarketingOrder, "HGP TT", "sf", 0);
+                    double hgpTlSf0 = sumTotal(detailMarketingOrder, "HGP TL", "sf", 0);
+                    System.out.println("HGP TT sf 0: " + hgpTtSf0 + ", HGP TL sf 0: " + hgpTlSf0 + ", Sum: " + (hgpTtSf0 + hgpTlSf0));
+                    
+                    summaryCell = summaryRow.createCell(4);
+                    summaryCell.setCellValue(hgpTtSf0 + hgpTlSf0);
                     summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    
+                    // Continue with rest of HGP calculations...
+                    double hgpTtMo0 = sumTotal(detailMarketingOrder, "HGP TT", "mo", 0);
+                    double hgpTlMo0 = sumTotal(detailMarketingOrder, "HGP TL", "mo", 0);
+                    System.out.println("HGP TT mo 0: " + hgpTtMo0 + ", HGP TL mo 0: " + hgpTlMo0);
                     
                     summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "HGP TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0));
+                    summaryCell.setCellValue(hgpTtMo0 + hgpTlMo0);
                     summaryCell.setCellStyle(tireNumSummaryStyle[i]);
                     
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "HGP TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    // Add similar debug for periods 1 and 2...
+                    System.out.println("=== END DEBUG i=5 ===\n");
                     
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "HGP TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "HGP TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "HGP TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
                 } else if (i == 8) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0));
+                    System.out.println("=== DEBUG: Processing i=8 (Combined OEM+HGP) ===");
+                    
+                    // Debug combined totals
+                    double combinedSf0 = sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0)
+                        + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0);
+                    System.out.println("Combined sf 0 total: " + combinedSf0);
+                    
+                    summaryCell = summaryRow.createCell(4);
+                    summaryCell.setCellValue(combinedSf0);
                     summaryCell.setCellStyle(tireNumSummaryStyle[i]);
                     
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    // Continue with other calculations...
+                    System.out.println("=== END DEBUG i=8 ===\n");
                     
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                } else if (i == 9) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                } else if (i == 10) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                } else if (i == 11) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TT", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TT", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TT", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TT", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                } else if (i == 12) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TL", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TL", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TL", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TL", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TL", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TL", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
                 } else if (i == 13) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0)) / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0) + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0) 
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0))) * 100);
+                    System.out.println("=== DEBUG: Processing i=13 (TT Percentage) ===");
+                    
+                    // Debug percentage calculations
+                    double ttTotal0 = sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0)
+                        + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0);
+                    double grandTotal0 = sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0)
+                        + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0)
+                        + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0);
+                    
+                    double percentage0 = (ttTotal0 / grandTotal0) * 100;
+                    System.out.println("TT Total sf 0: " + ttTotal0 + ", Grand Total sf 0: " + grandTotal0 + ", Percentage: " + percentage0 + "%");
+                    
+                    summaryCell = summaryRow.createCell(4);
+                    summaryCell.setCellValue(percentage0);
                     summaryCell.setCellStyle(calibriBold12YellowPercentage);
                     
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0)) / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
+                    System.out.println("=== END DEBUG i=13 ===\n");
                     
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TT", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 1)) / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
+                } else if (i == 21 || i == 22) {
+                    System.out.println("=== DEBUG: Processing i=" + i + " (Variance Calculation) ===");
                     
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TT", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 1)) /(sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TT", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 2)) / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TT", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 2)) / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                } else if (i == 14) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TL", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0)) / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TL", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0)) / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TL", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 1)) / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TL", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 1)) / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TL", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 2)) / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, "OEM TL", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 2)) / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                } else if (i == 15) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "sf", 0)) / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) 
-                    + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "mo", 0)) / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) 
-                    + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "sf", 1)) / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) 
-                    + sumTotal(detailMarketingOrder, "OEM TL", "sf", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "mo", 1)) / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) 
-                    + sumTotal(detailMarketingOrder, "OEM TL", "mo", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "sf", 2)) / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) 
-                    + sumTotal(detailMarketingOrder, "OEM TL", "sf", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "mo", 2)) / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) 
-                    + sumTotal(detailMarketingOrder, "OEM TL", "mo", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                } else if (i == 16) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[4], "sf", 0)) / (sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) 
-                    + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[4], "mo", 0)) / (sumTotal(detailMarketingOrder, "HGP TT", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[4], "sf", 1)) / (sumTotal(detailMarketingOrder, "HGP TT", "sf", 1) 
-                    + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[4], "mo", 1)) / (sumTotal(detailMarketingOrder, "HGP TT", "mo", 1) 
-                    + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[4], "sf", 2)) / (sumTotal(detailMarketingOrder, "HGP TT", "sf", 2) 
-                    + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[4], "mo", 2)) / (sumTotal(detailMarketingOrder, "HGP TT", "mo", 2) 
-                    + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                } else if (i == 17) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "sf", 0) + sumTotal(detailMarketingOrder, tireSummary[4], "sf", 0)) 
-                    / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "mo", 0) + sumTotal(detailMarketingOrder, tireSummary[4], "mo", 0)) 
-                    / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "sf", 1) + sumTotal(detailMarketingOrder, tireSummary[4], "sf", 1)) 
-                    / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "mo", 1) + sumTotal(detailMarketingOrder, tireSummary[4], "mo", 1)) 
-                    / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "sf", 2) + sumTotal(detailMarketingOrder, tireSummary[4], "sf", 2))
-                    / (sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[1], "mo", 2) + sumTotal(detailMarketingOrder, tireSummary[4], "mo", 2)) 
-                    / (sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                } else if (i == 18) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[7], "sf", 0)) / (sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0) 
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[7], "mo", 0)) / (sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0) 
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[7], "sf", 1)) / (sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 1))) * 100);
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[7], "mo", 1)) / (sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 1) 
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 1))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue((sumTotal(detailMarketingOrder, tireSummary[7], "sf", 2)) / (sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 2)) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(((sumTotal(detailMarketingOrder, tireSummary[7], "mo", 2)) / (sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 2) 
-                    + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 2))) * 100);
-                    summaryCell.setCellStyle(calibriBold12YellowPercentage);
-                } else if (i == 19) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                } else if (i == 20) {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                } else if (i == 21) {
-                	DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+                    DecimalFormatSymbols symbols = new DecimalFormatSymbols();
                     symbols.setGroupingSeparator('.');
-                	DecimalFormat formatter = new DecimalFormat("#,###", symbols);
-                	Double vs0 = (sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0)) - (sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0));
-                	String resultVs0 = "(" + formatter.format(vs0) + ")";
-                	
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(resultVs0);
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    DecimalFormat formatter = new DecimalFormat("#,###", symbols);
                     
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue("");
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    if (i == 21) {
+                        // OEM+HGP variance
+                        Double vs0 = (sumTotal(detailMarketingOrder, "OEM TT", "sf", 0) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 0)
+                            + sumTotal(detailMarketingOrder, "HGP TT", "sf", 0) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 0)) 
+                            - (sumTotal(detailMarketingOrder, "OEM TT", "mo", 0) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 0)
+                            + sumTotal(detailMarketingOrder, "HGP TT", "mo", 0) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 0));
+                        
+                        System.out.println("OEM+HGP Variance Period 0: " + vs0 + " (formatted: (" + formatter.format(vs0) + "))");
+                        String resultVs0 = "(" + formatter.format(vs0) + ")";
+                        
+                        summaryCell = summaryRow.createCell(4);
+                        summaryCell.setCellValue(resultVs0);
+                        summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    } else {
+                        // FDR variance
+                        Double vs0 = (sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0)) 
+                            - (sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0));
+                        
+                        System.out.println("FDR Variance Period 0: " + vs0 + " (formatted: (" + formatter.format(vs0) + "))");
+                        String resultVs0 = "(" + formatter.format(vs0) + ")";
+                        
+                        summaryCell = summaryRow.createCell(4);
+                        summaryCell.setCellValue(resultVs0);
+                        summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    }
                     
-                    Double vs1 = (sumTotal(detailMarketingOrder, "OEM TT", "sf", 1) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 1) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 1)) - (sumTotal(detailMarketingOrder, "OEM TT", "mo", 1) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 1)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 1) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 1));
-                	String resultVs1 = "(" + formatter.format(vs1) + ")";
-                	
-                	summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(resultVs1);
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    System.out.println("=== END DEBUG i=" + i + " ===\n");
                     
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue("");
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    Double vs2 = (sumTotal(detailMarketingOrder, "OEM TT", "sf", 2) + sumTotal(detailMarketingOrder, "OEM TL", "sf", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "sf", 2) + sumTotal(detailMarketingOrder, "HGP TL", "sf", 2)) - (sumTotal(detailMarketingOrder, "OEM TT", "mo", 2) + sumTotal(detailMarketingOrder, "OEM TL", "mo", 2)
-                    + sumTotal(detailMarketingOrder, "HGP TT", "mo", 2) + sumTotal(detailMarketingOrder, "HGP TL", "mo", 2));
-                	String resultVs2 = "(" + formatter.format(vs2) + ")";
-                	
-                	summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(resultVs2);
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue("");
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                } else if (i == 22) {
-                	DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-                    symbols.setGroupingSeparator('.');
-                	DecimalFormat formatter = new DecimalFormat("#,###", symbols);
-                	Double vs0 = (sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 0)) 
-                	- (sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 0) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 0));
-                	String resultVs0 = "(" + formatter.format(vs0) + ")";
-                	
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(resultVs0);
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue("");
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    Double vs1 = (sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 1))
-                    - (sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 1) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 1));
-                	String resultVs1 = "(" + formatter.format(vs1) + ")";
-                	
-                	summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(resultVs1);
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue("");
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    Double vs2 = (sumTotal(detailMarketingOrder, "FDR TR TT", "sf", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "sf", 2)) 
-                    - (sumTotal(detailMarketingOrder, "FDR TR TT", "mo", 2) + sumTotal(detailMarketingOrder, "FDR TR TL", "mo", 2));
-                	String resultVs2 = "(" + formatter.format(vs2) + ")";
-                	
-                	summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(resultVs2);
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue("");
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
                 } else {
-                	summaryCell = summaryRow.createCell(4);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, tireSummary[i], "sf", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    System.out.println("=== DEBUG: Processing i=" + i + " (Default case using tireSummary[" + i + "]) ===");
                     
-                    summaryCell = summaryRow.createCell(5);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, tireSummary[i], "mo", 0));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    if (tireSummary != null && i < tireSummary.length && tireSummary[i] != null) {
+                        System.out.println("tireSummary[" + i + "] = " + tireSummary[i]);
+                        
+                        double sf0 = sumTotal(detailMarketingOrder, tireSummary[i], "sf", 0);
+                        double mo0 = sumTotal(detailMarketingOrder, tireSummary[i], "mo", 0);
+                        System.out.println("Period 0 - sf: " + sf0 + ", mo: " + mo0);
+                        
+                        summaryCell = summaryRow.createCell(4);
+                        summaryCell.setCellValue(sf0);
+                        summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                        
+                        summaryCell = summaryRow.createCell(5);
+                        summaryCell.setCellValue(mo0);
+                        summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                        
+                        // Continue for periods 1 and 2...
+                        double sf1 = sumTotal(detailMarketingOrder, tireSummary[i], "sf", 1);
+                        double mo1 = sumTotal(detailMarketingOrder, tireSummary[i], "mo", 1);
+                        System.out.println("Period 1 - sf: " + sf1 + ", mo: " + mo1);
+                        
+                        double sf2 = sumTotal(detailMarketingOrder, tireSummary[i], "sf", 2);
+                        double mo2 = sumTotal(detailMarketingOrder, tireSummary[i], "mo", 2);
+                        System.out.println("Period 2 - sf: " + sf2 + ", mo: " + mo2);
+                        
+                        summaryCell = summaryRow.createCell(6);
+                        summaryCell.setCellValue(sf1);
+                        summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                        
+                        summaryCell = summaryRow.createCell(7);
+                        summaryCell.setCellValue(mo1);
+                        summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                        
+                        summaryCell = summaryRow.createCell(8);
+                        summaryCell.setCellValue(sf2);
+                        summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                        
+                        summaryCell = summaryRow.createCell(9);
+                        summaryCell.setCellValue(mo2);
+                        summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    } else {
+                        System.out.println("ERROR: tireSummary is null or index " + i + " is out of bounds!");
+                        if (tireSummary != null) {
+                            System.out.println("tireSummary length: " + tireSummary.length);
+                        }
+                    }
                     
-                    summaryCell = summaryRow.createCell(6);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, tireSummary[i], "sf", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(7);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, tireSummary[i], "mo", 1));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(8);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, tireSummary[i], "sf", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
-                    
-                    summaryCell = summaryRow.createCell(9);
-                    summaryCell.setCellValue(sumTotal(detailMarketingOrder, tireSummary[i], "mo", 2));
-                    summaryCell.setCellStyle(tireNumSummaryStyle[i]);
+                    System.out.println("=== END DEBUG i=" + i + " ===\n");
                 }
+
+                // Additional debug info that's always printed
+                System.out.println("Current i value: " + i);
+                System.out.println("summaryRow: " + (summaryRow != null ? "not null" : "null"));
+                System.out.println("tireNumSummaryStyle array length: " + (tireNumSummaryStyle != null ? tireNumSummaryStyle.length : "null"));
+                System.out.println("detailMarketingOrder: " + (detailMarketingOrder != null ? "not null (size: " + detailMarketingOrder.size() + ")" : "null"));
+                System.out.println("----------------------------------------");
                 currentRow++;
             }
             
@@ -2411,21 +2074,30 @@ public class MarketingOrderServiceImpl {
 			}
 			
 			//Save to SRI_IMPP_D_HEADERMARKETINGORDER
-			try {
-		        List<HeaderMarketingOrder> headerMoList = mo.getHeaderMarketingOrder();
-		        for (HeaderMarketingOrder headerMO : headerMoList) {
-		        	HeaderMarketingOrder savedHeaderMO = new HeaderMarketingOrder(headerMO);
-		        	savedHeaderMO.setHeaderId(getNewHeaderMarketingOrderId());
-		        	savedHeaderMO.setStatus(BigDecimal.valueOf(1));
-		        	savedHeaderMO.setCreationDate(new Date());
-		        	savedHeaderMO.setLastUpdateDate(new Date());
-		            headerMarketingOrderRepo.save(savedHeaderMO);
-		            statusHmo = 1;
-		        }
-			}catch(Exception e) {
-	            System.err.println("Error saving HeaderMO: " + e.getMessage());
-	            throw e;
-			}
+            try {
+                List<HeaderMarketingOrder> headerMoList = mo.getHeaderMarketingOrder();
+
+                // ✅ DEBUG: Print the size of the list
+                if (headerMoList != null) {
+                    System.out.println("DEBUG: Number of HeaderMarketingOrder items: " + headerMoList.size());
+                } else {
+                    System.out.println("DEBUG: headerMoList is null");
+                }
+
+                for (HeaderMarketingOrder headerMO : headerMoList) {
+                    HeaderMarketingOrder savedHeaderMO = new HeaderMarketingOrder(headerMO);
+                    savedHeaderMO.setHeaderId(getNewHeaderMarketingOrderId());
+                    savedHeaderMO.setStatus(BigDecimal.valueOf(1));
+                    savedHeaderMO.setCreationDate(new Date());
+                    savedHeaderMO.setLastUpdateDate(new Date());
+                    headerMarketingOrderRepo.save(savedHeaderMO);
+                    statusHmo = 1;
+                }
+            } catch (Exception e) {
+                System.err.println("Error saving HeaderMO: " + e.getMessage());
+                throw e;
+            }
+
 			
 			//Save to SRI_IMPP_D_MARKETINGORDER
 			try {
@@ -2459,11 +2131,76 @@ public class MarketingOrderServiceImpl {
     public Optional<HeaderMarketingOrder> getHeaderMOById(BigDecimal id) {
         return headerMarketingOrderRepo.findById(id);
     }
+    // Comparator<ViewDetailMarketingOrder> sortByNameOnlyPPC = Comparator.comparing(p -> {
+    //     String desc = p.getDescription();
+    //     if (desc == null || desc.isBlank()) {
+    //         return "ZZZ"; // put null or empty last
+    //     }
 
+    //     String result = desc.trim();
+
+    //     // Remove BRAND: FED, FDR
+    //     result = result.replaceFirst("^(FED|FDR)\\s+", "");
+
+    //     // Remove TYPE MARKERS
+    //     result = result.replaceFirst("^(TR\\s+TT|TR\\s+TL|SET-R|SET|TB)\\s+", "");
+    //     result = result.replaceFirst("^NR\\s+", "");
+    //     result = result.replaceFirst("^RACING\\s+", "");
+
+    //     // Remove spec (2.75-17, 70/90-17, 120/70-14, etc)
+    //     result = result.replaceFirst("^\\d+(\\.\\d+)?/\\d+(\\.\\d+)?\\s*[-R]\\s*\\d+\\s*", "");
+    //     result = result.replaceFirst("^\\d+(\\.\\d+)?-\\d+\\s*", "");
+
+    //     String name = result.trim();
+    //     if (name.isEmpty()) {
+    //         return "ZZZ";
+    //     }
+    //     return name.toUpperCase();
+    // });
+
+    Comparator<ViewDetailMarketingOrder> sortByCategoryThenNamePPC =
+    Comparator.comparing(
+        (ViewDetailMarketingOrder p) -> {
+            // FED-first flag → false for FED, true for others so FED goes first
+            String desc = p.getDescription();
+            return !(desc != null && desc.toUpperCase().contains("FED"));
+        }
+    )
+    .thenComparing(ViewDetailMarketingOrder::getCategory, Comparator.nullsLast(Comparator.naturalOrder()))
+    .thenComparing(p -> {
+        String desc = p.getDescription();
+        if (desc == null || desc.isBlank()) {
+            return "ZZZ"; // put null or empty last
+        }
+
+        String result = desc.trim();
+
+        // Remove BRAND: FED, FDR
+        result = result.replaceFirst("^(FED|FDR)\\s+", "");
+
+        // Remove TYPE MARKERS
+        result = result.replaceFirst("^(TR\\s+TT|TR\\s+TL|SET-R|SET|TB)\\s+", "");
+        result = result.replaceFirst("^NR\\s+", "");
+        result = result.replaceFirst("^RACING\\s+", "");
+
+        // Remove spec (2.75-17, 70/90-17, 120/70-14, etc)
+        result = result.replaceFirst("^\\d+(\\.\\d+)?/\\d+(\\.\\d+)?\\s*[-R]\\s*\\d+\\s*", "");
+        result = result.replaceFirst("^\\d+(\\.\\d+)?-\\d+\\s*", "");
+
+        String name = result.trim();
+        if (name.isEmpty()) {
+            return "ZZZ";
+        }
+        return name.toUpperCase();
+    });
+
+
+    
     //Show Detail Mo Add PPC di Awal
     public List<ViewDetailMarketingOrder> getDetailMarketingOrders(
     	    BigDecimal totalHKTT1, BigDecimal totalHKTT2, BigDecimal totalHKTT3,
     	    BigDecimal totalHKTL1, BigDecimal totalHKTL2, BigDecimal totalHKTL3,
+    	    BigDecimal totalHKTB1, BigDecimal totalHKTB2, BigDecimal totalHKTB3,
     	    String productMerk, String monthYear0, String monthYear1, String monthYear2) {
     	
 	    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-yyyy");
@@ -2492,6 +2229,7 @@ public class MarketingOrderServiceImpl {
             List<Map<String, Object>> listData = detailMarketingOrderRepo.getDataTable(
 	    	        totalHKTT1, totalHKTT2, totalHKTT3,
 	    	        totalHKTL1, totalHKTL2, totalHKTL3,
+	    	        totalHKTB1, totalHKTB2, totalHKTB3,
 	    	        productMerk
 	    	    );
 
@@ -2500,6 +2238,8 @@ public class MarketingOrderServiceImpl {
     	    for (Map<String, Object> rowData : listData) {
     	        ViewDetailMarketingOrder product = new ViewDetailMarketingOrder();
     	            	        
+    	        product.setMachineType(rowData.get("MACHINE_TYPE") != null ? rowData.get("MACHINE_TYPE").toString() : null);
+    	        product.setMinOrder(rowData.get("MIN_ORDER") != null ? new BigDecimal(rowData.get("MIN_ORDER").toString()) : BigDecimal.ZERO);
     	        product.setPartNumber(rowData.get("PART_NUMBER") != null ? new BigDecimal(rowData.get("PART_NUMBER").toString()) : BigDecimal.ZERO);
     	        product.setSpareMould(rowData.get("SPARE_MOULD") != null ? new BigDecimal(rowData.get("SPARE_MOULD").toString()) : BigDecimal.ZERO);
     	        product.setMouldMonthlyPlan(rowData.get("MOULD_MONTHLY_PLAN") != null ? new BigDecimal(rowData.get("MOULD_MONTHLY_PLAN").toString()) : BigDecimal.ZERO);
@@ -2527,7 +2267,7 @@ public class MarketingOrderServiceImpl {
     	    }
 
     	    List<ViewDetailMarketingOrder> detailMarketingOrders = productList; 
-
+    	    productList.sort(sortByCategoryThenNamePPC);
     	    return detailMarketingOrders; 
     	}
     
@@ -2599,6 +2339,7 @@ public class MarketingOrderServiceImpl {
         response.setDataHeaderMo(headerResponses);
 
         List<ViewDetailMarketingOrder> detailResponses = new ArrayList<>();
+        detailMarketingOrders.sort(sortByCategoryThenName);
         for (DetailMarketingOrder detail : detailMarketingOrders) {
         	ViewDetailMarketingOrder detailResponse = new ViewDetailMarketingOrder();
         	
@@ -2757,31 +2498,57 @@ public class MarketingOrderServiceImpl {
 	                if (hk.compareTo(BigDecimal.ZERO) != 0) {
 		                System.out.println("ini ppddd " + hk);
 	                    ppd = totalMO.divide(hk, RoundingMode.HALF_UP); 
+	                    detailMo.setPpd(ppd);
 	                    
 	                } else {
-	                    System.err.println("Warning: HK is zero, setting ppd to zero.");
+	                    System.out.println("Warning: HK is zero, setting ppd to zero.");
+	                    detailMo.setPpd(BigDecimal.ZERO);
+	                    System.out.println("Warning: HK is zero, setting ppd to zero.");
 	                }
 	                System.out.println("ini ppd " + ppd);
+	                
+	                BigDecimal cav;
 	
-	                detailMo.setPpd(ppd);
-	                BigDecimal cav = ppd.divide(detailMo.getCapacity(), RoundingMode.HALF_UP);
-	                if (cav.compareTo(BigDecimal.ONE) < 0) {
-		                detailMo.setCav(BigDecimal.ONE);
-	                }else {
-		                detailMo.setCav(cav);
-	                }
-	                
-	                for(ItemCuring cur : curingList) {
-	                	if(cur.getITEM_CURING().compareTo(itemCuring) == 0) {
-	                		if(cur.getMACHINE_TYPE().compareTo("A/B") == 0) {
-	                			abM0 = abM0.add(detailMo.getMoMonth0());
-	                			abM1 = abM0.add(detailMo.getMoMonth1());
-	                			abM2 = abM0.add(detailMo.getMoMonth2());
-	                		}
-	                	}
-	                }
-	                
-		            headerMarketingOrderRepo.save(headerMO); 
+                    if (detailMo.getCapacity().compareTo(BigDecimal.ZERO) == 0) {
+                        System.out.println("Warning: Capacity is zero, setting cav to 1");
+                        cav = BigDecimal.ONE;  // or whatever default you want
+                    } else {
+                        cav = ppd.divide(detailMo.getCapacity(), RoundingMode.HALF_UP);
+                        System.out.println("Calculated cav: " + cav);
+                    }
+
+                    System.out.println("Calculated cav: " + cav);
+
+                    if (cav.compareTo(BigDecimal.ONE) < 0) {
+                    	System.out.println("cav is less than 1, set to 1");
+                        detailMo.setCav(BigDecimal.ONE);
+                    } else {
+                    	System.out.println("cav is greater or equal to 1, set to: " + cav);
+                        detailMo.setCav(cav);
+                    }
+
+                    for (ItemCuring cur : curingList) {
+                        System.out.println("Checking ItemCuring: " + cur.getITEM_CURING() + " with MACHINE_TYPE: " + cur.getMACHINE_TYPE());
+
+                        if (cur.getITEM_CURING() != null && itemCuring != null && cur.getITEM_CURING().equals(itemCuring)) {
+                            System.out.println("Matched ITEM_CURING: " + cur.getITEM_CURING());
+
+                            if ("A/B".equals(cur.getMACHINE_TYPE())) {
+                                System.out.println("MACHINE_TYPE is A/B. Adding MO values:");
+                                System.out.println("Before: abM0 = " + abM0 + ", abM1 = " + abM1 + ", abM2 = " + abM2);
+
+                                abM0 = abM0.add(detailMo.getMoMonth0());
+                                abM1 = abM0.add(detailMo.getMoMonth1());
+                                abM2 = abM0.add(detailMo.getMoMonth2());
+
+                                System.out.println("After: abM0 = " + abM0 + ", abM1 = " + abM1 + ", abM2 = " + abM2);
+                            }
+                        }
+                    }
+
+                    System.out.println("Saving headerMarketingOrder: " + headerMO);
+                    headerMarketingOrderRepo.save(headerMO);
+
 	            }
 	            detailResponses.add(detailMarketingOrderRepo.save(detailMo)); 
         	}
@@ -2923,12 +2690,13 @@ public class MarketingOrderServiceImpl {
             detailMo.setMaxCapMonth2(detaill.getMaxCapMonth2());
             detailMo.setInitialStock(detaill.getInitialStock());
             
-            detailMo.setSfMonth0(detaill.getSfMonth0());
-            detailMo.setSfMonth1(detaill.getSfMonth1());
-            detailMo.setSfMonth2(detaill.getSfMonth2());
-            detailMo.setMoMonth0(detaill.getMoMonth0());
-            detailMo.setMoMonth1(detaill.getMoMonth1());
-            detailMo.setMoMonth2(detaill.getMoMonth2());
+            detailMo.setSfMonth0(detaill.getSfMonth0() != null ? detaill.getSfMonth0() : BigDecimal.ZERO);
+            detailMo.setSfMonth1(detaill.getSfMonth1() != null ? detaill.getSfMonth1() : BigDecimal.ZERO);
+            detailMo.setSfMonth2(detaill.getSfMonth2() != null ? detaill.getSfMonth2() : BigDecimal.ZERO);
+
+            detailMo.setMoMonth0(detaill.getMoMonth0() != null ? detaill.getMoMonth0() : BigDecimal.ZERO);
+            detailMo.setMoMonth1(detaill.getMoMonth1() != null ? detaill.getMoMonth1() : BigDecimal.ZERO);
+            detailMo.setMoMonth2(detaill.getMoMonth2() != null ? detaill.getMoMonth2() : BigDecimal.ZERO);
             detailMo.setLockStatusM0(detaill.getLockStatusM0());
             detailMo.setLockStatusM1(detaill.getLockStatusM1());
             detailMo.setLockStatusM2(detaill.getLockStatusM2());
@@ -2958,14 +2726,14 @@ public class MarketingOrderServiceImpl {
                 if (prot.getPRODUCT_TYPE_ID().equals(prodType)) {
                     if (prot.getPRODUCT_TYPE().equals("TT")) {
                         hk = HKTT;
-                        ttM0 = ttM0.add(detaill.getMoMonth0());
-                        ttM1 = ttM1.add(detaill.getMoMonth1());
-                        ttM2 = ttM2.add(detaill.getMoMonth2());
+                        ttM0 = ttM0.add(detaill.getMoMonth0() != null ? detaill.getMoMonth0() : BigDecimal.ZERO);
+                        ttM1 = ttM1.add(detaill.getMoMonth1() != null ? detaill.getMoMonth1() : BigDecimal.ZERO);
+                        ttM2 = ttM2.add(detaill.getMoMonth2() != null ? detaill.getMoMonth2() : BigDecimal.ZERO);
                     } else if (prot.getPRODUCT_TYPE().equals("TL")) {
                         hk = HKTL;
-                        tlM0 = tlM0.add(detaill.getMoMonth0());
-                        tlM1 = tlM1.add(detaill.getMoMonth1());
-                        tlM2 = tlM2.add(detaill.getMoMonth2());
+                        tlM0 = tlM0.add(detaill.getMoMonth0() != null ? detaill.getMoMonth0() : BigDecimal.ZERO);
+                        tlM1 = tlM1.add(detaill.getMoMonth1() != null ? detaill.getMoMonth1() : BigDecimal.ZERO);
+                        tlM2 = tlM2.add(detaill.getMoMonth2() != null ? detaill.getMoMonth2() : BigDecimal.ZERO);
                     }
                     break;
                 }
@@ -2989,9 +2757,9 @@ public class MarketingOrderServiceImpl {
             for (ItemCuring cur : curingList) {
                 if (cur.getITEM_CURING().compareTo(itemCuring) == 0) {
                     if (cur.getMACHINE_TYPE().compareTo("A/B") == 0) {
-                        abM0 = abM0.add(detaill.getMoMonth0());
-                        abM1 = abM1.add(detaill.getMoMonth1());
-                        abM2 = abM2.add(detaill.getMoMonth2());
+                        abM0 = abM0.add(detaill.getMoMonth0() != null ? detaill.getMoMonth0() : BigDecimal.ZERO);
+                        abM1 = abM1.add(detaill.getMoMonth1() != null ? detaill.getMoMonth1() : BigDecimal.ZERO);
+                        abM2 = abM2.add(detaill.getMoMonth2() != null ? detaill.getMoMonth2() : BigDecimal.ZERO);
                     }
                 }
             }
@@ -3359,6 +3127,13 @@ public class MarketingOrderServiceImpl {
 	    	return byteArrayInputStream;
 	    }
 	    
+        public static String safeDecimalString(BigDecimal value) {
+            if (value == null) {
+                return "0";
+            }
+            return value.toPlainString().replace(",", ".");
+        }
+
 	    
 	  //EXPORT MARKETING ORDER
 	    public ByteArrayInputStream dataToExcel(String id) throws IOException {
@@ -3630,165 +3405,211 @@ public class MarketingOrderServiceImpl {
 	                    titleCell.setCellValue(monthFormat.format(marketingOrder.getMonth2()));
 	                    titleCell.setCellStyle(calibriBold12BL);
 	            	} else if (i == 1) {
-	            		sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
-	            		headerMORow = sheet.createRow(i);
-	                    headerMOCell = headerMORow.createCell(13);
-	                    headerMOCell.setCellValue(headerMO[i]);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(14);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(15);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    
-	                    headerMOCell = headerMORow.createCell(16);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(0).getWdNormalTire() != null ? headerMarketingOrder.get(0).getWdNormalTire().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(17);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(1).getWdNormalTire() != null ? headerMarketingOrder.get(1).getWdNormalTire().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(18);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(2).getWdNormalTire() != null ? headerMarketingOrder.get(2).getWdNormalTire().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	            	} else if (i == 2) {
-	            		sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
-	            		monthCell = monthRow.createCell(13);
-	            		monthCell.setCellValue(headerMO[i]);
-	            		monthCell.setCellStyle(calibriBold11B);
-	            		monthCell = monthRow.createCell(14);
-	            		monthCell.setCellStyle(calibriBold11B);
-	            		monthCell = monthRow.createCell(15);
-	            		monthCell.setCellStyle(calibriBold11B);
-	                    
-	            		monthCell = monthRow.createCell(16);
-	            		monthCell.setCellValue(headerMarketingOrder.get(0).getWdNormalTube() != null ? headerMarketingOrder.get(0).getWdNormalTube().doubleValue() : 0);
-	            		monthCell.setCellStyle(calibri11DecBold);
-	            		monthCell = monthRow.createCell(17);
-	            		monthCell.setCellValue(headerMarketingOrder.get(1).getWdNormalTube() != null ? headerMarketingOrder.get(1).getWdNormalTube().doubleValue() : 0);
-	            		monthCell.setCellStyle(calibri11DecBold);
-	            		monthCell = monthRow.createCell(18);
-	            		monthCell.setCellValue(headerMarketingOrder.get(2).getWdNormalTube() != null ? headerMarketingOrder.get(2).getWdNormalTube().doubleValue() : 0);
-	            		monthCell.setCellStyle(calibri11DecBold);
-	            	} else if (i == 3) {
-	            		sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
-	            		headerMORow = sheet.createRow(i);
-	            		headerMOCell = headerMORow.createCell(13);
-	            		headerMOCell.setCellValue(headerMO[i]);
-	            		headerMOCell.setCellStyle(calibriBold11B);
-	            		headerMOCell = headerMORow.createCell(14);
-	            		headerMOCell.setCellStyle(calibriBold11B);
-	            		headerMOCell = headerMORow.createCell(15);
-	            		headerMOCell.setCellStyle(calibriBold11B);
-	                    
-	            		headerMOCell = headerMORow.createCell(16);
-	            		headerMOCell.setCellValue(headerMarketingOrder.get(0).getWdOtTl() != null ? headerMarketingOrder.get(0).getWdOtTl().doubleValue() : 0);
-	            		headerMOCell.setCellStyle(calibri11DecBold);
-	            		headerMOCell = headerMORow.createCell(17);
-	            		headerMOCell.setCellValue(headerMarketingOrder.get(1).getWdOtTl() != null ? headerMarketingOrder.get(1).getWdOtTl().doubleValue() : 0);
-	            		headerMOCell.setCellStyle(calibri11DecBold);
-	            		headerMOCell = headerMORow.createCell(18);
-	            		headerMOCell.setCellValue(headerMarketingOrder.get(2).getWdOtTl() != null ? headerMarketingOrder.get(2).getWdOtTl().doubleValue() : 0);
-	            		headerMOCell.setCellStyle(calibri11DecBold);
-	            	} else if (i == 4) {
-	            		sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
-	            		headerMORow = sheet.createRow(i);
-	                    headerMOCell = headerMORow.createCell(13);
-	                    headerMOCell.setCellValue(headerMO[i]);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(14);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(15);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    
-	                    headerMOCell = headerMORow.createCell(16);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(0).getWdOtTt() != null ? headerMarketingOrder.get(0).getWdOtTt().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(17);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(1).getWdOtTt() != null ? headerMarketingOrder.get(1).getWdOtTt().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(18);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(2).getWdOtTt() != null ? headerMarketingOrder.get(2).getWdOtTt().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	            	} else if (i == 5) {
-	            		sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
-	            		headerMORow = sheet.createRow(i);
-	                    headerMOCell = headerMORow.createCell(13);
-	                    headerMOCell.setCellValue(headerMO[i]);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(14);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(15);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    
-	                    headerMOCell = headerMORow.createCell(16);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(0).getWdOtTube() != null ? headerMarketingOrder.get(0).getWdOtTube().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(17);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(1).getWdOtTube() != null ? headerMarketingOrder.get(1).getWdOtTube().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(18);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(2).getWdOtTube() != null ? headerMarketingOrder.get(2).getWdOtTube().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	            	} else if (i == 6) {
-	            		sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
-	            		headerMORow = sheet.createRow(i);
-	                    headerMOCell = headerMORow.createCell(13);
-	                    headerMOCell.setCellValue(headerMO[i]);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(14);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(15);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    
-	                    headerMOCell = headerMORow.createCell(16);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(0).getTotalWdTl() != null ? headerMarketingOrder.get(0).getTotalWdTl().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(17);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(1).getTotalWdTl() != null ? headerMarketingOrder.get(1).getTotalWdTl().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(18);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(2).getTotalWdTl() != null ? headerMarketingOrder.get(2).getTotalWdTl().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	            	} else if (i == 7) {
-	            		sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
-	            		headerMORow = sheet.createRow(i);
-	                    headerMOCell = headerMORow.createCell(13);
-	                    headerMOCell.setCellValue(headerMO[i]);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(14);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(15);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    
-	                    headerMOCell = headerMORow.createCell(16);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(0).getTotalWdTt() != null ? headerMarketingOrder.get(0).getTotalWdTt().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(17);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(1).getTotalWdTt() != null ? headerMarketingOrder.get(1).getTotalWdTt().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(18);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(2).getTotalWdTt() != null ? headerMarketingOrder.get(2).getTotalWdTt().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	            	} else if (i == 8) {
-	            		sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
-	            		headerMORow = sheet.createRow(i);
-	                    headerMOCell = headerMORow.createCell(13);
-	                    headerMOCell.setCellValue(headerMO[i]);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(14);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    headerMOCell = headerMORow.createCell(15);
-	                    headerMOCell.setCellStyle(calibriBold11B);
-	                    
-	                    headerMOCell = headerMORow.createCell(16);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(0).getTotalWdTube() != null ? headerMarketingOrder.get(0).getTotalWdTube().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(17);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(1).getTotalWdTube() != null ? headerMarketingOrder.get(1).getTotalWdTube().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	                    headerMOCell = headerMORow.createCell(18);
-	                    headerMOCell.setCellValue(headerMarketingOrder.get(2).getTotalWdTube() != null ? headerMarketingOrder.get(2).getTotalWdTube().doubleValue() : 0);
-	                    headerMOCell.setCellStyle(calibri11DecBold);
-	            	} else if (i == 9) {
+                        sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
+                        headerMORow = sheet.createRow(i);
+
+                        headerMOCell = headerMORow.createCell(13);
+                        headerMOCell.setCellValue(headerMO[i]);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(14);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(15);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(16);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(0).getWdNormalTire()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(17);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(1).getWdNormalTire()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(18);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(2).getWdNormalTire()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                    } else if (i == 2) {
+                        sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
+                        monthCell = monthRow.createCell(13);
+                        monthCell.setCellValue(headerMO[i]);
+                        monthCell.setCellStyle(calibriBold11B);
+
+                        monthCell = monthRow.createCell(14);
+                        monthCell.setCellStyle(calibriBold11B);
+
+                        monthCell = monthRow.createCell(15);
+                        monthCell.setCellStyle(calibriBold11B);
+
+                        monthCell = monthRow.createCell(16);
+                        monthCell.setCellValue(safeDecimalString(headerMarketingOrder.get(0).getWdNormalTube()));
+                        monthCell.setCellStyle(calibri11DecBold);
+
+                        monthCell = monthRow.createCell(17);
+                        monthCell.setCellValue(safeDecimalString(headerMarketingOrder.get(1).getWdNormalTube()));
+                        monthCell.setCellStyle(calibri11DecBold);
+
+                        monthCell = monthRow.createCell(18);
+                        monthCell.setCellValue(safeDecimalString(headerMarketingOrder.get(2).getWdNormalTube()));
+                        monthCell.setCellStyle(calibri11DecBold);
+
+                    } else if (i == 3) {
+                        sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
+                        headerMORow = sheet.createRow(i);
+
+                        headerMOCell = headerMORow.createCell(13);
+                        headerMOCell.setCellValue(headerMO[i]);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(14);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(15);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(16);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(0).getWdOtTl()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(17);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(1).getWdOtTl()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(18);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(2).getWdOtTl()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                    } else if (i == 4) {
+                        sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
+                        headerMORow = sheet.createRow(i);
+
+                        headerMOCell = headerMORow.createCell(13);
+                        headerMOCell.setCellValue(headerMO[i]);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(14);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(15);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(16);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(0).getWdOtTt()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(17);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(1).getWdOtTt()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(18);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(2).getWdOtTt()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                    } else if (i == 5) {
+                        sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
+                        headerMORow = sheet.createRow(i);
+
+                        headerMOCell = headerMORow.createCell(13);
+                        headerMOCell.setCellValue(headerMO[i]);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(14);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(15);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(16);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(0).getWdOtTube()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(17);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(1).getWdOtTube()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(18);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(2).getWdOtTube()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                    } else if (i == 6) {
+                        sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
+                        headerMORow = sheet.createRow(i);
+
+                        headerMOCell = headerMORow.createCell(13);
+                        headerMOCell.setCellValue(headerMO[i]);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(14);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(15);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(16);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(0).getTotalWdTl()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(17);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(1).getTotalWdTl()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(18);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(2).getTotalWdTl()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                    } else if (i == 7) {
+                        sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
+                        headerMORow = sheet.createRow(i);
+
+                        headerMOCell = headerMORow.createCell(13);
+                        headerMOCell.setCellValue(headerMO[i]);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(14);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(15);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(16);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(0).getTotalWdTt()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(17);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(1).getTotalWdTt()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(18);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(2).getTotalWdTt()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                    } else if (i == 8) {
+                        sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
+                        headerMORow = sheet.createRow(i);
+
+                        headerMOCell = headerMORow.createCell(13);
+                        headerMOCell.setCellValue(headerMO[i]);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(14);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(15);
+                        headerMOCell.setCellStyle(calibriBold11B);
+
+                        headerMOCell = headerMORow.createCell(16);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(0).getTotalWdTube()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(17);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(1).getTotalWdTube()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+
+                        headerMOCell = headerMORow.createCell(18);
+                        headerMOCell.setCellValue(safeDecimalString(headerMarketingOrder.get(2).getTotalWdTube()));
+                        headerMOCell.setCellStyle(calibri11DecBold);
+                    } else if (i == 9) {
 	            		sheet.addMergedRegion(new CellRangeAddress(i, i, 13, 15));
 	            		headerMORow = sheet.createRow(i);
 	                    headerMOCell = headerMORow.createCell(13);
@@ -4027,6 +3848,49 @@ public class MarketingOrderServiceImpl {
 	            
 	            // Mengisi data
 	            int rowIndex = 21;
+//                sortBySpecAndName(detailMarketingOrder);
+//                detailMarketingOrder.sort(Comparator
+//                    .comparing((DetailMarketingOrder dMo) -> {
+//                        String[] parts = dMo.getDescription().split(" ");
+//                        // If `RACING` is there → spec is parts[4]
+//                        // else → spec is parts[3]
+//                        String spec = "";
+//                        if (parts.length >= 5 && parts[3].equalsIgnoreCase("RACING")) {
+//                            spec = parts[4];
+//                        } else if (parts.length >= 4) {
+//                            spec = parts[3];
+//                        }
+//                        return spec;
+//                    }, (spec1, spec2) -> {
+//                        try {
+//                            String[] s1 = spec1.split("-");
+//                            String[] s2 = spec2.split("-");
+//                            double w1 = Double.parseDouble(s1[0].replace("/", ".").replace(",", "."));
+//                            double w2 = Double.parseDouble(s2[0].replace("/", ".").replace(",", "."));
+//                            int cmp = Double.compare(w1, w2);
+//                            if (cmp != 0) return cmp;
+//                            int d1 = Integer.parseInt(s1[1]);
+//                            int d2 = Integer.parseInt(s2[1]);
+//                            return Integer.compare(d1, d2);
+//                        } catch (Exception e) {
+//                            return spec1.compareTo(spec2); // fallback to string compare
+//                        }
+//                    })
+//                    .thenComparing((DetailMarketingOrder dMo) -> {
+//                        String[] parts = dMo.getDescription().split(" ");
+//                        if (parts.length >= 5 && parts[3].equalsIgnoreCase("RACING")) {
+//                            return parts[5];
+//                        } else if (parts.length >= 5) {
+//                            return parts[4];
+//                        }
+//                        return "";
+//                    })
+//                );
+	            
+//	            detailMarketingOrder.sort(comparator);
+	            
+	            detailMarketingOrder.sort(sortByCategoryThenName);
+	            
 	            for (DetailMarketingOrder dMo : detailMarketingOrder) {
 	                Row dataRow = sheet.createRow(rowIndex++);
 
@@ -4113,6 +3977,244 @@ public class MarketingOrderServiceImpl {
 	            out.close(); // Tutup output stream setelah selesai
 	        }
 	    }
+	    
+	    // Comparator<DetailMarketingOrder> sortByNameOnly = Comparator.comparing(dMo -> {
+	    //     String desc = dMo.getDescription();
+	    //     String[] parts = desc.trim().split("\\s+");
+
+	    //     // Example: FDR TR TL RACING 120/70-17 MAXTREME SE
+	    //     // Or: FDR TR TL 120/70-17 SPORT XR EVO
+
+	    //     String namePart;
+	    //     if (parts.length >= 6 && parts[3].equalsIgnoreCase("RACING")) {
+	    //         // If "RACING" → name starts at parts[5] onward
+	    //         StringBuilder name = new StringBuilder();
+	    //         for (int i = 5; i < parts.length; i++) {
+	    //             name.append(parts[i]).append(" ");
+	    //         }
+	    //         namePart = name.toString().trim();
+	    //     } else if (parts.length >= 5) {
+	    //         // No "RACING" → name starts at parts[4] onward
+	    //         StringBuilder name = new StringBuilder();
+	    //         for (int i = 4; i < parts.length; i++) {
+	    //             name.append(parts[i]).append(" ");
+	    //         }
+	    //         namePart = name.toString().trim();
+	    //     } else {
+	    //         namePart = ""; // fallback
+	    //     }
+
+	    //     return namePart.toUpperCase(); // to ignore case
+	    // });
+
+        // Comparator<DetailMarketingOrder> sortByNameOnly = Comparator.comparing(dMo -> {
+        //     String desc = dMo.getDescription();
+        //     if (desc == null || desc.isBlank()) {
+        //         return "ZZZ"; // null or blank → goes last alphabetically
+        //     }
+
+        //     String[] parts = desc.trim().split("\\s+");
+
+        //     String namePart;
+        //     if (parts.length >= 6 && parts[3].equalsIgnoreCase("RACING")) {
+        //         StringBuilder name = new StringBuilder();
+        //         for (int i = 5; i < parts.length; i++) {
+        //             name.append(parts[i]).append(" ");
+        //         }
+        //         namePart = name.toString().trim();
+        //     } else if (parts.length >= 5) {
+        //         StringBuilder name = new StringBuilder();
+        //         for (int i = 4; i < parts.length; i++) {
+        //             name.append(parts[i]).append(" ");
+        //         }
+        //         namePart = name.toString().trim();
+        //     } else {
+        //         namePart = ""; // fallback
+        //     }
+
+        //     if (namePart.isEmpty()) {
+        //         return "ZZZ"; // unknown name → push last too
+        //     }
+
+        //     return namePart.toUpperCase();
+        // });
+
+        // Comparator<DetailMarketingOrder> sortByNameOnly = Comparator.comparing(dMo -> {
+        //     String desc = dMo.getDescription();
+        //     if (desc == null || desc.isBlank()) {
+        //         return "ZZZ"; // null goes last
+        //     }
+
+        //     String result = desc.trim();
+
+        //     // 1. Remove BRAND: FED or FDR
+        //     result = result.replaceFirst("^(FED|FDR)\\s+", "");
+
+        //     // 2. Remove known type markers: TR TT, TR TL, SET, SET-R, TB, NR, RACING
+        //     result = result.replaceFirst("^(TR\\s+TT|TR\\s+TL|SET-R|SET|TB)\\s+", "");
+        //     result = result.replaceFirst("^NR\\s+", "");
+        //     result = result.replaceFirst("^RACING\\s+", "");
+
+        //     // Sometimes NR appears *after* type:
+        //     result = result.replaceFirst("^NR\\s+", "");
+
+        //     // 3. Remove the spec: e.g. 2.75-17, 70/90-17, 120/70-14, 120/65 R17
+        //     result = result.replaceFirst("^\\d+(\\.\\d+)?/\\d+(\\.\\d+)?\\s*[-R]\\s*\\d+\\s*", "");
+        //     result = result.replaceFirst("^\\d+(\\.\\d+)?-\\d+\\s*", "");
+
+        //     // 4. Trim result → name
+        //     String name = result.trim();
+        //     if (name.isEmpty()) {
+        //         return "ZZZ";
+        //     }
+
+        //     return name.toUpperCase();
+        // });
+
+        Comparator<DetailMarketingOrder> sortByCategoryThenName =
+            Comparator.comparing((DetailMarketingOrder dMo) -> {
+                String desc = dMo.getDescription();
+                // If description contains "FED", sort by category
+                if (desc != null && desc.toUpperCase().contains("FED")) {
+                    return dMo.getCategory();
+                }
+                // Otherwise, just return category as usual
+                return dMo.getCategory();
+            }, Comparator.nullsLast(Comparator.naturalOrder()))
+            .thenComparing(dMo -> {
+                String desc = dMo.getDescription();
+                if (desc == null || desc.isBlank()) {
+                    return "ZZZ"; // null goes last
+                }
+
+                String result = desc.trim();
+
+                // 1. Remove BRAND: FED or FDR
+                result = result.replaceFirst("^(FED|FDR)\\s+", "");
+
+                // 2. Remove known type markers: TR TT, TR TL, SET, SET-R, TB, NR, RACING
+                result = result.replaceFirst("^(TR\\s+TT|TR\\s+TL|SET-R|SET|TB)\\s+", "");
+                result = result.replaceFirst("^NR\\s+", "");
+                result = result.replaceFirst("^RACING\\s+", "");
+
+                // 3. Remove the spec: e.g. 2.75-17, 70/90-17, 120/70-14, 120/65 R17
+                result = result.replaceFirst("^\\d+(\\.\\d+)?/\\d+(\\.\\d+)?\\s*[-R]\\s*\\d+\\s*", "");
+                result = result.replaceFirst("^\\d+(\\.\\d+)?-\\d+\\s*", "");
+
+                // 4. Trim result → name
+                String name = result.trim();
+                if (name.isEmpty()) {
+                    return "ZZZ";
+                }
+
+                return name.toUpperCase();
+            });
+
+
+
+	    
+	    Comparator<DetailMarketingOrder> comparator = Comparator
+	    	    .comparing((DetailMarketingOrder dMo) -> {
+	    	        String[] parts = dMo.getDescription().split(" ");
+	    	        // Get type: "TT" or "TL"
+	    	        return parts.length >= 3 ? parts[2] : "";
+	    	    })
+	    	    .thenComparing((DetailMarketingOrder dMo) -> {
+	    	        String[] parts = dMo.getDescription().split(" ");
+	    	        String spec = "";
+	    	        if (parts.length >= 5 && parts[3].equalsIgnoreCase("RACING")) {
+	    	            spec = parts[4];
+	    	        } else if (parts.length >= 4) {
+	    	            spec = parts[3];
+	    	        }
+	    	        return spec;
+	    	    }, (spec1, spec2) -> {
+	    	        try {
+	    	            // Clean possible leading/trailing spaces
+	    	            spec1 = spec1.trim();
+	    	            spec2 = spec2.trim();
+	    	            
+	    	            String[] s1 = spec1.split("-");
+	    	            String[] s2 = spec2.split("-");
+
+	    	            String w1Part = s1[0].replace("R", "").replace("/", ".");
+	    	            String w2Part = s2[0].replace("R", "").replace("/", ".");
+
+	    	            double w1 = Double.parseDouble(w1Part);
+	    	            double w2 = Double.parseDouble(w2Part);
+
+	    	            int cmp = Double.compare(w1, w2);
+	    	            if (cmp != 0) return cmp;
+
+	    	            int d1 = Integer.parseInt(s1[1].replaceAll("[^0-9]", ""));
+	    	            int d2 = Integer.parseInt(s2[1].replaceAll("[^0-9]", ""));
+	    	            return Integer.compare(d1, d2);
+	    	        } catch (Exception e) {
+	    	            return spec1.compareTo(spec2);
+	    	        }
+	    	    })
+	    	    .thenComparing((DetailMarketingOrder dMo) -> {
+	    	        String[] parts = dMo.getDescription().split(" ");
+	    	        if (parts.length >= 5 && parts[3].equalsIgnoreCase("RACING")) {
+	    	            return String.join(" ", parts).split(" ", 6)[5].trim();
+	    	        } else if (parts.length >= 5) {
+	    	            return parts[4].trim();
+	    	        }
+	    	        return "";
+	    	    });
+
+        public static void sortBySpecAndName(List<DetailMarketingOrder> orders) {
+            orders.sort(new Comparator<DetailMarketingOrder>() {
+                @Override
+                public int compare(DetailMarketingOrder o1, DetailMarketingOrder o2) {
+                    String[] parts1 = splitDescription(o1.getDescription());
+                    String[] parts2 = splitDescription(o2.getDescription());
+
+                    int specCompare = compareSpecs(parts1[0], parts2[0]);
+                    if (specCompare != 0) {
+                        return specCompare;
+                    }
+
+                    return parts1[1].compareTo(parts2[1]);
+                }
+
+                private String[] splitDescription(String description) {
+                    if (description == null) return new String[]{"", ""};
+                    String[] tokens = description.split(" ");
+                    if (tokens.length < 5) return new String[]{"", ""};
+                    String spec = tokens[3];
+                    String name = tokens[4];
+                    return new String[]{spec, name};
+                }
+
+                private int compareSpecs(String spec1, String spec2) {
+                    // Example: "2.75-18" vs "100/90-18"
+                    // or "70/90-14" vs "80/90-17"
+                    // Try to compare by width first, then profile, then rim.
+
+                    // Normalize to same format for easier splitting
+                    String[] s1 = spec1.split("[-/]");
+                    String[] s2 = spec2.split("[-/]");
+
+                    try {
+                        int w1 = Integer.parseInt(s1[0].replace(".", ""));
+                        int w2 = Integer.parseInt(s2[0].replace(".", ""));
+                        if (w1 != w2) return Integer.compare(w1, w2);
+
+                        int p1 = s1.length > 1 ? Integer.parseInt(s1[1].replace(".", "")) : 0;
+                        int p2 = s2.length > 1 ? Integer.parseInt(s2[1].replace(".", "")) : 0;
+                        if (p1 != p2) return Integer.compare(p1, p2);
+
+                        int r1 = s1.length > 2 ? Integer.parseInt(s1[2]) : (s1.length > 1 ? Integer.parseInt(s1[1]) : 0);
+                        int r2 = s2.length > 2 ? Integer.parseInt(s2[2]) : (s2.length > 1 ? Integer.parseInt(s2[1]) : 0);
+                        return Integer.compare(r1, r2);
+
+                    } catch (Exception e) {
+                        return spec1.compareTo(spec2);
+                    }
+                }
+            });
+        }
 	    
 	    //------------------------------------------------------------------------------------------------------------------
 	    

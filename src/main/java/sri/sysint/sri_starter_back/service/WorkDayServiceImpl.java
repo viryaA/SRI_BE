@@ -163,28 +163,28 @@ public class WorkDayServiceImpl {
                 currentWorkDay.setOFF(workDay.getOFF());
                 currentWorkDay.setSEMI_OFF(workDay.getSEMI_OFF());
 
-                LocalDate dateWD;
-
-                try {
-                    dateWD = LocalDate.parse(workDay.getDATE_WD().toString());
-                } catch (Exception isoParseException) {
-                    try {
-                        SimpleDateFormat fullDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
-                        Date parsedDate = fullDateFormat.parse(workDay.getDATE_WD().toString());
-                        dateWD = parsedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    } catch (Exception e) {
-                        throw new RuntimeException("Unable to parse DATE_WD: " + workDay.getDATE_WD(), e);
-                    }
-                }
-
-                updateOffAndSemiOffSU(currentWorkDay, dateWD);                
+//                LocalDate dateWD;
+//
+//                try {
+//                    dateWD = LocalDate.parse(workDay.getDATE_WD().toString());
+//                } catch (Exception isoParseException) {
+//                    try {
+//                        SimpleDateFormat fullDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+//                        Date parsedDate = fullDateFormat.parse(workDay.getDATE_WD().toString());
+//                        dateWD = parsedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//                    } catch (Exception e) {
+//                        throw new RuntimeException("Unable to parse DATE_WD: " + workDay.getDATE_WD(), e);
+//                    }
+//                }
+//
+//                updateOffAndSemiOffSU(currentWorkDay, dateWD);                
                 currentWorkDay.setLAST_UPDATE_DATE(new Date());
                 currentWorkDay.setLAST_UPDATED_BY(workDay.getLAST_UPDATED_BY());
 
                 workDayRepo.save(currentWorkDay);
                 
-                updateSpesificHour(currentWorkDay, workDay.getDATE_WD());
-                
+//                updateSpesificHour(currentWorkDay, workDay.getDATE_WD());
+//                
                 return currentWorkDay;
             } else {
                 throw new RuntimeException("WorkDay with date " + workDay.getDATE_WD() + " not found.");

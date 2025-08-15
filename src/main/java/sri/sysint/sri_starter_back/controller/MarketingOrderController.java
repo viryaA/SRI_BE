@@ -101,31 +101,47 @@ public class MarketingOrderController {
     }
     
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping("/exportResumeMO/{month0}/{month1}/{month2}")
-	public ResponseEntity<InputStreamResource> exportResume(@PathVariable String month0, @PathVariable String month1, @PathVariable String month2) throws IOException {
-    	String MM = "";
-    	try {
-    		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            Date date0 = dateFormat.parse(month0);
+	@RequestMapping("/exportResumeMO/{month0}/{month1}/{month2}")
+	public ResponseEntity<InputStreamResource> exportResume(
+			@PathVariable String month0, 
+			@PathVariable String month1, 
+			@PathVariable String month2) throws IOException {
 
-            // Format ulang menjadi 3 huruf pertama bulan
-            SimpleDateFormat outputFormat0 = new SimpleDateFormat("MMM", Locale.ENGLISH);
-            String m0 = outputFormat0.format(date0).toUpperCase();
+		System.out.println("=== exportResumeMO called ===");
+		System.out.println("month0: " + month0);
+		System.out.println("month1: " + month1);
+		System.out.println("month2: " + month2);
 
-            MM = m0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-	    String filename = "Resume MO " + MM + ".xlsx";
-	    
-	    ByteArrayInputStream data = marketingOrderServiceImpl.resumeMO(month0, month1, month2);
-	    InputStreamResource file = new InputStreamResource(data);
-	    
-	    return ResponseEntity.ok()
-	        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-	        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-	        .body(file);
+		String MM = "";
+		try {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+			Date date0 = dateFormat.parse(month0);
+			System.out.println("Parsed date0: " + date0);
+
+			SimpleDateFormat outputFormat0 = new SimpleDateFormat("MMM", Locale.ENGLISH);
+			String m0 = outputFormat0.format(date0).toUpperCase();
+			System.out.println("Formatted m0: " + m0);
+
+			MM = m0;
+		} catch (Exception e) {
+			System.out.println("Exception while parsing month0: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		String filename = "Resume MO " + MM + ".xlsx";
+		System.out.println("Generated filename: " + filename);
+
+		ByteArrayInputStream data = marketingOrderServiceImpl.resumeMO(month0, month1, month2);
+		System.out.println("Received ByteArrayInputStream from resumeMO service");
+
+		InputStreamResource file = new InputStreamResource(data);
+
+		return ResponseEntity.ok()
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+			.contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+			.body(file);
 	}
+
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/arRejectDefectMo")
@@ -291,34 +307,63 @@ public class MarketingOrderController {
 		BigDecimal totalWdTlM0 = new BigDecimal((String) params.get("totalHKTL1"));
 		BigDecimal totalWdTlM1 = new BigDecimal((String) params.get("totalHKTL2"));
 		BigDecimal totalWdTlM2 = new BigDecimal((String) params.get("totalHKTL3"));
+		BigDecimal totalWdTbM0 = new BigDecimal((String) params.get("totalHKTB1"));
+		BigDecimal totalWdTbM1 = new BigDecimal((String) params.get("totalHKTB2"));
+		BigDecimal totalWdTbM2 = new BigDecimal((String) params.get("totalHKTB3"));
 		String typeMo = (String) params.get("productMerk");
 
 		List<ViewDetailMarketingOrder> detailMarketingOrders = marketingOrderServiceImpl.getDetailMarketingOrders(
 				totalWdTtM0, totalWdTtM1, totalWdTtM2,
 				totalWdTlM0, totalWdTlM1, totalWdTlM2,
+				totalWdTbM0, totalWdTbM1, totalWdTbM2,
 				typeMo, monthYear0, monthYear1, monthYear2
 		);
 
 		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), detailMarketingOrders);
 		return response;
 	}
-
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/saveMarketingOrderMarketing")
 	public Response saveMarketingOrderMarketing(final HttpServletRequest req, @RequestBody List<ViewDetailMarketingOrder> detailMOList) throws ResourceNotFoundException {
 
+		System.out.println("===== START saveMarketingOrderMarketing =====");
+		System.out.println("Received detailMOList size: " + detailMOList.size());
+
 		for (ViewDetailMarketingOrder detail : detailMOList) {
-			System.out.println("Ini lock status dari db" + detail.toString());
+			System.out.println("Input ViewDetailMarketingOrder: "
+				+ "detailId=" + detail.getDetailId()
+				+ ", moId=" + detail.getMoId()
+				+ ", category=" + detail.getCategory()
+				+ ", partNumber=" + detail.getPartNumber()
+				+ ", description=" + detail.getDescription()
+				+ ", machineType=" + detail.getMachineType()
+				+ ", capacity=" + detail.getCapacity()
+				+ ", qtyPerMould=" + detail.getQtyPerMould()
+				+ ", qtyPerRak=" + detail.getQtyPerRak()
+				+ ", minOrder=" + detail.getMinOrder()
+				+ ", maxCapMonth0=" + detail.getMaxCapMonth0()
+				+ ", maxCapMonth1=" + detail.getMaxCapMonth1()
+				+ ", maxCapMonth2=" + detail.getMaxCapMonth2()
+				+ ", initialStock=" + detail.getInitialStock()
+				+ ", sfMonth0=" + detail.getSfMonth0()
+				+ ", sfMonth1=" + detail.getSfMonth1()
+				+ ", sfMonth2=" + detail.getSfMonth2()
+				+ ", moMonth0=" + detail.getMoMonth0()
+				+ ", moMonth1=" + detail.getMoMonth1()
+				+ ", moMonth2=" + detail.getMoMonth2()
+				+ ", ppd=" + detail.getPpd()
+				+ ", cav=" + detail.getCav()
+				+ ", lockStatusM0=" + detail.getLockStatusM0()
+				+ ", lockStatusM1=" + detail.getLockStatusM1()
+				+ ", lockStatusM2=" + detail.getLockStatusM2()
+			);
 		}
-		
-		// Create a list to hold the response data
+
 		List<DetailMarketingOrder> MOListProducts = new ArrayList<>();
 
-		// Map DetailMarketingOrder to ViewMO_ListProduct
 		for (ViewDetailMarketingOrder viewMO : detailMOList) {
 			DetailMarketingOrder detail = new DetailMarketingOrder();
-			
-			// Assign fields from the view model to the entity
+
 			detail.setDetailId(viewMO.getDetailId());
 			detail.setMoId(viewMO.getMoId());
 			detail.setCategory(viewMO.getCategory());
@@ -344,14 +389,48 @@ public class MarketingOrderController {
 			detail.setLockStatusM0(viewMO.getLockStatusM0());
 			detail.setLockStatusM1(viewMO.getLockStatusM1());
 			detail.setLockStatusM2(viewMO.getLockStatusM2());
+
+			// Explicit debug for each mapped entity field
+			System.out.println("Mapped DetailMarketingOrder: "
+				+ "detailId=" + detail.getDetailId()
+				+ ", moId=" + detail.getMoId()
+				+ ", category=" + detail.getCategory()
+				+ ", partNumber=" + detail.getPartNumber()
+				+ ", description=" + detail.getDescription()
+				+ ", machineType=" + detail.getMachineType()
+				+ ", capacity=" + detail.getCapacity()
+				+ ", qtyPerMould=" + detail.getQtyPerMould()
+				+ ", qtyPerRak=" + detail.getQtyPerRak()
+				+ ", minOrder=" + detail.getMinOrder()
+				+ ", maxCapMonth0=" + detail.getMaxCapMonth0()
+				+ ", maxCapMonth1=" + detail.getMaxCapMonth1()
+				+ ", maxCapMonth2=" + detail.getMaxCapMonth2()
+				+ ", initialStock=" + detail.getInitialStock()
+				+ ", sfMonth0=" + detail.getSfMonth0()
+				+ ", sfMonth1=" + detail.getSfMonth1()
+				+ ", sfMonth2=" + detail.getSfMonth2()
+				+ ", moMonth0=" + detail.getMoMonth0()
+				+ ", moMonth1=" + detail.getMoMonth1()
+				+ ", moMonth2=" + detail.getMoMonth2()
+				+ ", ppd=" + detail.getPpd()
+				+ ", cav=" + detail.getCav()
+				+ ", lockStatusM0=" + detail.getLockStatusM0()
+				+ ", lockStatusM1=" + detail.getLockStatusM1()
+				+ ", lockStatusM2=" + detail.getLockStatusM2()
+			);
+
 			MOListProducts.add(detail);
-			
 		}
+
+		System.out.println("Total DetailMarketingOrder to update: " + MOListProducts.size());
+
 		marketingOrderServiceImpl.updateDetailMOById(MOListProducts);
 
-		Response response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
-		return response;
+		System.out.println("===== END saveMarketingOrderMarketing =====");
+
+		return new Response(HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
 	}
+
 	
 
 	@PreAuthorize("isAuthenticated()")	    
