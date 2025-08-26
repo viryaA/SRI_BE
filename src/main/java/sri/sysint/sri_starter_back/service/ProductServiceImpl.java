@@ -157,7 +157,7 @@ public class ProductServiceImpl {
     }
     public Product activateProduct(Product product) {
         try {
-            Optional<Product> currentProductOpt = productRepo.findById(product.getPART_NUMBER());
+            Optional<Product> currentProductOpt = productRepo.findById(product.getID());
             
             if (currentProductOpt.isPresent()) {
             	Product currentProduct = currentProductOpt.get();

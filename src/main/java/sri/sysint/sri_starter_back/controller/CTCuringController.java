@@ -6,14 +6,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -35,9 +40,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import reactor.core.publisher.Flux;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import sri.sysint.sri_starter_back.exception.ResourceNotFoundException;
 import sri.sysint.sri_starter_back.model.CTAssy;
@@ -47,6 +56,7 @@ import sri.sysint.sri_starter_back.model.MachineCuring;
 import sri.sysint.sri_starter_back.model.Response;
 import sri.sysint.sri_starter_back.service.CTCuringServiceImpl;
 import sri.sysint.sri_starter_back.repository.ItemCuringRepo;
+import sri.sysint.sri_starter_back.repository.CTCuringRepo;
 import sri.sysint.sri_starter_back.repository.MachineCuringRepo;
 
 @CrossOrigin(maxAge = 3600)
@@ -57,6 +67,9 @@ public class CTCuringController {
 
 	@Autowired
 	private CTCuringServiceImpl ctCuringServiceImpl;
+
+	@Autowired
+	private CTCuringRepo ctCuringRepo;
 	
     @Autowired
     private ItemCuringRepo itemCuringRepo;
@@ -66,8 +79,40 @@ public class CTCuringController {
 
 	@PersistenceContext	
 	private EntityManager em;
+	
+    
 
-		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+    @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
+    private ObjectMapper mapper;
+
+    @GetMapping(value = "/ctcuring/stream", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional(readOnly = true)
+    public StreamingResponseBody streamAll() {
+        return outputStream -> {
+            try (Stream<CTCuring> stream = ctCuringRepo.streamAll()) {
+                ObjectMapper mapper = new ObjectMapper();
+
+                stream.forEach(entity -> {
+                    try {
+                        String json = mapper.writeValueAsString(entity);
+                        // write each JSON object followed by newline → NDJSON
+                        outputStream.write(json.getBytes());
+                        outputStream.write('\n');
+                        outputStream.flush();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        };
+    }
+
+	
+
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllCTCuring")
 	public Response getAllCTCuring(final HttpServletRequest req) throws ResourceNotFoundException {
 
@@ -86,7 +131,7 @@ public class CTCuringController {
 	    return response;
 	}
 
-		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@GetMapping("/getCTCuringById/{id}")
 	public Response getCTCuringById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
 
@@ -105,7 +150,7 @@ public class CTCuringController {
 	    return response;
 	}
 
-		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/saveCTCuring")
 	public Response saveCTCuring(final HttpServletRequest req, @RequestBody CTCuring ctCuring) throws ResourceNotFoundException {
 

@@ -77,6 +77,7 @@ import sri.sysint.sri_starter_back.model.view.ViewHeaderMarketingOrder;
 import sri.sysint.sri_starter_back.model.view.ViewMachineCuring;
 import sri.sysint.sri_starter_back.model.view.ViewMarketingOrder;
 import sri.sysint.sri_starter_back.repository.CTCuringRepo;
+import sri.sysint.sri_starter_back.repository.MonthlyPlanNewRepo;
 import sri.sysint.sri_starter_back.repository.DetailMarketingOrderRepo;
 
 
@@ -86,6 +87,9 @@ public class MarketingOrderServiceImpl {
 	
 	@Autowired
     private MarketingOrderRepo marketingOrderRepo;
+
+    @Autowired
+    private MonthlyPlanNewRepo monthlyPlanningNewRepo;
 	
 	@Autowired
     private MonthlyPlanRepo monthlyPlanningRepo;
@@ -4218,16 +4222,62 @@ public class MarketingOrderServiceImpl {
 	    
 	    //------------------------------------------------------------------------------------------------------------------
 	    
-	    public List<MonthlyPlan> getAllMp() {
-	    	Iterable<MonthlyPlan> mp = monthlyPlanningRepo.findAll();
-	        List<MonthlyPlan> mpList = new ArrayList<>();
-	        for (MonthlyPlan item : mp) {
-	        	MonthlyPlan mpTemp = new MonthlyPlan(item);
-	        	mpList.add(mpTemp);
-	        }
-	        return mpList;
-	    }
-	    
+        public List<Map<String, Object>> testingspmp() {
+//            System.out.println(">> Service testingspmp called with date: " + datemp);
+
+            List<Map<String, Object>> result = monthlyPlanningNewRepo.findWorkingDaySummary();
+
+            if (result == null || result.isEmpty()) {
+                System.out.println(">> Repository returned no results.");
+            } else {
+                System.out.println(">> Repository returned " + result.size() + " records.");
+                result.forEach(row -> System.out.println("   Row: " + row));
+            }
+
+            return result;
+        }
+
+        public List<Map<String, Object>> getAllMp() {
+            // Call first query
+            List<Map<String, Object>> mpos = monthlyPlanningNewRepo.findMarketingOrderSummary();
+
+            List<Map<String, Object>> result = new ArrayList<>();
+
+            for (Map<String, Object> row : mpos) {
+                // skip row if VERSION is null
+                if (row.get("VERSION") == null) {
+                    continue;
+                }
+
+                // copy row into a mutable map
+                Map<String, Object> mutableRow = new HashMap<>(row);
+
+                // get version from this row
+                int version = Integer.parseInt(row.get("VERSION").toString());
+
+                // collect moIds from this row
+                List<String> moIds = new ArrayList<>();
+                if (row.get("FDR_ID") != null) moIds.add(row.get("FDR_ID").toString());
+                if (row.get("FED_ID") != null) moIds.add(row.get("FED_ID").toString());
+
+                if (!moIds.isEmpty()) {
+                    // run second query
+                    List<Map<String, Object>> mpps = monthlyPlanningNewRepo.findMonthlyPlanSummary(moIds, version);
+
+                    if (!mpps.isEmpty()) {
+                        // merge first result into row
+                        mutableRow.putAll(mpps.get(0));
+                    }
+                }
+
+                // add to final result
+                result.add(mutableRow);
+            }
+
+            return result;
+        }
+
+  
 
 	    public List<ViewMachineCuring> getMachinesByItemCuring(String itemCuring) {
 		    List<Map<String, Object>> result = ctCuringRepo.getMachineByItemCuring(itemCuring);

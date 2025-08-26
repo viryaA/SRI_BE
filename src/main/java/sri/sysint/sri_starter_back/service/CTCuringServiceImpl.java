@@ -9,8 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.transaction.Transactional;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
@@ -54,6 +56,18 @@ public class CTCuringServiceImpl {
     public CTCuringServiceImpl(CTCuringRepo ctCuringRepo){
         this.ctCuringRepo = ctCuringRepo;
     }
+    
+    @Transactional
+    public List<CTCuring> processStream() {
+        try (Stream<CTCuring> stream = ctCuringRepo.streamAll()) {
+            return stream.toList(); // collect stream into list
+        }
+    }
+    @Transactional(readOnly = true) // 👈 keeps transaction open
+    public Stream<CTCuring> streamAll() {
+        return ctCuringRepo.streamAll();
+    }
+
     
     public BigDecimal getNewId() {
     	return ctCuringRepo.getNewId().add(BigDecimal.valueOf(1));

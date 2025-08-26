@@ -510,11 +510,12 @@ public class MarketingOrderController {
 	@GetMapping("/getAllMonthlyPlanning")
 	public Response getAllMonthlyPlanning(final HttpServletRequest req) throws ResourceNotFoundException {
 
-//	    	List <MonthlyPlan> data = marketingOrderServiceImpl.getAllMp();
-		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), null);
+		List<Map<String, Object>> data = marketingOrderServiceImpl.getAllMp();
+		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), req.getRequestURI(), data);
 		return response;
 	}
 	
+
 	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getMachineByItemCuring")
 	public Response getMachineByItemCuring(@RequestParam("itemCuring") String itemCuring, final HttpServletRequest req) throws ResourceNotFoundException {
@@ -572,6 +573,20 @@ public class MarketingOrderController {
 //	        return response;
 //	    }
 //	    
+
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@PostMapping("/notificationMp")
+	public Response notificationMp(@RequestBody String inputJson) {
+		try {
+			List<Map<String, Object>> result = monthlyPlanServiceImpl.notificationMp(inputJson);
+			response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(), null, result);
+			return response;
+		} catch (Exception e) {
+			response = new Response( HttpStatus.BAD_REQUEST.value(), null, HttpStatus.OK.getReasonPhrase(), null,"Error: " + e.getMessage());
+			return response;
+		}
+	}
+
 	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/generate")
 	public Response generate(@RequestBody String inputJson) {

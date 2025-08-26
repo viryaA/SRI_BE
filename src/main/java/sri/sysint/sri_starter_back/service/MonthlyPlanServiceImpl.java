@@ -23,8 +23,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -1905,6 +1909,28 @@ public class MonthlyPlanServiceImpl {
         }
     }
     
+    public List<Map<String, Object>> notificationMp(String inputJson) throws Exception {
+        JsonNode root = objectMapper.readTree(inputJson);
+        System.out.println("Parsed JSON: " + inputJson);
+		ObjectNode transformed = objectMapper.createObjectNode();
+
+		// Transform MO_ID array into individual keys
+		JsonNode moIds = root.get("MO_ID");
+		if (moIds != null && moIds.isArray()) {
+			for (int i = 0; i < moIds.size(); i++) {
+				transformed.put("MO_ID" + (i + 1), moIds.get(i).asText());
+			}
+		}
+		
+        List<String> moIdsS = new ArrayList<>();
+        for (JsonNode moIdNode : root.path("MO_ID")) {
+            if (moIdNode != null && !moIdNode.isNull()) {
+                moIdsS.add(moIdNode.asText());
+            }
+        }
+    	return monthlyPlanNewRepo.findTotalPlanByMoIds(moIdsS);
+    }
+    
     public List<Map<String, Object>> generateMp(String inputJson) throws Exception {
         try {
             JsonNode root = objectMapper.readTree(inputJson);
@@ -1926,6 +1952,10 @@ public class MonthlyPlanServiceImpl {
                 }
             }
 
+			   System.out.println("Deleting Log Start");
+               monthlyPlanNewRepo.deleteLog();
+			   System.out.println("Deleting Log Done");
+
 			for (String moId : moIdsS) {
                System.out.println("Deleting Total Plan by MO_ID: " + moId);
                totalPlanRepo.deleteByMOID(moId);
@@ -1946,67 +1976,25 @@ public class MonthlyPlanServiceImpl {
 		    	monthlyPlanNewRepo.callGenerateMp1(withCheatingMO);
 		        return null;
 		    });
-			// while(callSpBuatMp9WithOutput(transformedJson)) {
-			// 	System.out.println("jalan bang");
-			// }
-			System.out.println("ppsdfjs");
-//			monthlyPlanNewRepo.callGenerateMp2(transformedJson);
-			System.out.println("dhdhfd");
-
-            //  System.out.println("dapetin versi");
-            //  int ChangeMouldVersion = monthlyPlanNewRepo.getChangeMouldVersion(String.join(",", moIdsS));
-            //  System.out.println("generate change mould");
-            //  monthlyPlanNewRepo.runChangeMouldQuery(moIdsS.get(1),moIdsS.get(0), ChangeMouldVersion, String.join(",", moIdsS));
-
-            // // Save total plan
-            // for (String moId : moIds) {
-            //     if (totalPlanRepo.existsTotalPlanByMOID(moId)) {
-            //         System.out.println("MO_ID " + moId + " already exists. Skipping.");
-            //         continue;
-            //     }
-
-            //     System.out.println("Processing Save Total Plan MO_ID: " + moId);
-            //     String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
-            //     monthlyPlanNewRepo.saveTotalPlan(singleInputJson);
-            //     System.out.println("Finish MO_ID: " + moId);
-            // }
-
-            // // Hitung Mould
-            // for (String moId : moIds) {
-            //     System.out.println("Processing Calculate Mould Needed MO_ID: " + moId);
-            //     String singleInputJson = String.format("{\"MO_ID\":\"%s\"}", moId);
-            //     monthlyPlanNewRepo.hitungMould(singleInputJson);
-            // }
-
-            // // Call Generate MP
-            // int cheatingId = root.path("CHEATING_ID").asInt();
-            // for (String moId : moIds) {
-            //     System.out.println("Calling Generate MP for MO_ID: " + moId);
-            //     String singleInputJson = String.format("{\"MO_ID\":\"%s\", \"CHEATING_ID\":%d}", moId, cheatingId);
-            //     monthlyPlanNewRepo.callGenerateMp(singleInputJson);
-            // }
-
-            // // Loop After Generate 5 times
-            // for (int i = 0; i < 5; i++) {
-            //     for (String moId : moIds) {
-            //         System.out.println("Processing After Generate (loop " + (i + 1) + "): " + moId);
-            //         monthlyPlanNewRepo.callAfterGenerate(moId, BigDecimal.valueOf(cheatingId));
-            //     }
-            // }
-
+		    
+		    try {
+		        future.get(10, TimeUnit.MINUTES);
+		    } catch (TimeoutException e) {
+		        future.cancel(true);
+		    } catch (ExecutionException | InterruptedException e) {
+		        e.printStackTrace();
+		    } finally {
+		        executor.shutdownNow();
+		    }
+		
 			BigDecimal version = totalPlanRepo.getNewestVersion(moIdsS.get(1).toString(),moIdsS.get(0).toString());
 
 
             // // Get summary
              System.out.println("get summary");
 			List<Map<String, Object>> dataDetailMp = monthlyPlanNewRepo.getMonthlyPlanSummaryByMoIds(moIdsS,version);
-             
-			// monthlyPlanNewRepo.callChangeMouldResult(String.join(",", moIdsS));
-
-            // Delete total plan
 
             return dataDetailMp;
-//			return null;
 
         } catch (Exception e) {
             e.printStackTrace(); // Log the exception
@@ -2038,7 +2026,13 @@ public class MonthlyPlanServiceImpl {
     	    moids.add(buffer.getMoId());
     	}
     	
-    	BigDecimal version = totalPlanRepo.getNewestVersion(moids.get(1).toString(),moids.get(0).toString());
+		BigDecimal version;
+		if (versionGenerate.compareTo(BigDecimal.ZERO) == 0) {
+			version = totalPlanRepo.getNewestVersion(moids.get(1).toString(), moids.get(0).toString());
+		} else {
+			version = versionGenerate;
+		}
+		System.out.println("Using version: " + version);
 
 	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdInAndVersion(moids, version);
 	 // Step 1: Sort the list by getDateMp()
@@ -2578,7 +2572,13 @@ public class MonthlyPlanServiceImpl {
     	    moids.add(buffer.getMoId());
     	}
     	
-    	BigDecimal version = totalPlanRepo.getNewestVersion(moids.get(1).toString(),moids.get(0).toString());
+		BigDecimal version;
+		if (versionGenerate.compareTo(BigDecimal.ZERO) == 0) {
+			version = totalPlanRepo.getNewestVersion(moids.get(1).toString(), moids.get(0).toString());
+		} else {
+			version = versionGenerate;
+		}
+		System.out.println("Using version: " + version);
 
 	   	List<MonthlyPlanningNew> shiftMonthlyPlan = monthlyPlanNewRepo.findByMoIdInAndVersion(moids, version);
 	 // Step 1: Sort the list by getDateMp()

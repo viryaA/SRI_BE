@@ -42,7 +42,21 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
     )
     List<Map<String, Object>> getMonthlyPlanSummaryByMoIds(@Param("moIds") List<String> moIds,@Param("versionParam") BigDecimal versionParam);
 
-	
+    @Query(value = "SELECT t.MOULD_NEEDED AS mouldNeeded, " +
+                   "       t.TOTAL_PLAN AS totalPlan, " +
+                   "       t.ITEM_CURING AS itemCuring " +
+                   "FROM SRI_IMPP_D_TOTALPLAN t " +
+                   "JOIN ( " +
+                   "    SELECT DISTINCT REGEXP_SUBSTR(message, 'CN-[0-9]+', 1, 1) AS extracted_item " +
+                   "    FROM DEBUG_LOG " +
+                   "    WHERE STEP LIKE '%DEBUG - Produk Baru%' " +
+                   "    ORDER BY ID DESC FETCH FIRST 1 ROW ONLY " +
+                   ") d " +
+                   "   ON UPPER(t.ITEM_CURING) = UPPER(d.extracted_item) " +
+                   "WHERE t.ID_MO IN (:moIds) AND t.STATUS = 0" +
+                   "ORDER BY t.ITEM_CURING",
+           nativeQuery = true)
+    List<Map<String, Object>> findTotalPlanByMoIds(@Param("moIds") List<String> moIds);
 	
 	@Query(value = "SELECT MAX(VERSION) FROM SRI_IMPP_T_MONTHLYPLAN1 WHERE MO_ID IN (:moIds)", nativeQuery = true)
 	BigDecimal findLatestVersionsByMoIds(@Param("moIds") List<String> moIds);
@@ -59,7 +73,8 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
     void callChangeMouldResult(@Param("jsonInput") String jsonInput);
 	
     @Modifying
-    @Query(value = "BEGIN SP_BUAT_MP_68(:jsonInput); END;", nativeQuery = true)
+    @Transactional
+    @Query(value = "BEGIN SP_BUAT_MP_75(:jsonInput); END;", nativeQuery = true)
     void callGenerateMp1(@Param("jsonInput") String jsonInput);
 
     @Modifying
@@ -70,6 +85,12 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
     @Query(value = "BEGIN SP_SAVE_TOTALPLAN1(:jsonInput); END;", nativeQuery = true)
     void saveTotalPlan(@Param("jsonInput") String jsonInput);
     
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM DEBUG_LOG", nativeQuery = true)
+    void deleteLog();
+
+
     @Modifying
     @Query(value = "BEGIN SP_HITUNG_MOULD3(:jsonInput); END;", nativeQuery = true)
     void hitungMould(@Param("jsonInput") String jsonInput);
@@ -281,6 +302,71 @@ public interface MonthlyPlanNewRepo extends JpaRepository<MonthlyPlanningNew, St
     List<Map<String, Object>> findDailyMouldUseSummaryAsMap(
             @Param("moIds") List<String> moIds,
             @Param("version") BigDecimal version);
+
+
+    @Query(value =
+            "SELECT " +
+            "    TRUNC(fdr.MONTH_0) as Month, " +
+            "    mp.VERSION, " +
+            "    fdr.MO_ID AS FDR_ID, " +
+            "    fed.MO_ID AS FED_ID, " +
+            "    fed.V_AFTER_AR_RJ_DF AS MO_VERSION " +
+            "FROM SRI_IMPP_T_MARKETINGORDER fdr " +
+            "JOIN SRI_IMPP_T_MARKETINGORDER fed " +
+            "    ON TRUNC(fdr.MONTH_0) = TRUNC(fed.MONTH_0) " +
+            "   AND fdr.V_AFTER_AR_RJ_DF = fed.V_AFTER_AR_RJ_DF " +
+            "   AND fdr.TYPE = 'FDR' " +
+            "   AND fed.TYPE = 'FED' " +
+            "LEFT JOIN SRI_IMPP_T_MONTHLYPLAN1 mp " +
+            "    ON mp.MO_ID IN (fdr.MO_ID, fed.MO_ID) " +
+            "WHERE fdr.V_AFTER_AR_RJ_DF > 0 " +
+            "GROUP BY TRUNC(fdr.MONTH_0), mp.VERSION, fdr.MO_ID, fed.MO_ID, fed.V_AFTER_AR_RJ_DF " +
+            "ORDER BY TRUNC(fdr.MONTH_0) DESC, mp.VERSION",
+            nativeQuery = true)
+    List<Map<String, Object>> findMarketingOrderSummary();
+
+        @Query(value =
+            "SELECT " +
+            "    DATE_WD, " +
+            "    ROUND(SUM(CASE WHEN DESCRIPTION = 'WD_NORMAL' THEN SHIFT1_TOTAL_TIME ELSE 0 END) / 60, 2) AS SHIFT1_NORMAL_HOURS, " +
+            "    ROUND(SUM(CASE WHEN DESCRIPTION = 'WD_NORMAL' THEN SHIFT2_TOTAL_TIME ELSE 0 END) / 60, 2) AS SHIFT2_NORMAL_HOURS, " +
+            "    ROUND(SUM(CASE WHEN DESCRIPTION = 'WD_NORMAL' THEN SHIFT3_TOTAL_TIME ELSE 0 END) / 60, 2) AS SHIFT3_NORMAL_HOURS, " +
+
+            "    ROUND(SUM(CASE WHEN DESCRIPTION = 'OT_TT' THEN SHIFT1_TOTAL_TIME ELSE 0 END) / 60, 2) AS SHIFT1_OT_TT_HOURS, " +
+            "    ROUND(SUM(CASE WHEN DESCRIPTION = 'OT_TT' THEN SHIFT2_TOTAL_TIME ELSE 0 END) / 60, 2) AS SHIFT2_OT_TT_HOURS, " +
+            "    ROUND(SUM(CASE WHEN DESCRIPTION = 'OT_TT' THEN SHIFT3_TOTAL_TIME ELSE 0 END) / 60, 2) AS SHIFT3_OT_TT_HOURS, " +
+
+            "    ROUND(SUM(CASE WHEN DESCRIPTION = 'OT_TL' THEN SHIFT1_TOTAL_TIME ELSE 0 END) / 60, 2) AS SHIFT1_OT_TL_HOURS, " +
+            "    ROUND(SUM(CASE WHEN DESCRIPTION = 'OT_TL' THEN SHIFT2_TOTAL_TIME ELSE 0 END) / 60, 2) AS SHIFT2_OT_TL_HOURS, " +
+            "    ROUND(SUM(CASE WHEN DESCRIPTION = 'OT_TL' THEN SHIFT3_TOTAL_TIME ELSE 0 END) / 60, 2) AS SHIFT3_OT_TL_HOURS, " +
+
+            "    ROUND(SUM(SHIFT1_TOTAL_TIME + SHIFT2_TOTAL_TIME + SHIFT3_TOTAL_TIME) / 60, 2) AS TOTAL_HOURS " +
+            "FROM SRI_IMPP_D_WD_HOURS_SPECIFIC " +
+            "GROUP BY DATE_WD " +
+            "ORDER BY DATE_WD",
+            nativeQuery = true)
+    List<Map<String, Object>> findWorkingDaySummary();
+
+    @Query(value =
+            "SELECT " +
+            "    SUM(mp.MO_MONTH_0) AS TOTAL_MO_MONTH_0, " +
+            "    SUM(tp.TOTAL_PLAN) AS TOTAL_PLAN_SUM " +
+            "FROM ( " +
+            "    SELECT ITEM_CURING, SUM(TOTAL_HARIAN) AS MO_MONTH_0 " +
+            "    FROM SRI_IMPP_T_MONTHLYPLAN1 " +
+            "    WHERE MO_ID IN (:moIds) AND VERSION = :version " +
+            "    GROUP BY ITEM_CURING " +
+            ") mp " +
+            "LEFT JOIN ( " +
+            "    SELECT ITEM_CURING, SUM(TOTAL_PLAN) AS TOTAL_PLAN " +
+            "    FROM SRI_IMPP_D_TOTALPLAN " +
+            "    WHERE ID_MO IN (:moIds) " +
+            "    GROUP BY ITEM_CURING " +
+            ") tp " +
+            "ON tp.ITEM_CURING = mp.ITEM_CURING",
+            nativeQuery = true)
+    List<Map<String, Object>> findMonthlyPlanSummary(@Param("moIds") List<String> moIds,
+                                                     @Param("version") int version);
 //    @Modifying
 //    @Transactional
 //    @Query(value = "DELETE FROM SRI_IMPP_D_TOTALPLAN", nativeQuery = true)

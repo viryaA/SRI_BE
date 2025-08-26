@@ -11,7 +11,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "SRI_IMPP_M_CT_CURING")
 public class CTCuring {
-	 @Id
+	 	@Id
 	    @Column(name = "CT_CURING_ID")
 	    private BigDecimal CT_CURING_ID;
 

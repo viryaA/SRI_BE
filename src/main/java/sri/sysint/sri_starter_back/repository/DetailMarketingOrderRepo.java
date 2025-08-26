@@ -23,61 +23,52 @@ public interface DetailMarketingOrderRepo extends JpaRepository<DetailMarketingO
         + "    p.PART_NUMBER,\r\n"
         + "    p.DESCRIPTION,\r\n"
         + "    i.MACHINE_TYPE,\r\n"
-        + "    ROUND(i.KAPA_PER_MOULD * 99.5 / 100, 0) AS KAPA_PER_MOULD,\r\n"
+        + "    ROUND(ct_min.WAKTU_TOTAL_CT_NORMAL * 99.5 / 100, 0) AS KAPA_PER_MOULD,\r\n"
         + "    i.NUMBER_OF_MOULD,\r\n"
         + "    p.QTY_PER_RAK,\r\n"
-        + "    CEIL(p.UPPER_CONSTANT / NULLIF(p.QTY_PER_RAK, 0)) * p.QTY_PER_RAK AS MIN_ORDER,\r\n"
-        + "    NVL(FLOOR(\r\n"
-        + "        (ROUND(i.KAPA_PER_MOULD * 99.5 / 100, 0) * i.NUMBER_OF_MOULD * \r\n"
-        + "        (CASE \r\n"
-        + "            WHEN t.PRODUCT_TYPE = 'TT' THEN TO_NUMBER(:totalHKTT1)\r\n"
-        + "            WHEN t.PRODUCT_TYPE = 'TL' THEN TO_NUMBER(:totalHKTL1)\r\n"
-        + "            WHEN t.PRODUCT_TYPE = 'TB' THEN TO_NUMBER(:totalHKTB1)\r\n"
-        + "            ELSE 1\r\n"
-        + "        END)) / NULLIF(p.QTY_PER_RAK, 0)\r\n"
-        + "    ) * p.QTY_PER_RAK, 0) AS KAPASITAS_MAKSIMUM_1,\r\n"
-        + "    NVL(FLOOR(\r\n"
-        + "        (ROUND(i.KAPA_PER_MOULD * 99.5 / 100, 0) * i.NUMBER_OF_MOULD * \r\n"
-        + "        (CASE \r\n"
-        + "            WHEN t.PRODUCT_TYPE = 'TT' THEN TO_NUMBER(:totalHKTT2)\r\n"
-        + "            WHEN t.PRODUCT_TYPE = 'TL' THEN TO_NUMBER(:totalHKTL2)\r\n"
-        + "            WHEN t.PRODUCT_TYPE = 'TB' THEN TO_NUMBER(:totalHKTB2)\r\n"
-        + "            ELSE 1\r\n"
-        + "        END)) / NULLIF(p.QTY_PER_RAK, 0)\r\n"
-        + "    ) * p.QTY_PER_RAK, 0) AS KAPASITAS_MAKSIMUM_2,\r\n"
-        + "    NVL(FLOOR(\r\n"
-        + "        (ROUND(i.KAPA_PER_MOULD * 99.5 / 100, 0) * i.NUMBER_OF_MOULD * \r\n"
-        + "        (CASE \r\n"
-        + "            WHEN t.PRODUCT_TYPE = 'TT' THEN TO_NUMBER(:totalHKTT3)\r\n"
-        + "            WHEN t.PRODUCT_TYPE = 'TL' THEN TO_NUMBER(:totalHKTL3)\r\n"
-        + "            WHEN t.PRODUCT_TYPE = 'TB' THEN TO_NUMBER(:totalHKTB3)\r\n"
-        + "            ELSE 1\r\n"
-        + "        END)) / NULLIF(p.QTY_PER_RAK, 0)\r\n"
-        + "    ) * p.QTY_PER_RAK, 0) AS KAPASITAS_MAKSIMUM_3\r\n"
-        + "FROM \r\n"
-        + "    SRI_IMPP_M_PRODUCT p\r\n"
-        + "LEFT JOIN \r\n"
-        + "    SRI_IMPP_M_ITEMCURING i ON p.ITEM_CURING = i.ITEM_CURING\r\n"
-        + "JOIN \r\n"
-        + "    SRI_IMPP_M_PRODUCTTYPE t ON p.PRODUCT_TYPE_ID = t.PRODUCT_TYPE_ID\r\n"
-        + "WHERE\r\n"
-        + "    t.PRODUCT_MERK = :productMerk\r\n"
-        + "    AND p.STATUS = 1\r\n"
-        + "    AND (p.DESCRIPTION LIKE 'FDR TB%' OR p.DESCRIPTION LIKE 'FED TB%' OR i.ITEM_CURING IS NOT NULL)\r\n",
-			nativeQuery = true)
-		List<Map<String, Object>> getDataTable(
-				@Param("totalHKTT1") BigDecimal totalHKTT1,
-				@Param("totalHKTT2") BigDecimal totalHKTT2,
-				@Param("totalHKTT3") BigDecimal totalHKTT3, 
-				@Param("totalHKTL1") BigDecimal totalHKTL1, 
-				@Param("totalHKTL2") BigDecimal totalHKTL2, 
-				@Param("totalHKTL3") BigDecimal totalHKTL3,
-				@Param("totalHKTB1") BigDecimal totalHKTB1, 
-				@Param("totalHKTB2") BigDecimal totalHKTB2, 
-				@Param("totalHKTB3") BigDecimal totalHKTB3,
-				@Param("productMerk") String productMerk);
-
-
+        + "    FLOOR(p.UPPER_CONSTANT / NULLIF(p.QTY_PER_RAK, 0)) * p.QTY_PER_RAK AS MIN_ORDER,\r\n"
+        + "    CASE WHEN p.QTY_PER_RAK = 0 THEN 0 ELSE FLOOR(\r\n"
+        + "        (ROUND(ct_min.WAKTU_TOTAL_CT_NORMAL * 99.5 / 100, 0) * i.NUMBER_OF_MOULD *\r\n"
+        + "        (CASE WHEN t.PRODUCT_TYPE = 'TT' THEN TO_NUMBER(:totalHKTT1)\r\n"
+        + "              WHEN t.PRODUCT_TYPE = 'TL' THEN TO_NUMBER(:totalHKTL1)\r\n"
+        + "              WHEN t.PRODUCT_TYPE = 'TB' THEN TO_NUMBER(:totalHKTB1)\r\n"
+        + "              ELSE 1 END)) / NULLIF(p.QTY_PER_RAK, 0)) * p.QTY_PER_RAK\r\n"
+        + "    END AS KAPASITAS_MAKSIMUM_1,\r\n"
+        + "    CASE WHEN p.QTY_PER_RAK = 0 THEN 0 ELSE FLOOR(\r\n"
+        + "        (ROUND(ct_min.WAKTU_TOTAL_CT_NORMAL * 99.5 / 100, 0) * i.NUMBER_OF_MOULD *\r\n"
+        + "        (CASE WHEN t.PRODUCT_TYPE = 'TT' THEN TO_NUMBER(:totalHKTT2)\r\n"
+        + "              WHEN t.PRODUCT_TYPE = 'TL' THEN TO_NUMBER(:totalHKTL2)\r\n"
+        + "              WHEN t.PRODUCT_TYPE = 'TB' THEN TO_NUMBER(:totalHKTB2)\r\n"
+        + "              ELSE 1 END)) / NULLIF(p.QTY_PER_RAK, 0)) * p.QTY_PER_RAK\r\n"
+        + "    END AS KAPASITAS_MAKSIMUM_2,\r\n"
+        + "    CASE WHEN p.QTY_PER_RAK = 0 THEN 0 ELSE FLOOR(\r\n"
+        + "        (ROUND(ct_min.WAKTU_TOTAL_CT_NORMAL * 99.5 / 100, 0) * i.NUMBER_OF_MOULD *\r\n"
+        + "        (CASE WHEN t.PRODUCT_TYPE = 'TT' THEN TO_NUMBER(:totalHKTT3)\r\n"
+        + "              WHEN t.PRODUCT_TYPE = 'TL' THEN TO_NUMBER(:totalHKTL3)\r\n"
+        + "              WHEN t.PRODUCT_TYPE = 'TB' THEN TO_NUMBER(:totalHKTB3)\r\n"
+        + "              ELSE 1 END)) / NULLIF(p.QTY_PER_RAK, 0)) * p.QTY_PER_RAK\r\n"
+        + "    END AS KAPASITAS_MAKSIMUM_3,\r\n"
+        + "    p.PRODUCT_TYPE_ID\r\n"
+        + "FROM SRI_IMPP_M_PRODUCT p\r\n"
+        + "LEFT JOIN SRI_IMPP_M_ITEMCURING i ON p.ITEM_CURING = i.ITEM_CURING\r\n"
+        + "JOIN SRI_IMPP_M_PRODUCTTYPE t ON p.PRODUCT_TYPE_ID = t.PRODUCT_TYPE_ID\r\n"
+        + "LEFT JOIN (SELECT WIP, MIN(WAKTU_TOTAL_CT_NORMAL) AS WAKTU_TOTAL_CT_NORMAL\r\n"
+        + "           FROM SRI_IMPP_M_CT_CURING GROUP BY WIP) ct_min ON ct_min.WIP = i.ITEM_CURING\r\n"
+        + "WHERE t.PRODUCT_MERK = :productMerk\r\n"
+        + "  AND p.STATUS = 1\r\n"
+        + "  AND (p.DESCRIPTION LIKE 'FDR TB%' OR p.DESCRIPTION LIKE 'FED TB%' OR i.ITEM_CURING IS NOT NULL)\r\n",
+       nativeQuery = true)
+	List<Map<String, Object>> getDataTable(
+			@Param("totalHKTT1") BigDecimal totalHKTT1,
+			@Param("totalHKTT2") BigDecimal totalHKTT2,
+			@Param("totalHKTT3") BigDecimal totalHKTT3, 
+			@Param("totalHKTL1") BigDecimal totalHKTL1, 
+			@Param("totalHKTL2") BigDecimal totalHKTL2, 
+			@Param("totalHKTL3") BigDecimal totalHKTL3,
+			@Param("totalHKTB1") BigDecimal totalHKTB1, 
+			@Param("totalHKTB2") BigDecimal totalHKTB2, 
+			@Param("totalHKTB3") BigDecimal totalHKTB3,
+			@Param("productMerk") String productMerk);
 	
 	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_D_MARKETINGORDER", nativeQuery = true)
     BigDecimal getNewId();
