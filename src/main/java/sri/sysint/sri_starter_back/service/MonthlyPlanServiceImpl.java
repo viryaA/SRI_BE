@@ -1972,20 +1972,20 @@ public class MonthlyPlanServiceImpl {
 			String withCheatingMO = objectMapper.writeValueAsString(transformed);
 			System.out.println("Transformed JSON with cheating: " + withCheatingMO );
 			ExecutorService executor = Executors.newSingleThreadExecutor();
-		    Future<?> future = executor.submit(() -> {
+		    // Future<?> future = executor.submit(() -> {
 		    	monthlyPlanNewRepo.callGenerateMp1(withCheatingMO);
-		        return null;
-		    });
+		    //     return null;
+		    // });
 		    
-		    try {
-		        future.get(10, TimeUnit.MINUTES);
-		    } catch (TimeoutException e) {
-		        future.cancel(true);
-		    } catch (ExecutionException | InterruptedException e) {
-		        e.printStackTrace();
-		    } finally {
-		        executor.shutdownNow();
-		    }
+		    // try {
+		    //     future.get(10, TimeUnit.MINUTES);
+		    // } catch (TimeoutException e) {
+		    //     future.cancel(true);
+		    // } catch (ExecutionException | InterruptedException e) {
+		    //     e.printStackTrace();
+		    // } finally {
+		    //     executor.shutdownNow();
+		    // }
 		
 			BigDecimal version = totalPlanRepo.getNewestVersion(moIdsS.get(1).toString(),moIdsS.get(0).toString());
 
@@ -2929,6 +2929,13 @@ public class MonthlyPlanServiceImpl {
             tableHeadMpCell = tableHeadMpRow2.createCell(i + 7);
             tableHeadMpCell.setCellStyle(calibri11CenterBorder);
 
+			prepareProdSheet.addMergedRegion(new CellRangeAddress(16, 17, i + 8, i + 8));
+			tableHeadMpCell = tableHeadMpRow1.createCell(i + 8);
+			tableHeadMpCell.setCellStyle(calibriBold11CenterBorder);
+			tableHeadMpCell.setCellValue("MOULD NEED"); 
+			tableHeadMpCell = tableHeadMpRow2.createCell(i + 8);
+			tableHeadMpCell.setCellStyle(calibri11CenterBorder);
+
             int mpDatarow = 18;
             Row mpDataRow;
             Cell mpDataCell;
@@ -3021,6 +3028,16 @@ public class MonthlyPlanServiceImpl {
                         mpDataCell.setCellValue("");
                     }
                     mpDataCell.setCellStyle(calibri11RightBorder);
+
+					mpDataCell = mpDataRow.createCell(monthLength + 8);
+					if (totalPlanData.isPresent()) {
+                        BigDecimal mouldneed = totalPlanData.get().getMOULD_NEEDED();
+                        mpDataCell.setCellValue(mouldneed != null ? mouldneed.doubleValue() : null);
+                    } else {
+                        mpDataCell.setCellValue("");
+                    }
+                    mpDataCell.setCellStyle(calibri11RightBorder);
+
 
                     mpDatarow++;
                 }

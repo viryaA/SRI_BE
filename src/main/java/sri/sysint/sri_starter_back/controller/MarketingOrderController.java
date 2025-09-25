@@ -587,6 +587,7 @@ public class MarketingOrderController {
 		}
 	}
 
+	//INI BARU
 	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/generate")
 	public Response generate(@RequestBody String inputJson) {
