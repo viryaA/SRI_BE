@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.lang.reflect.Field;
 
 import javax.transaction.Transactional;
@@ -24,12 +26,20 @@ import javax.transaction.Transactional;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,28 +163,28 @@ public class WorkDayServiceImpl {
                 currentWorkDay.setOFF(workDay.getOFF());
                 currentWorkDay.setSEMI_OFF(workDay.getSEMI_OFF());
 
-                LocalDate dateWD;
-
-                try {
-                    dateWD = LocalDate.parse(workDay.getDATE_WD().toString());
-                } catch (Exception isoParseException) {
-                    try {
-                        SimpleDateFormat fullDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
-                        Date parsedDate = fullDateFormat.parse(workDay.getDATE_WD().toString());
-                        dateWD = parsedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    } catch (Exception e) {
-                        throw new RuntimeException("Unable to parse DATE_WD: " + workDay.getDATE_WD(), e);
-                    }
-                }
-
-                updateOffAndSemiOffSU(currentWorkDay, dateWD);                
+//                LocalDate dateWD;
+//
+//                try {
+//                    dateWD = LocalDate.parse(workDay.getDATE_WD().toString());
+//                } catch (Exception isoParseException) {
+//                    try {
+//                        SimpleDateFormat fullDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+//                        Date parsedDate = fullDateFormat.parse(workDay.getDATE_WD().toString());
+//                        dateWD = parsedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//                    } catch (Exception e) {
+//                        throw new RuntimeException("Unable to parse DATE_WD: " + workDay.getDATE_WD(), e);
+//                    }
+//                }
+//
+//                updateOffAndSemiOffSU(currentWorkDay, dateWD);                
                 currentWorkDay.setLAST_UPDATE_DATE(new Date());
                 currentWorkDay.setLAST_UPDATED_BY(workDay.getLAST_UPDATED_BY());
 
                 workDayRepo.save(currentWorkDay);
                 
-                updateSpesificHour(currentWorkDay, workDay.getDATE_WD());
-                
+//                updateSpesificHour(currentWorkDay, workDay.getDATE_WD());
+//                
                 return currentWorkDay;
             } else {
                 throw new RuntimeException("WorkDay with date " + workDay.getDATE_WD() + " not found.");
@@ -488,50 +498,50 @@ public class WorkDayServiceImpl {
     }
     
     private void updateOffAndSemiOffSU(WorkDay workDay, LocalDate dateWd) {
-        BigDecimal shift1 = workDay.getIWD_SHIFT_1();
-        BigDecimal shift2 = workDay.getIWD_SHIFT_2();
-        BigDecimal shift3 = workDay.getIWD_SHIFT_3();
-
-        DayOfWeek dayOfWeek = dateWd.getDayOfWeek();
-
-        // Logic for Saturday and Sunday
-        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-            workDay.setOFF(BigDecimal.ONE);
-            workDay.setSEMI_OFF(BigDecimal.ZERO);
-            return;
-        }
-
-        // Logic for Monday
-        if (dayOfWeek == DayOfWeek.MONDAY) {
-            if (shift1.compareTo(BigDecimal.ONE) == 0 && shift2.compareTo(BigDecimal.ONE) == 0) {
-                workDay.setOFF(BigDecimal.ZERO);
-                workDay.setSEMI_OFF(BigDecimal.ZERO);
-            } else if (shift1.compareTo(BigDecimal.ZERO) == 0 && shift2.compareTo(BigDecimal.ZERO) == 0) {
-                workDay.setOFF(BigDecimal.ONE);
-                workDay.setSEMI_OFF(BigDecimal.ZERO);
-            } else {
-                workDay.setOFF(BigDecimal.ZERO);
-                workDay.setSEMI_OFF(BigDecimal.ONE);
-            }
-            return;
-        }
-
-        // Logic for Tuesday - Friday
-        if (dayOfWeek.getValue() >= DayOfWeek.TUESDAY.getValue() && dayOfWeek.getValue() <= DayOfWeek.FRIDAY.getValue()) {
-            if (shift1.compareTo(BigDecimal.ZERO) == 0 && shift2.compareTo(BigDecimal.ZERO) == 0 && shift3.compareTo(BigDecimal.ZERO) == 0) {
-                // All shifts inactive
-                workDay.setOFF(BigDecimal.ONE);
-                workDay.setSEMI_OFF(BigDecimal.ZERO);
-            } else if (shift1.compareTo(BigDecimal.ONE) == 0 && shift2.compareTo(BigDecimal.ONE) == 0 && shift3.compareTo(BigDecimal.ONE) == 0) {
-                // All shifts active
-                workDay.setOFF(BigDecimal.ZERO);
-                workDay.setSEMI_OFF(BigDecimal.ZERO);
-            } else {
-                // Mixed active/inactive shifts
-                workDay.setOFF(BigDecimal.ZERO);
-                workDay.setSEMI_OFF(BigDecimal.ONE);
-            }
-        }
+//        BigDecimal shift1 = workDay.getIWD_SHIFT_1();
+//        BigDecimal shift2 = workDay.getIWD_SHIFT_2();
+//        BigDecimal shift3 = workDay.getIWD_SHIFT_3();
+//
+//        DayOfWeek dayOfWeek = dateWd.getDayOfWeek();
+//
+//        // Logic for Saturday and Sunday
+//        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+//            workDay.setOFF(BigDecimal.ONE);
+//            workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            return;
+//        }
+//
+//        // Logic for Monday
+//        if (dayOfWeek == DayOfWeek.MONDAY) {
+//            if (shift1.compareTo(BigDecimal.ONE) == 0 && shift2.compareTo(BigDecimal.ONE) == 0) {
+//                workDay.setOFF(BigDecimal.ZERO);
+//                workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            } else if (shift1.compareTo(BigDecimal.ZERO) == 0 && shift2.compareTo(BigDecimal.ZERO) == 0) {
+//                workDay.setOFF(BigDecimal.ONE);
+//                workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            } else {
+//                workDay.setOFF(BigDecimal.ZERO);
+//                workDay.setSEMI_OFF(BigDecimal.ONE);
+//            }
+//            return;
+//        }
+//
+//        // Logic for Tuesday - Friday
+//        if (dayOfWeek.getValue() >= DayOfWeek.TUESDAY.getValue() && dayOfWeek.getValue() <= DayOfWeek.FRIDAY.getValue()) {
+//            if (shift1.compareTo(BigDecimal.ZERO) == 0 && shift2.compareTo(BigDecimal.ZERO) == 0 && shift3.compareTo(BigDecimal.ZERO) == 0) {
+//                // All shifts inactive
+//                workDay.setOFF(BigDecimal.ONE);
+//                workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            } else if (shift1.compareTo(BigDecimal.ONE) == 0 && shift2.compareTo(BigDecimal.ONE) == 0 && shift3.compareTo(BigDecimal.ONE) == 0) {
+//                // All shifts active
+//                workDay.setOFF(BigDecimal.ZERO);
+//                workDay.setSEMI_OFF(BigDecimal.ZERO);
+//            } else {
+//                // Mixed active/inactive shifts
+//                workDay.setOFF(BigDecimal.ZERO);
+//                workDay.setSEMI_OFF(BigDecimal.ONE);
+//            }
+//        }
     }
 
     private void updateOffAndSemiOff(WorkDay workDay, String dateWd) throws Exception {
@@ -637,4 +647,656 @@ public class WorkDayServiceImpl {
             }
         }
     }
+
+    public ByteArrayInputStream exportTemplateExcel(BigDecimal month, BigDecimal year) throws IOException {
+        YearMonth ym = YearMonth.of(year.intValue(), month.intValue());
+        LocalDate startDate = ym.atDay(1);         // e.g. 2025-06-01
+        LocalDate endDate = ym.atEndOfMonth();     // e.g. 2025-06-30
+
+        // Now directly pass LocalDate objects
+        List<Object[]> shiftDetails = workDayRepo.findShiftDetailsByDateRange(startDate, endDate);
+        List<Object[]> shiftDetailsNormal = workDayRepo.findShiftDetailsByDateRangeNormal(startDate, endDate);
+        if(shiftDetails.isEmpty()) {
+        	System.out.println("KOsongngnggngngngn");
+            return dataExportTemplateExcelBlank(month.intValue(),year.intValue());
+        }
+        ByteArrayInputStream byteArrayInputStream = dataExportTemplateExcel(shiftDetails,shiftDetailsNormal);
+        return byteArrayInputStream;
+    }
+
+    public ByteArrayInputStream dataExportTemplateExcel(List<Object[]> workDays,List<Object[]> workDaysNormal) throws IOException {
+    	String[] rows = {
+    		    "DATE_WD",
+    		    "S1 OFF NORMAL", 
+                "S1 START NORMAL", "S1 END NORMAL", "S1 REASON NORMAL",
+    		    "S1 OFF TT",
+    		    "S1 START OT_TT", "S1 END OT_TT", "S1 REASON OT_TT",
+    		    "S1 OFF TL",
+    		    "S1 START OT_TL", "S1 END OT_TL", "S1 REASON OT_TL",
+                "S2 OFF NORMAL",
+    		    "S2 START NORMAL", "S2 END NORMAL", "S2 REASON NORMAL",
+    		    "S2 OFF TT", 
+    		    "S2 START OT_TT", "S2 END OT_TT", "S2 REASON OT_TT",
+    		    "S2 OFF TL",
+    		    "S2 START OT_TL", "S2 END OT_TL", "S2 REASON OT_TL",
+                "S3 OFF NORMAL",
+    		    "S3 START NORMAL", "S3 END NORMAL", "S3 REASON NORMAL",
+    		    "S3 OFF TT",
+    		    "S3 START OT_TT", "S3 END OT_TT", "S3 REASON OT_TT",
+    		    "S3 OFF TL",
+    		    "S3 START OT_TL", "S3 END OT_TL", "S3 REASON OT_TL",
+
+    		};
+
+    		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+    		    Sheet sheet = workbook.createSheet("WorkDays");
+
+    		    // Put the titles in the first column (column A)
+    		    for (int i = 0; i < rows.length; i++) {
+    		        Row row = sheet.getRow(i);
+    		        if (row == null) row = sheet.createRow(i);
+    		        Cell cell = row.createCell(0); // Column A
+    		        cell.setCellValue(rows[i]);
+    		    }
+
+    		    int colIdx = 1; // Start from column B
+
+                for (Object[] record : workDaysNormal) {
+    		        int rowIdx = 0;
+    		        Row row = sheet.getRow(rowIdx++);
+    		        if (row == null) row = sheet.createRow(rowIdx - 1); // Ensure row exists
+
+    		        Cell cell = row.createCell(colIdx);
+
+    		        // S1 OFF & REASON
+    		        String s1Desc = record[3] != null ? record[3].toString() : "";
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[0].toString().equals("0") ? "Yes" : "No");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[1] != null ? record[1].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[2] != null ? record[2].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s1Desc);
+                    rowIdx += 8;
+
+    		        // S2
+    		        String s2Desc = record[7] != null ? record[7].toString() : "";
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[4].toString().equals("0") ? "Yes" : "No");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5] != null ? record[5].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[6] != null ? record[6].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s2Desc);
+                    rowIdx += 8;
+                    
+    		        // S3
+    		        String s3Desc = record[11] != null ? record[11].toString() : "";
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[8].toString().equals("0") ? "Yes" : "No");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9] != null ? record[9].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[10] != null ? record[10].toString() : "");
+                    sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Desc);
+    		        colIdx++; // move to the next column for the next record
+    		    }
+
+    		    colIdx = 1; // Start from column B
+    		    Date prevDate = null;
+    		    for (Object[] record : workDays) {
+    		        int rowIdx = 0;
+    		        Row row = sheet.getRow(rowIdx++);
+    		        if (row == null) row = sheet.createRow(rowIdx - 1); // Ensure row exists
+
+    		        Cell cell = row.createCell(colIdx);
+
+    		        if (record[0] != null && record[0] instanceof Date) {
+    		            Date currentDate = (Date) record[0];
+
+    		            // Compare only the date part (ignore time)
+    		            SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+    		            String curr = fmt.format(currentDate);
+    		            String prev = prevDate != null ? fmt.format(prevDate) : "";
+
+    		            if (curr.equals(prev)) {
+    		                colIdx--; // Same date, skip setting it again
+    		            } else {
+    		                // Set date with format
+    		                CellStyle dateCellStyle = workbook.createCellStyle();
+    		                CreationHelper createHelper = workbook.getCreationHelper();
+    		                dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+
+    		                cell.setCellValue(currentDate);
+    		                cell.setCellStyle(dateCellStyle);
+    		            }
+
+
+    		            prevDate = currentDate;
+    		        } else {
+    		            cell.setCellValue("");
+    		        }
+
+                    rowIdx +=4;
+
+
+    		        // S1 OFF & REASON
+    		        String s1Desc = record[4] != null ? record[4].toString() : "";
+    		        System.out.print("d");
+    		        // S1 OT_TT
+    		        String hsDesc = record[14] != null ? record[14].toString() : "";
+    		        if ("OT_TT".equalsIgnoreCase(hsDesc)) {
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5].toString().equals("0") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[2] != null ? record[2].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[3] != null ? record[3].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s1Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+    		        System.out.print("4");
+                    
+    		        // S1 OT_TL
+    		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[5].toString().equals("0") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[2] != null ? record[2].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[3] != null ? record[3].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s1Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+                    rowIdx += 4;
+
+    		        // S2
+    		        String s2Desc = record[8] != null ? record[8].toString() : "";
+    		        System.out.print("dr");
+    		        if ("OT_TT".equalsIgnoreCase(hsDesc)) {
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9].toString().equals("0") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[6] != null ? record[6].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[7] != null ? record[7].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s2Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+    		        System.out.print("5");
+    		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
+        		        sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[9].toString().equals("0") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[6] != null ? record[6].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[7] != null ? record[7].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s2Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+                    rowIdx += 4;
+
+
+    		        // S3
+    		        String s3Desc = record[12] != null ? record[12].toString() : "";
+    		        System.out.print("dk");
+    		        if ("OT_TT".equalsIgnoreCase(hsDesc)) {
+    		        	sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[13].toString().equals("0") ? "Yes" : "No");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[10] != null ? record[10].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[11] != null ? record[11].toString() : "");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Desc);
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+    		        System.out.print("7");
+    		        if ("OT_TL".equalsIgnoreCase(hsDesc)) {
+    		        	sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[13].toString().equals("0") ? "Yes" : "No");
+        		        System.out.print("7f");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[10] != null ? record[10].toString() : "");
+        		        System.out.print("7d");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(record[11] != null ? record[11].toString() : "");
+        		        System.out.print("7t");
+    		            sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Desc);
+        		        System.out.println("7h");
+    		        } else {
+    		            rowIdx += 4;
+    		        }
+
+    		        colIdx++; // move to the next column for the next record
+    		    }
+    		    
+    		    System.out.println("/n ff");
+
+    		    // Adjust widths
+    		    for (int i = 0; i < colIdx; i++) {
+    		        sheet.autoSizeColumn(i);
+    		    }
+    		    sheet.createFreezePane(1, 1);
+    		    
+    		    CellStyle lockedStyle = workbook.createCellStyle();
+    		    lockedStyle.setLocked(true);
+
+    		    CellStyle unlockedStyle = workbook.createCellStyle();
+    		    unlockedStyle.setLocked(false);
+
+    		    // Lock only the first row and column A
+    		    for (int r = 0; r <= sheet.getLastRowNum(); r++) {
+    		        Row row = sheet.getRow(r);
+    		        if (row == null) continue;
+
+    		        for (int c = 0; c < colIdx; c++) {
+    		            Cell cell = row.getCell(c);
+    		            if (cell == null) continue;
+
+    		            CellStyle originalStyle = cell.getCellStyle();
+    		            CellStyle newStyle = workbook.createCellStyle();
+    		            newStyle.cloneStyleFrom(originalStyle); // preserve formatting
+
+    		            if (r == 0 || c == 0) {
+    		                newStyle.setLocked(true);
+    		            } else {
+    		                newStyle.setLocked(false);
+    		            }
+
+    		            cell.setCellStyle(newStyle);
+    		        }
+    		    }
+
+    		    sheet.protectSheet("your_password");
+    		    
+    		    DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+    		    DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[] {"Yes", "No"});
+
+    		    // Target rows: 1, 5, 9, 13, 17, 21 (0-based index, so row 2 = index 1)
+    		    int[] dropdownRows = {1, 5, 9, 13, 17, 21, 25, 29, 33};
+    		    for (int row : dropdownRows) {
+    		        CellRangeAddressList addressList = new CellRangeAddressList(row, row, 1, colIdx - 1); // From col B to last used
+    		        DataValidation validation = validationHelper.createValidation(constraint, addressList);
+    		        validation.setSuppressDropDownArrow(true);
+    		        validation.setShowErrorBox(true);
+    		        sheet.addValidationData(validation);
+    		    }
+    		    
+    		 // Create styles
+    		    CellStyle HeaderStyle = workbook.createCellStyle();
+    		    HeaderStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+    		    HeaderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+    		    
+    		    CellStyle lightBlueStyle = workbook.createCellStyle();
+    		    lightBlueStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
+    		    lightBlueStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+
+    		    CellStyle lightGreenStyle = workbook.createCellStyle();
+    		    lightGreenStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+    		    lightGreenStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+    		    
+    		    CellStyle lightYellowStyle = workbook.createCellStyle();
+    		    lightYellowStyle.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+    		    lightYellowStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    		    
+    		    Font boldFont = workbook.createFont();
+    		    boldFont.setBold(true);
+
+		        Row rowH = sheet.getRow(0);
+		        for (int c = 0; c < colIdx; c++) {
+		            Cell cell = rowH.getCell(c);
+		            if (cell == null) cell = rowH.createCell(c);
+		            CellStyle newStyle = workbook.createCellStyle();
+		            newStyle.cloneStyleFrom(cell.getCellStyle());
+		            newStyle.setFillForegroundColor(HeaderStyle.getFillForegroundColor());
+		            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		            newStyle.setBorderBottom(BorderStyle.THIN);
+		            newStyle.setBorderTop(BorderStyle.THIN);
+		            newStyle.setBorderLeft(BorderStyle.THIN);
+		            newStyle.setBorderRight(BorderStyle.THIN);
+		            newStyle.setFont(boldFont);
+		            if (c >= 1) {
+		                newStyle.setAlignment(HorizontalAlignment.CENTER);
+		            }
+		            cell.setCellStyle(newStyle);
+		        }
+		        
+    		    // Apply background to rows 2–9 (index 1 to 8)
+                XSSFCellStyle[] greenStyles = new XSSFCellStyle[3];
+                greenStyles[0] = (XSSFCellStyle) workbook.createCellStyle();
+                greenStyles[0].setFillForegroundColor(new XSSFColor(new java.awt.Color(200, 255, 200), null)); // light green
+                greenStyles[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                greenStyles[1] = (XSSFCellStyle) workbook.createCellStyle();
+                greenStyles[1].setFillForegroundColor(new XSSFColor(new java.awt.Color(120, 200, 120), null)); // medium green
+                greenStyles[1].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                greenStyles[2] = (XSSFCellStyle) workbook.createCellStyle();
+                greenStyles[2].setFillForegroundColor(new XSSFColor(new java.awt.Color(60, 150, 60), null)); // darker green
+                greenStyles[2].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+    		    applyStyleToRows(sheet, 1, 4, colIdx, greenStyles[0], boldFont, workbook);
+                applyStyleToRows(sheet, 5, 8, colIdx, greenStyles[1], boldFont, workbook);
+                applyStyleToRows(sheet, 9, 12, colIdx, greenStyles[2], boldFont, workbook);
+
+    		    // Apply background to rows 10–17 (index 9 to 16)
+    		    XSSFCellStyle[] yellowStyles = new XSSFCellStyle[3];
+
+                // Define progressively darker yellow shades
+                yellowStyles[0] = (XSSFCellStyle) workbook.createCellStyle();
+                yellowStyles[0].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 255, 200), null)); // light yellow
+                yellowStyles[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                yellowStyles[1] = (XSSFCellStyle) workbook.createCellStyle();
+                yellowStyles[1].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 255, 130), null)); // medium yellow
+                yellowStyles[1].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                yellowStyles[2] = (XSSFCellStyle) workbook.createCellStyle();
+                yellowStyles[2].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 220, 50), null)); // darker yellow
+                yellowStyles[2].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                
+                applyStyleToRows(sheet, 13, 16, colIdx, yellowStyles[0], boldFont, workbook); // light yellow
+                applyStyleToRows(sheet, 17, 20, colIdx, yellowStyles[1], boldFont, workbook); // medium yellow
+                applyStyleToRows(sheet, 21, 24, colIdx, yellowStyles[2], boldFont, workbook); // dark yellow
+    		    
+                XSSFCellStyle[] redStyles = new XSSFCellStyle[3];
+
+                // Light red
+                redStyles[0] = (XSSFCellStyle) workbook.createCellStyle();
+                redStyles[0].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 200, 200), null)); // soft red
+                redStyles[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                // Medium red
+                redStyles[1] = (XSSFCellStyle) workbook.createCellStyle();
+                redStyles[1].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 100, 100), null)); // medium red
+                redStyles[1].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+                // Darker red
+                redStyles[2] = (XSSFCellStyle) workbook.createCellStyle();
+                redStyles[2].setFillForegroundColor(new XSSFColor(new java.awt.Color(200, 50, 50), null)); // darker red
+                redStyles[2].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    		    
+                applyStyleToRows(sheet, 25, 28, colIdx, redStyles[0], boldFont, workbook); // Light red
+                applyStyleToRows(sheet, 29, 32, colIdx, redStyles[1], boldFont, workbook); // Medium red
+                applyStyleToRows(sheet, 33, 36, colIdx, redStyles[2], boldFont, workbook); // Dark red
+
+    		    
+    		    workbook.write(out);
+    		    return new ByteArrayInputStream(out.toByteArray());
+    		}
+    		
+    }
+    private void applyStyleToRows(Sheet sheet, int startRow, int endRow, int colIdx, XSSFCellStyle baseStyle, Font boldFont,Workbook workbook) {
+        for (int r = startRow; r <= endRow; r++) {
+            Row row = sheet.getRow(r);
+            if (row == null) continue;
+            for (int c = 0; c < colIdx; c++) {
+                Cell cell = row.getCell(c);
+                if (cell == null) cell = row.createCell(c);
+                XSSFCellStyle newStyle = (XSSFCellStyle) workbook.createCellStyle();
+                newStyle.cloneStyleFrom(baseStyle);
+                newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                newStyle.setBorderBottom(BorderStyle.THIN);
+                newStyle.setBorderTop(BorderStyle.THIN);
+                newStyle.setBorderLeft(BorderStyle.THIN);
+                newStyle.setBorderRight(BorderStyle.THIN);
+                if (c == 0){
+                    newStyle.setFont(boldFont);
+                    newStyle.setLocked(true);
+                }else{
+                    newStyle.setLocked(false);
+                }
+                cell.setCellStyle(newStyle);
+            }
+        }
+    }
+
+    public ByteArrayInputStream dataExportTemplateExcelBlank(int month, int year) throws IOException {
+        String[] rows = {
+            "DATE_WD",
+            "S1 OFF NORMAL", "S1 START NORMAL", "S1 END NORMAL", "S1 REASON NORMAL",
+            "S1 OFF TT", "S1 START OT_TT", "S1 END OT_TT", "S1 REASON OT_TT",
+            "S1 OFF TL", "S1 START OT_TL", "S1 END OT_TL", "S1 REASON OT_TL",
+            "S2 OFF NORMAL", "S2 START NORMAL", "S2 END NORMAL", "S2 REASON NORMAL",
+            "S2 OFF TT", "S2 START OT_TT", "S2 END OT_TT", "S2 REASON OT_TT",
+            "S2 OFF TL", "S2 START OT_TL", "S2 END OT_TL", "S2 REASON OT_TL",
+            "S3 OFF NORMAL", "S3 START NORMAL", "S3 END NORMAL", "S3 REASON NORMAL",
+            "S3 OFF TT", "S3 START OT_TT", "S3 END OT_TT", "S3 REASON OT_TT",
+            "S3 OFF TL", "S3 START OT_TL", "S3 END OT_TL", "S3 REASON OT_TL"
+        };
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("WorkDays");
+
+            // Write headers in column A
+            for (int i = 0; i < rows.length; i++) {
+                Row row = sheet.createRow(i);
+                Cell cell = row.createCell(0); // Column A
+                cell.setCellValue(rows[i]);
+            }
+
+            // Generate date for each weekday (Mon-Fri) of the given month and year
+            LocalDate startDate = LocalDate.of(year, month, 1);
+            LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+            int colIdx = 1;
+
+            for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+                // Create reusable style and helper once before the loop (move these outside the loop)
+                CreationHelper createHelper = workbook.getCreationHelper();
+                CellStyle dateCellStyle = workbook.createCellStyle();
+                dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+
+                // inside the loop
+                Row row = sheet.getRow(0);
+                if (row == null) row = sheet.createRow(0);
+
+                // Create date cell and format it
+                Cell dateCell = row.createCell(colIdx);
+                dateCell.setCellValue(java.sql.Date.valueOf(date)); // Converts LocalDate to java.sql.Date
+                dateCell.setCellStyle(dateCellStyle);
+
+                int rowIdx = 1;
+                DayOfWeek day = date.getDayOfWeek();
+                boolean isWeekday = day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY;
+                boolean isSaturday = day == DayOfWeek.SATURDAY;
+                boolean isSunday = day == DayOfWeek.SUNDAY;
+                boolean isMonday = day == DayOfWeek.MONDAY;
+
+                // --- Shift 1 ---
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "No" : "Yes"); // S1 OFF NORMAL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "07:10" : "00:00"); // START NORMAL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "15:50" : "00:00"); // END NORMAL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON NORMAL
+
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TT
+
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TL
+
+                // --- Shift 2 ---
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "No" : "Yes"); // S2 OFF NORMAL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "15:50" : "00:00"); // START NORMAL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(isWeekday ? "23:30" : "00:00"); // END NORMAL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON NORMAL
+
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TT
+
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TL
+
+                // --- Shift 3 ---
+                String s3NormalOff = (isWeekday && !isMonday || isSaturday) ? "No" : "Yes";
+                String s3Start = (isWeekday && !isMonday || isSaturday) ? "23:30" : "00:00";
+                String s3End = (isWeekday && !isMonday || isSaturday) ? "07:10" : "00:00";
+
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3NormalOff); // S3 OFF NORMAL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3Start); // START NORMAL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(s3End); // END NORMAL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON NORMAL
+
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TT
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TT
+
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("Yes"); // OFF TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // START OT_TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue("00:00"); // END OT_TL
+                sheet.getRow(rowIdx++).createCell(colIdx).setCellValue(""); // REASON OT_TL
+
+                colIdx++;
+            }
+
+    		    
+            System.out.println("/n ff");
+
+            // Adjust widths
+            for (int i = 0; i < colIdx; i++) {
+                sheet.autoSizeColumn(i);
+            }
+            sheet.createFreezePane(1, 1);
+            
+            CellStyle lockedStyle = workbook.createCellStyle();
+            lockedStyle.setLocked(true);
+
+            CellStyle unlockedStyle = workbook.createCellStyle();
+            unlockedStyle.setLocked(false);
+
+            // Lock only the first row and column A
+            for (int r = 0; r <= sheet.getLastRowNum(); r++) {
+                Row row = sheet.getRow(r);
+                if (row == null) continue;
+
+                for (int c = 0; c < colIdx; c++) {
+                    Cell cell = row.getCell(c);
+                    if (cell == null) continue;
+
+                    CellStyle originalStyle = cell.getCellStyle();
+                    CellStyle newStyle = workbook.createCellStyle();
+                    newStyle.cloneStyleFrom(originalStyle); // preserve formatting
+
+                    if (r == 0 || c == 0) {
+                        newStyle.setLocked(true);
+                    } else {
+                        newStyle.setLocked(false);
+                    }
+
+                    cell.setCellStyle(newStyle);
+                }
+            }
+
+            sheet.protectSheet("your_password");
+            
+            DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+            DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[] {"Yes", "No"});
+
+            // Target rows: 1, 5, 9, 13, 17, 21 (0-based index, so row 2 = index 1)
+            int[] dropdownRows = {1, 5, 9, 13, 17, 21, 25, 29, 33};
+            for (int row : dropdownRows) {
+                CellRangeAddressList addressList = new CellRangeAddressList(row, row, 1, colIdx - 1); // From col B to last used
+                DataValidation validation = validationHelper.createValidation(constraint, addressList);
+                validation.setSuppressDropDownArrow(true);
+                validation.setShowErrorBox(true);
+                sheet.addValidationData(validation);
+            }
+            
+            // Create styles
+            CellStyle HeaderStyle = workbook.createCellStyle();
+            HeaderStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+            HeaderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            
+            CellStyle lightBlueStyle = workbook.createCellStyle();
+            lightBlueStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
+            lightBlueStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+
+            CellStyle lightGreenStyle = workbook.createCellStyle();
+            lightGreenStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+            lightGreenStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            
+            CellStyle lightYellowStyle = workbook.createCellStyle();
+            lightYellowStyle.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+            lightYellowStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            
+            Font boldFont = workbook.createFont();
+            boldFont.setBold(true);
+
+            Row rowH = sheet.getRow(0);
+            for (int c = 0; c < colIdx; c++) {
+                Cell cell = rowH.getCell(c);
+                if (cell == null) cell = rowH.createCell(c);
+                CellStyle newStyle = workbook.createCellStyle();
+                newStyle.cloneStyleFrom(cell.getCellStyle());
+                newStyle.setFillForegroundColor(HeaderStyle.getFillForegroundColor());
+                newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                newStyle.setBorderBottom(BorderStyle.THIN);
+                newStyle.setBorderTop(BorderStyle.THIN);
+                newStyle.setBorderLeft(BorderStyle.THIN);
+                newStyle.setBorderRight(BorderStyle.THIN);
+                newStyle.setFont(boldFont);
+                if (c >= 1) {
+                    newStyle.setAlignment(HorizontalAlignment.CENTER);
+                }
+                cell.setCellStyle(newStyle);
+            }
+            
+            // Apply background to rows 2–9 (index 1 to 8)
+            XSSFCellStyle[] greenStyles = new XSSFCellStyle[3];
+            greenStyles[0] = (XSSFCellStyle) workbook.createCellStyle();
+            greenStyles[0].setFillForegroundColor(new XSSFColor(new java.awt.Color(200, 255, 200), null)); // light green
+            greenStyles[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            greenStyles[1] = (XSSFCellStyle) workbook.createCellStyle();
+            greenStyles[1].setFillForegroundColor(new XSSFColor(new java.awt.Color(120, 200, 120), null)); // medium green
+            greenStyles[1].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            greenStyles[2] = (XSSFCellStyle) workbook.createCellStyle();
+            greenStyles[2].setFillForegroundColor(new XSSFColor(new java.awt.Color(60, 150, 60), null)); // darker green
+            greenStyles[2].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            applyStyleToRows(sheet, 1, 4, colIdx, greenStyles[0], boldFont, workbook);
+            applyStyleToRows(sheet, 5, 8, colIdx, greenStyles[1], boldFont, workbook);
+            applyStyleToRows(sheet, 9, 12, colIdx, greenStyles[2], boldFont, workbook);
+
+            // Apply background to rows 10–17 (index 9 to 16)
+            XSSFCellStyle[] yellowStyles = new XSSFCellStyle[3];
+
+            // Define progressively darker yellow shades
+            yellowStyles[0] = (XSSFCellStyle) workbook.createCellStyle();
+            yellowStyles[0].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 255, 200), null)); // light yellow
+            yellowStyles[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            yellowStyles[1] = (XSSFCellStyle) workbook.createCellStyle();
+            yellowStyles[1].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 255, 130), null)); // medium yellow
+            yellowStyles[1].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            yellowStyles[2] = (XSSFCellStyle) workbook.createCellStyle();
+            yellowStyles[2].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 220, 50), null)); // darker yellow
+            yellowStyles[2].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            
+            applyStyleToRows(sheet, 13, 16, colIdx, yellowStyles[0], boldFont, workbook); // light yellow
+            applyStyleToRows(sheet, 17, 20, colIdx, yellowStyles[1], boldFont, workbook); // medium yellow
+            applyStyleToRows(sheet, 21, 24, colIdx, yellowStyles[2], boldFont, workbook); // dark yellow
+            
+            XSSFCellStyle[] redStyles = new XSSFCellStyle[3];
+
+            // Light red
+            redStyles[0] = (XSSFCellStyle) workbook.createCellStyle();
+            redStyles[0].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 200, 200), null)); // soft red
+            redStyles[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            // Medium red
+            redStyles[1] = (XSSFCellStyle) workbook.createCellStyle();
+            redStyles[1].setFillForegroundColor(new XSSFColor(new java.awt.Color(255, 100, 100), null)); // medium red
+            redStyles[1].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            // Darker red
+            redStyles[2] = (XSSFCellStyle) workbook.createCellStyle();
+            redStyles[2].setFillForegroundColor(new XSSFColor(new java.awt.Color(200, 50, 50), null)); // darker red
+            redStyles[2].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            
+            applyStyleToRows(sheet, 25, 28, colIdx, redStyles[0], boldFont, workbook); // Light red
+            applyStyleToRows(sheet, 29, 32, colIdx, redStyles[1], boldFont, workbook); // Medium red
+            applyStyleToRows(sheet, 33, 36, colIdx, redStyles[2], boldFont, workbook); // Dark red
+
+            
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        }
+    		
+    }
+
 }

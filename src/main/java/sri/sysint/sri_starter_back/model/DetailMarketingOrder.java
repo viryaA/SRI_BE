@@ -94,6 +94,12 @@ public class DetailMarketingOrder {
 	@Column(name = "DEFECT")
 	private BigDecimal defect;
 	
+	@Column(name = "TOTAL_DEFCT")
+	private BigDecimal totalDefect;
+	
+	@Column(name = "MO_GROSS")
+	private BigDecimal moGross;
+	
 	@Column(name = "REJECT")
 	private BigDecimal reject;
 	
@@ -151,11 +157,80 @@ public class DetailMarketingOrder {
 	    this.createdBy = detailMarketingOrder.getCreatedBy();
 	    this.lastUpdateDate = detailMarketingOrder.getLastUpdateDate();
 	    this.lastUpdatedBy = detailMarketingOrder.getLastUpdatedBy();
+	    this.totalDefect = detailMarketingOrder.getTotalDefect();
+	    this.moGross = detailMarketingOrder.getMoGross();
 	}
+	
+	
+
+	public DetailMarketingOrder(BigDecimal detailId, String moId, String category, BigDecimal partNumber,
+			String description, String machineType, BigDecimal capacity, BigDecimal qtyPerMould, BigDecimal qtyPerRak,
+			BigDecimal minOrder, BigDecimal maxCapMonth0, BigDecimal maxCapMonth1, BigDecimal maxCapMonth2,
+			BigDecimal initialStock, BigDecimal sfMonth0, BigDecimal sfMonth1, BigDecimal sfMonth2, BigDecimal moMonth0,
+			BigDecimal moMonth1, BigDecimal moMonth2, BigDecimal ppd, BigDecimal cav, BigDecimal lockStatusM0,
+			BigDecimal lockStatusM1, BigDecimal lockStatusM2, BigDecimal ar, BigDecimal defect, BigDecimal totalDefect,
+			BigDecimal moGross, BigDecimal reject, BigDecimal totalAr, BigDecimal status, Date creationDate,
+			String createdBy, Date lastUpdateDate, String lastUpdatedBy) {
+		super();
+		this.detailId = detailId;
+		this.moId = moId;
+		this.category = category;
+		this.partNumber = partNumber;
+		this.description = description;
+		this.machineType = machineType;
+		this.capacity = capacity;
+		this.qtyPerMould = qtyPerMould;
+		this.qtyPerRak = qtyPerRak;
+		this.minOrder = minOrder;
+		this.maxCapMonth0 = maxCapMonth0;
+		this.maxCapMonth1 = maxCapMonth1;
+		this.maxCapMonth2 = maxCapMonth2;
+		this.initialStock = initialStock;
+		this.sfMonth0 = sfMonth0;
+		this.sfMonth1 = sfMonth1;
+		this.sfMonth2 = sfMonth2;
+		this.moMonth0 = moMonth0;
+		this.moMonth1 = moMonth1;
+		this.moMonth2 = moMonth2;
+		this.ppd = ppd;
+		this.cav = cav;
+		this.lockStatusM0 = lockStatusM0;
+		this.lockStatusM1 = lockStatusM1;
+		this.lockStatusM2 = lockStatusM2;
+		this.ar = ar;
+		this.defect = defect;
+		this.totalDefect = totalDefect;
+		this.moGross = moGross;
+		this.reject = reject;
+		this.totalAr = totalAr;
+		this.status = status;
+		this.creationDate = creationDate;
+		this.createdBy = createdBy;
+		this.lastUpdateDate = lastUpdateDate;
+		this.lastUpdatedBy = lastUpdatedBy;
+	}
+
+
 
 	public DetailMarketingOrder() {}
 
 	
+	public BigDecimal getTotalDefect() {
+		return totalDefect;
+	}
+
+	public void setTotalDefect(BigDecimal totalDefect) {
+		this.totalDefect = totalDefect;
+	}
+
+	public BigDecimal getMoGross() {
+		return moGross;
+	}
+
+	public void setMoGross(BigDecimal moGross) {
+		this.moGross = moGross;
+	}
+
 	public BigDecimal getDetailId() {
 		return detailId;
 	}

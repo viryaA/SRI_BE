@@ -12,7 +12,8 @@ import org.springframework.data.repository.query.Param;
 
 import sri.sysint.sri_starter_back.model.DWorkDayHoursSpesific;
 
-public interface DWorkDayHoursSpecificRepo extends JpaRepository<DWorkDayHoursSpesific, Date> {
+public interface DWorkDayHoursSpecificRepo extends JpaRepository<DWorkDayHoursSpesific, BigDecimal> {
+    Optional<List<DWorkDayHoursSpesific>> findByDATEWD(Date dateWD);
 	
 	@Query(value = "SELECT * FROM SRI_IMPP_D_WD_HOURS_SPECIFIC WHERE DETAIL_WD_HOURS_SPECIFIC_ID = :id", nativeQuery = true)
     Optional<DWorkDayHoursSpesific> findById(@Param("id") BigDecimal id);
@@ -33,8 +34,13 @@ public interface DWorkDayHoursSpecificRepo extends JpaRepository<DWorkDayHoursSp
 	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_D_WD_HOURS_SPECIFIC", nativeQuery = true)
     BigDecimal getNewId();
 	
-	@Query(value = "SELECT * FROM SRI_IMPP_D_WD_HOURS_SPECIFIC WHERE TO_DATE(DATE_WD, 'DD-MM-YYYY') = TO_DATE(:date, 'DD-MM-YYYY') AND DESCRIPTION = :description", nativeQuery = true)
-	Optional<DWorkDayHoursSpesific> findDWdHoursByDateAndDescription(@Param("date") String date, @Param("description") String description);
+	@Query(value = "SELECT * FROM SRI_IMPP_D_WD_HOURS_SPECIFIC " +
+				"WHERE TRUNC(DATE_WD) = TO_DATE(:date, 'DD-MM-YYYY') " +
+				"AND DESCRIPTION = :description", nativeQuery = true)
+	Optional<DWorkDayHoursSpesific> findDWdHoursByDateAndDescription(
+		
+    @Param("date") String date,
+    @Param("description") String description);
 
 	@Query(value = "SELECT * FROM SRI_IMPP_D_WD_HOURS_SPECIFIC", nativeQuery = true)
 	List<DWorkDayHoursSpesific> fetchAllManual();

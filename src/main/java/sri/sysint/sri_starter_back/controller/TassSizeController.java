@@ -89,7 +89,7 @@ public class TassSizeController {
 	    		TassSizes = TassSizeServiceImpl.getAllTassSize();
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -128,7 +128,7 @@ public class TassSizeController {
 	        	tassSize = TassSizeServiceImpl.getTassSizeById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -165,7 +165,7 @@ public class TassSizeController {
 	        	TassSize savedTassSize = TassSizeServiceImpl.saveTassSize(tassSize);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -202,7 +202,7 @@ public class TassSizeController {
 	        	TassSize updatedTassSize = TassSizeServiceImpl.updateTassSize(tassSize);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -239,7 +239,7 @@ public class TassSizeController {
 	        	TassSize deletedTassSize = TassSizeServiceImpl.deleteTassSize(tassSize);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -276,7 +276,7 @@ public class TassSizeController {
 	        	TassSize activatedTassSize = TassSizeServiceImpl.activateTassSize(tassSize);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -311,7 +311,7 @@ public class TassSizeController {
 
 	        if (user != null) {
 	        	if (file.isEmpty()) {
-	    	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	    	        return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	    	    }
 	    	    
 	    	    try (InputStream inputStream = file.getInputStream()) {
@@ -386,7 +386,7 @@ public class TassSizeController {
 	                    }
 	                }
 					if(!errorMessages.isEmpty()){
-						return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+						return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 					}
 
 					TassSizeServiceImpl.deleteAllTassSize();
@@ -394,16 +394,16 @@ public class TassSizeController {
 						TassSizeServiceImpl.saveTassSize(tassSize);
 					}
 	               
-	    	        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), TassSizes);
+	    	        return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), TassSizes);
 
 	    	    } catch (IOException e) {
-	    	        return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
+	    	        return new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
 	    	    }
 	        } else {
 	            throw new ResourceNotFoundException("User not found");
 	        }
 	    } catch (IllegalArgumentException e) {
-			return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+			return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 		} catch (Exception e) {
 	        throw new ResourceNotFoundException("JWT token is not valid or expired");
 	    }

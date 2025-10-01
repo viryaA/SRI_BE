@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,353 +57,211 @@ public class ItemAssyController {
     @PersistenceContext    
     private EntityManager em;
     
-    //START - GET MAPPING
-        @GetMapping("/getAllItemAssy")
-        public Response getAllPlant(final HttpServletRequest req) throws ResourceNotFoundException {
-            String header = req.getHeader("Authorization");
+	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
+    @GetMapping("/getAllItemAssy")
+    public Response getAllPlant(final HttpServletRequest req) throws ResourceNotFoundException {
 
-            if (header == null || !header.startsWith("Bearer ")) {
-                throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-            }
+        List<ItemAssy> itemAssies = new ArrayList<>();
+        itemAssies = itemAssyServiceImpl.getAllItemAssy();
 
-            String token = header.replace("Bearer ", "");
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            itemAssies
+        );
 
-            try {
-                String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
 
-                if (user != null) {
-                    //function goes here
-                    List<ItemAssy> itemAssies = new ArrayList<>();
-                    itemAssies = itemAssyServiceImpl.getAllItemAssy();
+        return response;
+    }
 
-                    response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        itemAssies
-                    );
-                } else {
-                    throw new ResourceNotFoundException("User not found");
-                }
-            } catch (Exception e) {
-                throw new ResourceNotFoundException("JWT token is not valid or expired");
-            }
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
+    @GetMapping("/getItemAssyById/{id}")
+    public Response getPlantById(final HttpServletRequest req, @PathVariable String id) throws ResourceNotFoundException {
 
-            return response;
-        }
-        
-        @GetMapping("/getItemAssyById/{id}")
-        public Response getPlantById(final HttpServletRequest req, @PathVariable String id) throws ResourceNotFoundException {
-            String header = req.getHeader("Authorization");
+        Optional<ItemAssy> itemAssy = Optional.of(new ItemAssy());
+        itemAssy = itemAssyServiceImpl.getItemAssyById(id);
 
-            if (header == null || !header.startsWith("Bearer ")) {
-                throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-            }
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            itemAssy
+        );
 
-            String token = header.replace("Bearer ", "");
 
-            try {
-                String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
+        return response;
+    }
 
-                if (user != null) {
-                    Optional<ItemAssy> itemAssy = Optional.of(new ItemAssy());
-                    itemAssy = itemAssyServiceImpl.getItemAssyById(id);
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+    @PostMapping("/saveItemAssy")
+    public Response savePlant(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
 
-                    response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        itemAssy
-                    );
-                } else {
-                    throw new ResourceNotFoundException("User not found");
-                }
-            } catch (Exception e) {
-                throw new ResourceNotFoundException("JWT token is not valid or expired");
-            }
+        ItemAssy savedItemAssy = itemAssyServiceImpl.saveItemAssy(itemAssy);
 
-            return response;
-        }
-    //END - GET MAPPING
-    //START - POST MAPPING
-        @PostMapping("/saveItemAssy")
-        public Response savePlant(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
-            String header = req.getHeader("Authorization");
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            savedItemAssy
+        );
 
-            if (header == null || !header.startsWith("Bearer ")) {
-                throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-            }
+        return response;
+    }
 
-            String token = header.replace("Bearer ", "");
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
+    @PostMapping("/updateItemAssy")
+    public Response updatePlant(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
 
-            try {
-                String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
+        ItemAssy updatedItemAssy = itemAssyServiceImpl.updateItemAssy(itemAssy);
 
-                if (user != null) {
-                    ItemAssy savedItemAssy = itemAssyServiceImpl.saveItemAssy(itemAssy);
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            updatedItemAssy
+        );
 
-                    response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        savedItemAssy
-                    );
-                } else {
-                    throw new ResourceNotFoundException("User not found");
-                }
-            } catch (Exception e) {
-                throw new ResourceNotFoundException("JWT token is not valid or expired");
-            }
+        return response;
+    }
 
-            return response;
-        }
-        
-        @PostMapping("/updateItemAssy")
-        public Response updatePlant(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
-            String header = req.getHeader("Authorization");
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
+    @PostMapping("/deleteItemAssy")
+    public Response deletePlant(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
 
-            if (header == null || !header.startsWith("Bearer ")) {
-                throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-            }
+        ItemAssy deletedItemAssy = itemAssyServiceImpl.deleteItemAssy(itemAssy);
 
-            String token = header.replace("Bearer ", "");
+        response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            deletedItemAssy
+        );
 
-            try {
-                String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
+        return response;
+    }
 
-                if (user != null) {
-                    ItemAssy updatedItemAssy = itemAssyServiceImpl.updateItemAssy(itemAssy);
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")    
+    @PostMapping("/restoreItemAssy")
+    public Response restoreItemAssy(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
 
-                    response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        updatedItemAssy
-                    );
-                } else {
-                    throw new ResourceNotFoundException("User not found");
-                }
-            } catch (Exception e) {
-                throw new ResourceNotFoundException("JWT token is not valid or expired");
-            }
+        ItemAssy restoredItemAssy = itemAssyServiceImpl.restoreItemAssy(itemAssy);
 
-            return response;
-        }
-        
-        @PostMapping("/deleteItemAssy")
-        public Response deletePlant(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
-            String header = req.getHeader("Authorization");
+        Response response = new Response(
+            
+            HttpStatus.OK.value(),
+            null,
+            HttpStatus.OK.getReasonPhrase(),
+            req.getRequestURI(),
+            restoredItemAssy
+        );
+        return response;
 
-            if (header == null || !header.startsWith("Bearer ")) {
-                throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-            }
+    }
 
-            String token = header.replace("Bearer ", "");
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+    @PostMapping("/saveItemAssyExcel")
+    @Transactional
+    public Response saveItemAssyExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
 
-            try {
-                String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
-
-                if (user != null) {
-                    ItemAssy deletedItemAssy = itemAssyServiceImpl.deleteItemAssy(itemAssy);
-
-                    response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        deletedItemAssy
-                    );
-                } else {
-                    throw new ResourceNotFoundException("User not found");
-                }
-            } catch (Exception e) {
-                throw new ResourceNotFoundException("JWT token is not valid or expired");
-            }
-
-            return response;
-        }
-        
-        @PostMapping("/restoreItemAssy")
-        public Response restoreItemAssy(final HttpServletRequest req, @RequestBody ItemAssy itemAssy) throws ResourceNotFoundException {
-            String header = req.getHeader("Authorization");
-
-            if (header == null || !header.startsWith("Bearer ")) {
-                throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-            }
-
-            String token = header.replace("Bearer ", "");
-
-            try {
-                String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
-
-                if (user != null) {
-                    ItemAssy restoredItemAssy = itemAssyServiceImpl.restoreItemAssy(itemAssy);
-
-                    Response response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        restoredItemAssy
-                    );
-                    return response;
-                } else {
-                    throw new ResourceNotFoundException("User not found");
-                }
-            } catch (Exception e) {
-                throw new ResourceNotFoundException("JWT token is not valid or expired");
-            }
+        if (file.isEmpty()) {
+            return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
         }
 
-        
-        @PostMapping("/saveItemAssyExcel")
-        @Transactional
-        public Response saveItemAssyExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
-            String header = req.getHeader("Authorization");
+        try (InputStream inputStream = file.getInputStream()) {
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+            XSSFSheet sheet = workbook.getSheetAt(0);
 
-            if (header == null || !header.startsWith("Bearer ")) {
-                throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-            }
+            List<ItemAssy> itemAssies = new ArrayList<>();
+            List<String> errorMessages = new ArrayList<>();
 
-            String token = header.replace("Bearer ", "");
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
 
-            try {
-                String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
+                if (row != null) {
+                    boolean isEmptyRow = true;
 
-                if (user != null) {
-                    if (file.isEmpty()) {
-                        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+                    for (int j = 0; j < row.getLastCellNum(); j++) {
+                        Cell cell = row.getCell(j);
+                        if (cell != null && cell.getCellType() != CellType.BLANK) {
+                            isEmptyRow = false;
+                            break;
+                        }
                     }
 
-                    try (InputStream inputStream = file.getInputStream()) {
-                        XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-                        XSSFSheet sheet = workbook.getSheetAt(0);
-
-                        List<ItemAssy> itemAssies = new ArrayList<>();
-                        List<String> errorMessages = new ArrayList<>();
-
-                        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                            Row row = sheet.getRow(i);
-
-                            if (row != null) {
-                                boolean isEmptyRow = true;
-
-                                for (int j = 0; j < row.getLastCellNum(); j++) {
-                                    Cell cell = row.getCell(j);
-                                    if (cell != null && cell.getCellType() != CellType.BLANK) {
-                                        isEmptyRow = false;
-                                        break;
-                                    }
-                                }
-
-                                if (isEmptyRow) {
-                                    continue;
-                                }
-
-                                ItemAssy itemAssy = new ItemAssy();
-                                Cell itemAssyCell = row.getCell(1);
-
-                                if (itemAssyCell == null || itemAssyCell.getCellType() == CellType.BLANK) {
-                                    errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 2 (Item Assy)");
-                                    continue;
-                                }
-
-                                itemAssy.setITEM_ASSY(itemAssyCell.getStringCellValue());
-                                itemAssy.setSTATUS(BigDecimal.valueOf(1));
-                                itemAssy.setCREATION_DATE(new Date());
-                                itemAssy.setLAST_UPDATE_DATE(new Date());
-
-                                itemAssies.add(itemAssy);
-                            }
-                        }
-
-                        if (!errorMessages.isEmpty()) {
-                            return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
-                        }
-
-                        itemAssyServiceImpl.deleteAllItemAssy();
-                        for (ItemAssy itemAssy : itemAssies) {
-                            itemAssyServiceImpl.saveItemAssy(itemAssy);
-                        }
-
-                        return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), itemAssies);
-
-                    } catch (IOException e) {
-                        throw new RuntimeException("Error processing file", e);
+                    if (isEmptyRow) {
+                        continue;
                     }
-                } else {
-                    throw new ResourceNotFoundException("User not found");
+
+                    ItemAssy itemAssy = new ItemAssy();
+                    Cell itemAssyCell = row.getCell(1);
+
+                    if (itemAssyCell == null || itemAssyCell.getCellType() == CellType.BLANK) {
+                        errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 2 (Item Assy)");
+                        continue;
+                    }
+
+                    itemAssy.setITEM_ASSY(itemAssyCell.getStringCellValue());
+                    itemAssy.setSTATUS(BigDecimal.valueOf(1));
+                    itemAssy.setCREATION_DATE(new Date());
+                    itemAssy.setLAST_UPDATE_DATE(new Date());
+
+                    itemAssies.add(itemAssy);
                 }
-            } catch (IllegalArgumentException e) {
-                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
-            } catch (Exception e) {
-                throw new ResourceNotFoundException("JWT token is not valid or expired");
             }
+
+            if (!errorMessages.isEmpty()) {
+                return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+            }
+
+            itemAssyServiceImpl.deleteAllItemAssy();
+            for (ItemAssy itemAssy : itemAssies) {
+                itemAssyServiceImpl.saveItemAssy(itemAssy);
+            }
+
+            return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), itemAssies);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error processing file", e);
         }
+    }
 
-        
-        @GetMapping("/exportItemAssyExcel")
-        public ResponseEntity<InputStreamResource> exportItemAssyExcel() throws IOException {
-            String filename = "EXPORT_MASTER_ITEM_ASSY.xlsx";
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+    @GetMapping("/exportItemAssyExcel")
+    public ResponseEntity<InputStreamResource> exportItemAssyExcel() throws IOException {
+        String filename = "EXPORT_MASTER_ITEM_ASSY.xlsx";
 
-            ByteArrayInputStream data = itemAssyServiceImpl.exportItemAssysExcel(); 
-            InputStreamResource file = new InputStreamResource(data);
+        ByteArrayInputStream data = itemAssyServiceImpl.exportItemAssysExcel(); 
+        InputStreamResource file = new InputStreamResource(data);
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                    .body(file);
-        }
-        
-        @GetMapping("/layoutItemAssyExcel")
-        public ResponseEntity<InputStreamResource> layoutItemAssyExcel() throws IOException {
-            String filename = "LAYOUT_MASTER_ITEM_ASSY.xlsx";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(file);
+    }
+    
+    	@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+    @GetMapping("/layoutItemAssyExcel")
+    public ResponseEntity<InputStreamResource> layoutItemAssyExcel() throws IOException {
+        String filename = "LAYOUT_MASTER_ITEM_ASSY.xlsx";
 
-            ByteArrayInputStream data = itemAssyServiceImpl.layoutItemAssysExcel(); 
-            InputStreamResource file = new InputStreamResource(data);
+        ByteArrayInputStream data = itemAssyServiceImpl.layoutItemAssysExcel(); 
+        InputStreamResource file = new InputStreamResource(data);
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                    .body(file);
-        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(file);
+    }
 
-//END - POST MAPPING
-//START - PUT MAPPING
-//END - PUT MAPPING
-//START - DELETE MAPPING
-//END - DELETE MAPPING
-//START - PROCEDURE
-//END - PROCEDURE
 }

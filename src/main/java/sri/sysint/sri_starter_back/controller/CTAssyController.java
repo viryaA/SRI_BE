@@ -89,7 +89,7 @@ public class CTAssyController {
 	        	ctAssys = ctAssyServiceImpl.getAllCTAssy();
 		
 			    response = new Response(
-			        new Date(),
+			        
 			        HttpStatus.OK.value(),
 			        null,
 			        HttpStatus.OK.getReasonPhrase(),
@@ -127,7 +127,7 @@ public class CTAssyController {
 	        	ctAssy = ctAssyServiceImpl.getCTAssyById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -164,7 +164,7 @@ public class CTAssyController {
 	        	CTAssy savedCTAssy = ctAssyServiceImpl.saveCTAssy(ctAssy);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -201,7 +201,7 @@ public class CTAssyController {
 	        	CTAssy updatedCTAssy = ctAssyServiceImpl.updateCTAssy(ctAssy);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -238,7 +238,7 @@ public class CTAssyController {
 	        	CTAssy deletedCTAssy = ctAssyServiceImpl.deleteCTAssy(ctAssy);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -275,7 +275,7 @@ public class CTAssyController {
 	        	CTAssy activatedCTAssy = ctAssyServiceImpl.activateCTAssy(ctAssy);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -310,7 +310,7 @@ public class CTAssyController {
 	
 	       if (user != null) {
 				if (file.isEmpty()) {
-					return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+					return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 				}
 				
 
@@ -412,23 +412,23 @@ public class CTAssyController {
 					}
 
 					if (!errorMessages.isEmpty()) {
-						return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+						return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 					}
 					ctAssyServiceImpl.deleteAllCTAssy();
 					for(CTAssy ctAssy : ctAssys){
 						ctAssyServiceImpl.saveCTAssy(ctAssy);
 					}
 
-					return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), ctAssys);
+					return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), ctAssys);
 
 				} catch (IOException e) {
-					return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
+					return new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
 				}
 	       } else {
 	           throw new ResourceNotFoundException("User not found");
 	       }
 	   } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    } catch (Exception e) {
 	       throw new ResourceNotFoundException("JWT token is not valid or expired");
 	   }

@@ -84,7 +84,7 @@ public class CtKapaController {
 	    	    ctKapas = ctKapaServiceImpl.getAllCtKapa();
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -122,7 +122,7 @@ public class CtKapaController {
 	    	    ctKapa = ctKapaServiceImpl.getCtKapaById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -160,7 +160,7 @@ public class CtKapaController {
 	        	CtKapa savedCtKapa = ctKapaServiceImpl.saveCtKapa(ctKapa);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -197,7 +197,7 @@ public class CtKapaController {
 	        	CtKapa updatedCtKapa = ctKapaServiceImpl.updateCtKapa(ctKapa);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -234,7 +234,7 @@ public class CtKapaController {
 	        	CtKapa deletedCtKapa = ctKapaServiceImpl.deleteCtKapa(ctKapa);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -271,7 +271,7 @@ public class CtKapaController {
 	            CtKapa restoredCtKapa = ctKapaServiceImpl.restoreCtKapa(ctKapa);
 
 	            Response response = new Response(
-	                new Date(),
+	                
 	                HttpStatus.OK.value(),
 	                null,
 	                HttpStatus.OK.getReasonPhrase(),
@@ -306,7 +306,7 @@ public class CtKapaController {
 
 	        if (user != null) {
 	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	            }
 
 	            try (InputStream inputStream = file.getInputStream()) {
@@ -421,7 +421,7 @@ public class CtKapaController {
 	                }
 
 	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+	                    return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 	                }
 
 	                ctKapaServiceImpl.deleteAllCtKapa();
@@ -429,7 +429,7 @@ public class CtKapaController {
 	                    ctKapaServiceImpl.saveCtKapa(ctKapa);
 	                }
 
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), ctKapas);
+	                return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), ctKapas);
 
 	            } catch (IOException e) {
 	                throw new RuntimeException("Error processing file", e);
@@ -438,7 +438,7 @@ public class CtKapaController {
 	            throw new ResourceNotFoundException("User not found");
 	        }
 	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    } catch (Exception e) {
 	        throw new ResourceNotFoundException("JWT token is not valid or expired");
 	    }

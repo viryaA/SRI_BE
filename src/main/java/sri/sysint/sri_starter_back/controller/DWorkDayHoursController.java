@@ -88,7 +88,7 @@ public class DWorkDayHoursController {
                 List<DWorkDayHours> dWorkDayHours = dWorkDayHoursServiceImpl.getAllWorkDayHours();
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -128,7 +128,7 @@ public class DWorkDayHoursController {
                 Optional<DWorkDayHours> dWorkDayHours = dWorkDayHoursServiceImpl.getWorkDayHoursByDate(parsedDate); 
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -176,7 +176,7 @@ public class DWorkDayHoursController {
                 Optional<DWorkDayHours> workDayHours = dWorkDayHoursServiceImpl.getWorkDayHoursByDateDesc(parsedDate, description);
 
               response = new Response(
-                        new Date(),
+                        
                         HttpStatus.OK.value(),
                         null,
                         HttpStatus.OK.getReasonPhrase(),
@@ -214,7 +214,7 @@ public class DWorkDayHoursController {
                 DWorkDayHours savedDWorkDayHours = dWorkDayHoursServiceImpl.saveWorkDayHours(dWorkDayHours); 
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -251,7 +251,7 @@ public class DWorkDayHoursController {
                 DWorkDayHours updatedDWorkDayHours = dWorkDayHoursServiceImpl.updateWorkDayHours(dWorkDayHours); 
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -288,7 +288,7 @@ public class DWorkDayHoursController {
                 DWorkDayHours deletedDWorkDayHours = dWorkDayHoursServiceImpl.deleteWorkDayHours(dWorkDayHours); 
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -325,7 +325,7 @@ public class DWorkDayHoursController {
                 DWorkDayHours deletedDWorkDayHours = dWorkDayHoursServiceImpl.restoreWorkDayHours(dWorkDayHours); 
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -360,7 +360,7 @@ public class DWorkDayHoursController {
 //
 //            if (user != null) {
 //                if (file.isEmpty()) {
-//                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+//                    return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 //                }
 //
 //                dWorkDayHoursServiceImpl.deleteAllWorkDayHours();
@@ -459,10 +459,10 @@ public class DWorkDayHoursController {
 //                        }
 //                    }
 //
-//                    return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDayHoursList);
+//                    return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDayHoursList);
 //
 //                } catch (IOException e) {
-//                    return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file: " + e.getMessage(), req.getRequestURI(), null);
+//                    return new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file: " + e.getMessage(), req.getRequestURI(), null);
 //                }
 //            } else {
 //                throw new ResourceNotFoundException("User not found");
@@ -490,7 +490,7 @@ public class DWorkDayHoursController {
 
             if (user != null) {
                 if (file.isEmpty()) {
-                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+                    return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
                 }
 
                 dWorkDayHoursServiceImpl.deleteAllWorkDayHours();
@@ -588,10 +588,10 @@ public class DWorkDayHoursController {
                         }
                     }
 
-                    return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDayHoursList);
+                    return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDayHoursList);
 
                 } catch (IOException e) {
-                    return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file: " + e.getMessage(), req.getRequestURI(), null);
+                    return new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file: " + e.getMessage(), req.getRequestURI(), null);
                 }
             } else {
                 throw new ResourceNotFoundException("User not found");
@@ -635,7 +635,7 @@ public class DWorkDayHoursController {
             	DWorkDayHours updatedWorkDay = dWorkDayHoursServiceImpl.turnOnHour(dateWd, hour, description);
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -673,7 +673,7 @@ public class DWorkDayHoursController {
             	DWorkDayHours updatedWorkDay = dWorkDayHoursServiceImpl.turnOffHour(dateWd, hour, description);
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),

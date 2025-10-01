@@ -77,6 +77,7 @@ public class ItemCuringServiceImpl {
                 currentItemCuring.setMACHINE_TYPE(itemCuring.getMACHINE_TYPE());
                 currentItemCuring.setSPARE_MOULD(itemCuring.getSPARE_MOULD());
                 currentItemCuring.setMOULD_MONTHLY_PLAN(itemCuring.getMOULD_MONTHLY_PLAN());
+                currentItemCuring.setMOULD_NOTES(itemCuring.getMOULD_NOTES());
 
                 currentItemCuring.setLAST_UPDATE_DATE(new Date());
                 currentItemCuring.setLAST_UPDATED_BY(itemCuring.getLAST_UPDATED_BY());
@@ -140,7 +141,7 @@ public class ItemCuringServiceImpl {
     }
     
     private ByteArrayInputStream dataToExcel(List<ItemCuring> itemCurings) throws IOException {
-        String[] header = {"NOMOR", "ITEM_CURING", "KAPA_PER_MOULD", "NUMBER_OF_MOULD", "MACHINE_TYPE", "SPARE_MOULD", "MOULD_MONTHLY_PLAN"};
+        String[] header = {"NOMOR", "ITEM_CURING", "KAPA_PER_MOULD", "NUMBER_OF_MOULD", "MACHINE_TYPE", "SPARE_MOULD", "MOULD_MONTHLY_PLAN","MOULD_NOTES"};
 
         Workbook workbook = new XSSFWorkbook();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -210,6 +211,10 @@ public class ItemCuringServiceImpl {
                 Cell mouldPlanCell = dataRow.createCell(6);
                 mouldPlanCell.setCellValue(item.getMOULD_MONTHLY_PLAN() != null ? item.getMOULD_MONTHLY_PLAN().doubleValue() : 0);
                 mouldPlanCell.setCellStyle(borderStyle);
+                
+                Cell mouldNoteCell = dataRow.createCell(7);
+                mouldNoteCell.setCellValue(item.getMOULD_NOTES() != null ? item.getMOULD_NOTES().doubleValue() : 0);
+                mouldNoteCell.setCellStyle(borderStyle);
             }
 
             workbook.write(out);
@@ -229,7 +234,7 @@ public class ItemCuringServiceImpl {
     }
     
     private ByteArrayInputStream layoutToExcel() throws IOException {
-        String[] header = {"NOMOR", "ITEM_CURING", "KAPA_PER_MOULD", "NUMBER_OF_MOULD", "MACHINE_TYPE", "SPARE_MOULD", "MOULD_MONTHLY_PLAN"};
+        String[] header = {"NOMOR", "ITEM_CURING", "KAPA_PER_MOULD", "NUMBER_OF_MOULD", "MACHINE_TYPE", "SPARE_MOULD", "MOULD_MONTHLY_PLAN","MOULD_NOTES"};
 
         Workbook workbook = new XSSFWorkbook();
         ByteArrayOutputStream out = new ByteArrayOutputStream();

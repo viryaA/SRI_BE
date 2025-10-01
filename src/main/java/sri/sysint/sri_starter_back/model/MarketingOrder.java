@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity
+	@Entity
 @Table(name = "SRI_IMPP_T_MARKETINGORDER")
 public class MarketingOrder {
 	@Id
@@ -27,6 +27,12 @@ public class MarketingOrder {
 	@Column(name = "REVISION_MARKETING")
 	private BigDecimal revisionMarketing;
 	
+	@Column(name = "V_BEFORE_AR_RJ_DF")
+	private BigDecimal vBeforeArRjDf;
+
+	@Column(name = "V_AFTER_AR_RJ_DF")
+	private BigDecimal vAfterArRjDf;
+
 	@Column(name = "MONTH_0")
 	private Date month0;
 	
@@ -59,6 +65,8 @@ public class MarketingOrder {
 	public MarketingOrder(MarketingOrder marketingOrder) {
         this.moId = marketingOrder.getMoId();
         this.type = marketingOrder.getType();
+        this.vBeforeArRjDf = marketingOrder.getvBeforeArRjDf();
+        this.vAfterArRjDf = marketingOrder.getvAfterArRjDf();
         this.dateValid = marketingOrder.getDateValid();
         this.revisionPpc = marketingOrder.getRevisionPpc();
         this.revisionMarketing = marketingOrder.getRevisionMarketing();
@@ -72,17 +80,20 @@ public class MarketingOrder {
         this.lastUpdateDate = marketingOrder.getLastUpdateDate();
         this.lastUpdatedBy = marketingOrder.getLastUpdatedBy();
     }
-
+	
 
 	public MarketingOrder(String moId, String type, Date dateValid, BigDecimal revisionPpc,
-			BigDecimal revisionMarketing, Date month0, Date month1, Date month2, BigDecimal statusFilled,
-			BigDecimal status, Date creationDate, String createdBy, Date lastUpdateDate, String lastUpdatedBy) {
+			BigDecimal revisionMarketing, BigDecimal vBeforeArRjDf, BigDecimal vAfterArRjDf, Date month0, Date month1,
+			Date month2, BigDecimal statusFilled, BigDecimal status, Date creationDate, String createdBy,
+			Date lastUpdateDate, String lastUpdatedBy) {
 		super();
 		this.moId = moId;
 		this.type = type;
 		this.dateValid = dateValid;
 		this.revisionPpc = revisionPpc;
 		this.revisionMarketing = revisionMarketing;
+		this.vBeforeArRjDf = vBeforeArRjDf;
+		this.vAfterArRjDf = vAfterArRjDf;
 		this.month0 = month0;
 		this.month1 = month1;
 		this.month2 = month2;
@@ -94,7 +105,21 @@ public class MarketingOrder {
 		this.lastUpdatedBy = lastUpdatedBy;
 	}
 
+	public BigDecimal getvBeforeArRjDf() {
+		return vBeforeArRjDf;
+	}
 
+	public void setvBeforeArRjDf(BigDecimal vBeforeArRjDf) {
+		this.vBeforeArRjDf = vBeforeArRjDf;
+	}
+
+	public BigDecimal getvAfterArRjDf() {
+		return vAfterArRjDf;
+	}
+
+	public void setvAfterArRjDf(BigDecimal vAfterArRjDf) {
+		this.vAfterArRjDf = vAfterArRjDf;
+	}
 
 	public String getMoId() {
 		return moId;

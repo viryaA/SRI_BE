@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -87,7 +89,7 @@ public class DWorkDayController {
 	    	    dWorkDays = dWorkDayServiceImpl.getAllDWorkDays();
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -125,7 +127,7 @@ public class DWorkDayController {
 	    	    dWorkDay = dWorkDayServiceImpl.getDWorkDayById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -142,46 +144,55 @@ public class DWorkDayController {
 	    return response;
 	}
 	
-	@GetMapping("/getDWorkDayByDate/{date}")
-	public Response getDWorkDayByDate(final HttpServletRequest req, @PathVariable String date) throws ResourceNotFoundException {
-	    // Validate JWT token
-	    String header = req.getHeader("Authorization");
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+	@PostMapping("/getDWorkDayByDate")
+	public Response getDWorkDayByDate(final HttpServletRequest req, @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
+		// Validate JWT token
+		String header = req.getHeader("Authorization");
+		if (header == null || !header.startsWith("Bearer ")) {
+			throw new ResourceNotFoundException("JWT token not found or maybe not valid");
+		}
 
-	    String token = header.replace("Bearer ", "");
+		String token = header.replace("Bearer ", "");
 
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	                .build()
-	                .verify(token)
-	                .getSubject();
+		try {
+			String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
+					.build()
+					.verify(token)
+					.getSubject();
 
-	        if (user == null) {
-	            throw new ResourceNotFoundException("User not found");
-	        }
+			if (user == null) {
+				throw new ResourceNotFoundException("User not found");
+			}
 
-	        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-	        Date parsedDate = dateFormat.parse(date);
+			String dateStr = requestBody.get("date");
+			if (dateStr == null) {
+				throw new ResourceNotFoundException("Missing required field: 'date'");
+			}
 
-	        List<DWorkDay> dworkDays = dWorkDayServiceImpl.getDWorkDayByDate(parsedDate);
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+			Date parsedDate;
+			try {
+				parsedDate = dateFormat.parse(dateStr);
+			} catch (ParseException e) {
+				throw new ResourceNotFoundException("Invalid date format, expected format is dd-MM-yyyy");
+			}
 
-	        response = new Response(
-	            new Date(),
-	            HttpStatus.OK.value(),
-	            null,
-	            HttpStatus.OK.getReasonPhrase(),
-	            req.getRequestURI(),
-	            dworkDays
-	        );
+			List<DWorkDay> dworkDays = dWorkDayServiceImpl.getDWorkDayByDate(parsedDate);
 
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("Error processing request: " + e.getMessage());
-	    }
+			return new Response(
+				
+				HttpStatus.OK.value(),
+				null,
+				HttpStatus.OK.getReasonPhrase(),
+				req.getRequestURI(),
+				dworkDays
+			);
 
-	    return response;
+		} catch (Exception e) {
+			throw new ResourceNotFoundException("Error processing request: " + e.getMessage());
+		}
 	}
+
 
 	@PostMapping("/saveDWorkDay")
 	public Response saveDWorkDay(final HttpServletRequest req, @RequestBody DWorkDay dWorkDay) throws ResourceNotFoundException {
@@ -203,7 +214,7 @@ public class DWorkDayController {
 	        	DWorkDay savedDWorkDay = dWorkDayServiceImpl.saveDWorkDay(dWorkDay);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -240,7 +251,7 @@ public class DWorkDayController {
 	        	DWorkDay updatedDWorkDay = dWorkDayServiceImpl.updateDWorkDay(dWorkDay);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -277,7 +288,7 @@ public class DWorkDayController {
 	        	DWorkDay deletedDWorkDay = dWorkDayServiceImpl.deleteDWorkDay(dWorkDay);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -314,7 +325,7 @@ public class DWorkDayController {
 	            DWorkDay restoredDWorkDay = dWorkDayServiceImpl.restoreDWorkDay(dWorkDay);
 
 	            response = new Response(
-	                new Date(),
+	                
 	                HttpStatus.OK.value(),
 	                null,
 	                HttpStatus.OK.getReasonPhrase(),
@@ -351,7 +362,7 @@ public class DWorkDayController {
 
 	        if (user != null) {
 	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	            }
 
 	            dWorkDayServiceImpl.deleteAllDWorkDay();
@@ -404,7 +415,7 @@ public class DWorkDayController {
 	                                                .toLocalDate();
 	                                        zonedDateTime = localDate.atStartOfDay(ZoneId.of("UTC"));
 	                                    } else {
-	                                        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null,
+	                                        return new Response( HttpStatus.BAD_REQUEST.value(), null,
 	                                                "Invalid date format in file: " + dateCell.toString(), req.getRequestURI(), null);
 	                                    }
 	                                } else if (dateCell.getCellType() == CellType.STRING) {
@@ -433,7 +444,7 @@ public class DWorkDayController {
 	                                dWorkDays.add(dWorkDay);
 
 	                            } catch (Exception e) {
-	                                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null,
+	                                return new Response( HttpStatus.BAD_REQUEST.value(), null,
 	                                        "Error parsing date: " + dateCell.toString(), req.getRequestURI(), null);
 	                            }
 	                        } else {
@@ -445,10 +456,10 @@ public class DWorkDayController {
 	                    }
 	                }
 
-	                response = new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDays);
+	                response = new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dWorkDays);
 
 	            } catch (IOException e) {
-	                response = new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
+	                response = new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
 	            }
 	        } else {
 	            throw new ResourceNotFoundException("User not found");

@@ -5,12 +5,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.transaction.Transactional;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
@@ -25,6 +32,8 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -50,10 +59,27 @@ public class CTCuringServiceImpl {
 
     @Autowired
     private MachineCuringRepo machineCuringRepo;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    private static final int BATCH_SIZE = 500;
 	
     public CTCuringServiceImpl(CTCuringRepo ctCuringRepo){
         this.ctCuringRepo = ctCuringRepo;
     }
+    
+    @Transactional
+    public List<CTCuring> processStream() {
+        try (Stream<CTCuring> stream = ctCuringRepo.streamAll()) {
+            return stream.toList(); // collect stream into list
+        }
+    }
+    @Transactional(readOnly = true) // 👈 keeps transaction open
+    public Stream<CTCuring> streamAll() {
+        return ctCuringRepo.streamAll();
+    }
+
     
     public BigDecimal getNewId() {
     	return ctCuringRepo.getNewId().add(BigDecimal.valueOf(1));
@@ -74,8 +100,32 @@ public class CTCuringServiceImpl {
     	Optional<CTCuring> ctCuring = ctCuringRepo.findById(id);
     	return ctCuring;
     }
-    
-    
+
+    @Transactional
+    public void saveAll(List<CTCuring> list) {
+        int i = 0;
+        for (CTCuring entity : list) {
+
+            entity.setCT_CURING_ID(getNewId());
+            entity.setSTATUS(BigDecimal.valueOf(1));
+            entity.setCREATION_DATE(new Date());
+            entity.setLAST_UPDATE_DATE(new Date());
+            
+            entityManager.persist(entity);
+            i++;
+
+            if (i % BATCH_SIZE == 0) {
+                entityManager.flush();
+                entityManager.clear();
+            }
+        }
+
+        // flush sisa data
+        entityManager.flush();
+        entityManager.clear();
+    }
+
+
     public CTCuring saveCTCuring(CTCuring ctCuring) {
         try {
         	ctCuring.setCT_CURING_ID(getNewId());
@@ -189,678 +239,202 @@ public class CTCuringServiceImpl {
         }
     }
     
-    
     public void deleteAllCTCuring() {
     	ctCuringRepo.deleteAll();
     }
     
     public ByteArrayInputStream exportCTCuringsExcel() throws IOException {
         List<CTCuring> ctCurings = ctCuringRepo.getDataOrderId();
-        ByteArrayInputStream byteArrayInputStream = dataToExcel(ctCurings);
-        return byteArrayInputStream;
+        return dataToExcelPlain(ctCurings);
     }
-    
-    private ByteArrayInputStream dataToExcel(List<CTCuring> ctCurings) throws IOException {
-        Workbook workbook = new XSSFWorkbook();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        try {
-                List<MachineCuring> activeMachineCurings = machineCuringRepo.findMachineCuringActive();
-            List<ItemCuring> activeItemCurings = itemCuringRepo.findItemCuringActive();
-            List<String> machineCuringWCT = activeMachineCurings.stream()
-                .map(MachineCuring::getWORK_CENTER_TEXT)
-                .collect(Collectors.toList());
-             List<String> itemCuringID = activeItemCurings.stream()
-                 .map(ItemCuring::getITEM_CURING)
-                 .collect(Collectors.toList());
-            
-            Sheet sheet = workbook.createSheet("CT_CURING DATA");
-
-            // Create fonts for header and sub-header
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerFont.setFontHeightInPoints((short) 12);
-            headerFont.setColor(IndexedColors.BLACK.getIndex());
-
-            Font subHeaderFont = workbook.createFont();
-            subHeaderFont.setBold(true);
-            subHeaderFont.setFontHeightInPoints((short) 11);
-            
-            CellStyle borderStyle = workbook.createCellStyle();
-            borderStyle.setBorderTop(BorderStyle.THIN);
-            borderStyle.setBorderBottom(BorderStyle.THIN);
-            borderStyle.setBorderLeft(BorderStyle.THIN);
-            borderStyle.setBorderRight(BorderStyle.THIN);
-            borderStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
-            borderStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
-            borderStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-            borderStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
-            
-            byte[] whiteColor = new byte[] {(byte) 255, (byte) 255, (byte) 255};
-            byte[] greyColor = new byte[] {(byte) 191, (byte) 191, (byte) 191};
-            byte[] brownColor = new byte[] {(byte) 191, (byte) 143, (byte) 0};
-            byte[] babyblueColor = new byte[] {(byte) 142, (byte) 169, (byte) 219};
-            byte[] yellowColor = new byte[] {(byte) 255, (byte) 255, (byte) 0};
-            byte[] sageGreenColor = new byte[] {(byte) 169, (byte) 208, (byte) 142};
-            byte[] orangeColor = new byte[] {(byte) 244, (byte) 176, (byte) 132};
-            byte[] greenColor = new byte[] {(byte) 0, (byte) 176, (byte) 80};
-            byte[] leafgreenColor = new byte[] {(byte) 146, (byte) 208, (byte) 80};
-            byte[] blueColor = new byte[] {(byte) 0, (byte) 112, (byte) 192};
-            byte[] skyblueColor = new byte[] {(byte) 0, (byte) 176, (byte) 240};
-
-
-        // Create cell styles with background colors
-            CellStyle whiteStyle = createCellStyleWithBorder(workbook, whiteColor);
-            CellStyle lightGreyStyle = createCellStyleWithBorder(workbook, greyColor);
-            CellStyle lightBrownStyle = createCellStyleWithBorder(workbook, brownColor);
-            CellStyle skyBlueStyle = createCellStyleWithBorder(workbook, babyblueColor);
-            CellStyle yellowStyle = createCellStyleWithBorder(workbook, yellowColor);
-            CellStyle darkGreenStyle = createCellStyleWithBorder(workbook, greenColor);
-            CellStyle lightGreenStyle = createCellStyleWithBorder(workbook, leafgreenColor);
-            CellStyle sageGreenStyle = createCellStyleWithBorder(workbook, sageGreenColor); 
-            CellStyle lightOrangeStyle = createCellStyleWithBorder(workbook, orangeColor); 
-            CellStyle darkBlueStyle = createCellStyleWithBorder(workbook, blueColor);
-            CellStyle lightBlueStyle = createCellStyleWithBorder(workbook, skyblueColor);
-        
-            // Create the first header row and merge cells
-            Row headerRow0 = sheet.createRow(0);
-            createMergedHeaderCell(sheet, headerRow0, 0, 10, "BASE DATA ROUTING SAP", whiteStyle);
-            createMergedHeaderCell(sheet, headerRow0, 11, 12, "JAM KERJA", whiteStyle);
-            createHeaderCell(headerRow0, 13, ":", whiteStyle);
-            createHeaderCell(headerRow0, 14, "", yellowStyle);
-            createHeaderCell(headerRow0, 15, "BTOL", yellowStyle);
-            createHeaderCell(headerRow0, 16, "", whiteStyle);
-            createMergedHeaderCell(sheet, headerRow0, 17, 20, "ALLOWANCE", lightOrangeStyle);
-            createMergedHeaderCell(sheet, headerRow0, 21, 26, "OPERATIONAL TIME", darkGreenStyle);
-            createMergedHeaderCell(sheet, headerRow0, 27, 34, "KAPASITAS", darkBlueStyle);
-
-            Row headerRow1 = sheet.createRow(1); 
-            Row headerRow2 = sheet.createRow(2); 
-            
-            createMergedHeaderCell(sheet, 1, 2, 0, 0, "WIP", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 1, 1, "Group Counter", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 2, 2, "Var Group Counter", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 3, 3, "Sequence", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 4, 4, "WCT", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 5, 5, "Operation Short Text", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 6, 6, "Operation Unit", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 7, 7, "Base Quantity", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 8, 8, "Standard Value Unit", lightGreyStyle);
-
-            
-            createHeaderCell(headerRow1, 9, "CT", lightBrownStyle);
-            createHeaderCell(headerRow1, 10, "CT", lightBrownStyle);
-            createMergedHeaderCell(sheet, headerRow1, 11, 13, "normal shift-", skyBlueStyle);
-            createHeaderCell(headerRow1, 14, "FRIDAY", sageGreenStyle);
-            createMergedHeaderCell(sheet, 1, 2, 15, 15, "TOTAL NORMAL", skyBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 16, 16, "TOTAL FRIDAY", sageGreenStyle);
-            createHeaderCell(headerRow1, 17, "NORMAL", lightOrangeStyle);
-            createHeaderCell(headerRow1, 18, "NORMAL", lightOrangeStyle);
-            createHeaderCell(headerRow1, 19, "NORMAL", lightOrangeStyle);
-            createMergedHeaderCell(sheet, 1, 2, 20, 20, "TOTAL", lightOrangeStyle);
-            createHeaderCell(headerRow1, 21, "NORMAL", lightGreenStyle);
-            createHeaderCell(headerRow1, 22, "NORMAL", lightGreenStyle);
-            createHeaderCell(headerRow1, 23, "NORMAL", lightGreenStyle);
-            createHeaderCell(headerRow1, 24, "JUMAT", darkGreenStyle);
-            createMergedHeaderCell(sheet, 1, 2, 25, 25, "TOTAL NORMAL", lightGreenStyle);
-            createMergedHeaderCell(sheet, 1, 2, 26, 26, "TOTAL FRIDAY", darkGreenStyle);
-            createHeaderCell(headerRow1, 27, "NORMAL", lightBlueStyle);
-            createHeaderCell(headerRow1, 28, "NORMAL", lightBlueStyle);
-            createHeaderCell(headerRow1, 29, "NORMAL", lightBlueStyle);
-            createHeaderCell(headerRow1, 30, "JUMAT", darkBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 31, 31, "TOTAL NORMAL", lightBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 32, 32, "TOTAL FRIDAY", darkBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 33, 33, "WAKTU TOTAL /CT", lightBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 34, 34, "WAKTU TOTAL /CT FRIDAY", darkBlueStyle);
-
-
-            createHeaderCell(headerRow2, 9, "SEKON/1PC", lightBrownStyle);
-            createHeaderCell(headerRow2, 10, "HR/1000PC", lightBrownStyle);
-            createHeaderCell(headerRow2, 11, "1", skyBlueStyle);
-            createHeaderCell(headerRow2, 12, "2", skyBlueStyle);
-            createHeaderCell(headerRow2, 13, "3", skyBlueStyle);
-            createHeaderCell(headerRow2, 14, "4", sageGreenStyle);
-            createHeaderCell(headerRow2, 17, "SHIFT 1", lightOrangeStyle);
-            createHeaderCell(headerRow2, 18, "SHIFT 2", lightOrangeStyle);
-            createHeaderCell(headerRow2, 19, "SHIFT 3", lightOrangeStyle);
-            createHeaderCell(headerRow2, 21, "SHIFT 1", lightGreenStyle);
-            createHeaderCell(headerRow2, 22, "SHIFT 2", lightGreenStyle);
-            createHeaderCell(headerRow2, 23, "SHIFT 3", lightGreenStyle);
-            createHeaderCell(headerRow2, 24, "SHIFT 1", darkGreenStyle);
-            createHeaderCell(headerRow2, 27, "SHIFT 1", lightBlueStyle);
-            createHeaderCell(headerRow2, 28, "SHIFT 2", lightBlueStyle);
-            createHeaderCell(headerRow2, 29, "SHIFT 3", lightBlueStyle);
-            createHeaderCell(headerRow2, 30, "SHIFT 1", darkBlueStyle);
-
-
-            // Populate data rows with consistent cell styling
-            int rowIndex = 3; 
-            for (CTCuring c : ctCurings) {
-                Row dataRow = sheet.createRow(rowIndex++);
-
-                // WIP
-                dataRow.createCell(0).setCellValue(c.getWIP() != null ? c.getWIP() : "");
-
-                // GROUP_COUNTER
-                dataRow.createCell(1).setCellValue(c.getGROUP_COUNTER() != null ? c.getGROUP_COUNTER() : "");
-
-                // VAR_GROUP_COUNTER
-                dataRow.createCell(2).setCellValue(c.getVAR_GROUP_COUNTER() != null ? c.getVAR_GROUP_COUNTER() : "");
-
-                // SEQUENCE
-                dataRow.createCell(3).setCellValue(c.getSEQUENCE() != null ? c.getSEQUENCE().doubleValue() : null);
-
-                // WCT
-                dataRow.createCell(4).setCellValue(c.getWCT() != null ? c.getWCT() : "");
-
-                // OPERATION_SHORT_TEXT
-                dataRow.createCell(5).setCellValue(c.getOPERATION_SHORT_TEXT() != null ? c.getOPERATION_SHORT_TEXT() : "");
-
-                // OPERATION_UNIT
-                dataRow.createCell(6).setCellValue(c.getOPERATION_UNIT() != null ? c.getOPERATION_UNIT() : "");
-
-                // BASE_QUANTITY
-                dataRow.createCell(7).setCellValue(c.getBASE_QUANTITY() != null ? c.getBASE_QUANTITY().doubleValue() : null);
-
-                // STANDARD_VALUE_UNIT
-                dataRow.createCell(8).setCellValue(c.getSTANDART_VALUE_UNIT() != null ? c.getSTANDART_VALUE_UNIT() : "");
-
-                // CT_SEC_1
-                dataRow.createCell(9).setCellValue(c.getCT_SEC1() != null ? c.getCT_SEC1().doubleValue() : null);
-
-                // CT_HR_1000
-                dataRow.createCell(10).setCellValue(c.getCT_HR1000() != null ? c.getCT_HR1000().doubleValue() : null);
-
-                // WH_NORMAL_SHIFT_0
-                dataRow.createCell(11).setCellValue(c.getWH_NORMAL_SHIFT_0() != null ? c.getWH_NORMAL_SHIFT_0().doubleValue() : null);
-
-                // WH_NORMAL_SHIFT_1
-                dataRow.createCell(12).setCellValue(c.getWH_NORMAL_SHIFT_1() != null ? c.getWH_NORMAL_SHIFT_1().doubleValue() : null);
-
-                // WH_NORMAL_SHIFT_2
-                dataRow.createCell(13).setCellValue(c.getWH_NORMAL_SHIFT_2() != null ? c.getWH_NORMAL_SHIFT_2().doubleValue() : null);
-
-                // WH_SHIFT_FRIDAY
-                dataRow.createCell(14).setCellValue(c.getWH_SHIFT_FRIDAY() != null ? c.getWH_SHIFT_FRIDAY().doubleValue() : null);
-
-                // WH_TOTAL_NORMAL_SHIFT
-                dataRow.createCell(15).setCellValue(c.getWH_TOTAL_NORMAL_SHIFT() != null ? c.getWH_TOTAL_NORMAL_SHIFT().doubleValue() : null);
-
-                // WH_TOTAL_SHIFT_FRIDAY
-                dataRow.createCell(16).setCellValue(c.getWH_TOTAL_SHIFT_FRIDAY() != null ? c.getWH_TOTAL_SHIFT_FRIDAY().doubleValue() : null);
-
-                // ALLOW_NORMAL_SHIFT_0
-                dataRow.createCell(17).setCellValue(c.getALLOW_NORMAL_SHIFT_0() != null ? c.getALLOW_NORMAL_SHIFT_0().doubleValue() : null);
-
-                // ALLOW_NORMAL_SHIFT_1
-                dataRow.createCell(18).setCellValue(c.getALLOW_NORMAL_SHIFT_1() != null ? c.getALLOW_NORMAL_SHIFT_1().doubleValue() : null);
-
-                // ALLOW_NORMAL_SHIFT_2
-                dataRow.createCell(19).setCellValue(c.getALLOW_NORMAL_SHIFT_2() != null ? c.getALLOW_NORMAL_SHIFT_2().doubleValue() : null);
-
-                // ALLOW_TOTAL
-                dataRow.createCell(20).setCellValue(c.getALLOW_TOTAL() != null ? c.getALLOW_TOTAL().doubleValue() : null);
-
-                // OP_TIME_NORMAL_SHIFT_0
-                dataRow.createCell(21).setCellValue(c.getOP_TIME_NORMAL_SHIFT_0() != null ? c.getOP_TIME_NORMAL_SHIFT_0().doubleValue() : null);
-
-                // OP_TIME_NORMAL_SHIFT_1
-                dataRow.createCell(22).setCellValue(c.getOP_TIME_NORMAL_SHIFT_1() != null ? c.getOP_TIME_NORMAL_SHIFT_1().doubleValue() : null);
-
-                // OP_TIME_NORMAL_SHIFT_2
-                dataRow.createCell(23).setCellValue(c.getOP_TIME_NORMAL_SHIFT_2() != null ? c.getOP_TIME_NORMAL_SHIFT_2().doubleValue() : null);
-
-                // OP_TIME_SHIFT_FRIDAY
-                dataRow.createCell(24).setCellValue(c.getOP_TIME_SHIFT_FRIDAY() != null ? c.getOP_TIME_SHIFT_FRIDAY().doubleValue() : null);
-
-                // OP_TIME_TOTAL_NORMAL_SHIFT
-                dataRow.createCell(25).setCellValue(c.getOP_TIME_NORMAL_SHIFT() != null ? c.getOP_TIME_NORMAL_SHIFT().doubleValue() : null);
-
-                // OP_TIME_TOTAL_SHIFT_FRIDAY
-                dataRow.createCell(26).setCellValue(c.getOP_TIME_TOTAL_SHIFT_FRIDAY() != null ? c.getOP_TIME_TOTAL_SHIFT_FRIDAY().doubleValue() : null);
-
-                // KAPS_NORMAL_SHIFT_0
-                dataRow.createCell(27).setCellValue(c.getKAPS_NORMAL_SHIFT_0() != null ? c.getKAPS_NORMAL_SHIFT_0().doubleValue() : null);
-
-                // KAPS_NORMAL_SHIFT_1
-                dataRow.createCell(28).setCellValue(c.getKAPS_NORMAL_SHIFT_1() != null ? c.getKAPS_NORMAL_SHIFT_1().doubleValue() : null);
-
-                // KAPS_NORMAL_SHIFT_2
-                dataRow.createCell(29).setCellValue(c.getKAPS_NORMAL_SHIFT_2() != null ? c.getKAPS_NORMAL_SHIFT_2().doubleValue() : null);
-
-                // KAPS_SHIFT_FRIDAY
-                dataRow.createCell(30).setCellValue(c.getKAPS_SHIFT_FRIDAY() != null ? c.getKAPS_SHIFT_FRIDAY().doubleValue() : null);
-
-                // KAPS_TOTAL_NORMAL_SHIFT
-                dataRow.createCell(31).setCellValue(c.getKAPS_TOTAL_NORMAL_SHIFT() != null ? c.getKAPS_TOTAL_NORMAL_SHIFT().doubleValue() : null);
-
-                // KAPS_TOTAL_SHIFT_FRIDAY
-                dataRow.createCell(32).setCellValue(c.getKAPS_TOTAL_SHIFT_FRIDAY() != null ? c.getKAPS_TOTAL_SHIFT_FRIDAY().doubleValue() : null);
-
-                // WAKTU_TOTAL_CT_NORMAL
-                dataRow.createCell(33).setCellValue(c.getWAKTU_TOTAL_CT_NORMAL() != null ? c.getWAKTU_TOTAL_CT_NORMAL().doubleValue() : null);
-
-                // WAKTU_TOTAL_CT_FRIDAY
-                dataRow.createCell(34).setCellValue(c.getWAKTU_TOTAL_CT_FRIDAY() != null ? c.getWAKTU_TOTAL_CT_FRIDAY().doubleValue() : null);
-
-                // Apply border style to each cell in the data row
-                for (int i = 0; i <= 34; i++) {
-                    dataRow.getCell(i).setCellStyle(borderStyle);
-                }
-            }
-            sheet.setColumnWidth(0, 20 * 256);
-            sheet.setColumnWidth(1, 20 * 256);  // Kolom C: Group Counter
-            sheet.setColumnWidth(2, 20 * 256);  // Kolom D: Var Group Counter
-            sheet.setColumnWidth(3, 20 * 256);  // Kolom E: Sequence
-            sheet.setColumnWidth(4, 10 * 256);  // Kolom F: WCT
-            sheet.setColumnWidth(5, 35 * 256);  // Kolom G: Operation Short Text
-            sheet.setColumnWidth(6, 30 * 256);  // Kolom H: Operation Unit
-            sheet.setColumnWidth(7, 15 * 256);  // Kolom I: Base Quantity
-            sheet.setColumnWidth(8, 20 * 256);  // Kolom J: Standard Value Unit
-            sheet.setColumnWidth(9, 15 * 256); // Kolom K: CT_SEC_1
-            sheet.setColumnWidth(10, 15 * 256); // Kolom L: CT_HR_1000
-            sheet.setColumnWidth(11, 12 * 256); // Kolom M: WH_NORMAL_SHIFT_0
-            sheet.setColumnWidth(12, 12 * 256); // Kolom N: WH_NORMAL_SHIFT_1
-            sheet.setColumnWidth(13, 12 * 256); // Kolom O: WH_NORMAL_SHIFT_2
-            sheet.setColumnWidth(14, 12 * 256); // Kolom P: WH_SHIFT_FRIDAY
-            sheet.setColumnWidth(15, 15 * 256); // Kolom Q: WH_TOTAL_NORMAL_SHIFT
-            sheet.setColumnWidth(16, 15 * 256); // Kolom R: WH_TOTAL_SHIFT_FRIDAY
-            sheet.setColumnWidth(17, 15 * 256); // Kolom S: ALLOW_NORMAL_SHIFT_0
-            sheet.setColumnWidth(18, 15 * 256); // Kolom T: ALLOW_NORMAL_SHIFT_1
-            sheet.setColumnWidth(19, 15 * 256); // Kolom U: ALLOW_NORMAL_SHIFT_2
-            sheet.setColumnWidth(20, 15 * 256); // Kolom V: ALLOW_TOTAL
-            sheet.setColumnWidth(21, 15 * 256); // Kolom W: OP_TIME_NORMAL_SHIFT_0
-            sheet.setColumnWidth(22, 15 * 256); // Kolom X: OP_TIME_NORMAL_SHIFT_1
-            sheet.setColumnWidth(23, 15 * 256); // Kolom Y: OP_TIME_NORMAL_SHIFT_2
-            sheet.setColumnWidth(24, 15 * 256); // Kolom Z: OP_TIME_SHIFT_FRIDAY
-            sheet.setColumnWidth(25, 15 * 256); // Kolom AA: OP_TIME_TOTAL_NORMAL_SHIFT
-            sheet.setColumnWidth(26, 15 * 256); // Kolom AB: OP_TIME_TOTAL_SHIFT_FRIDAY
-            sheet.setColumnWidth(27, 15 * 256); // Kolom AC: KAPS_NORMAL_SHIFT_0
-            sheet.setColumnWidth(28, 15 * 256); // Kolom AD: KAPS_NORMAL_SHIFT_1
-            sheet.setColumnWidth(29, 15 * 256); // Kolom AE: KAPS_NORMAL_SHIFT_2
-            sheet.setColumnWidth(30, 15 * 256); // Kolom AF: KAPS_SHIFT_FRIDAY
-            sheet.setColumnWidth(31, 15 * 256); // Kolom AG: KAPS_TOTAL_NORMAL_SHIFT
-            sheet.setColumnWidth(32, 15 * 256); // Kolom AH: KAPS_TOTAL_SHIFT_FRIDAY
-            sheet.setColumnWidth(33, 25 * 256); // Kolom AI: WAKTU_TOTAL_CT_NORMAL
-            sheet.setColumnWidth(34, 25 * 256); // Kolom AJ: WAKTU_TOTAL_CT_FRIDAY
-
-            Sheet hiddenSheetMachineCuring = workbook.createSheet("HIDDEN_MACHINECURINGS");
-            for (int i = 0; i < machineCuringWCT.size(); i++) {
-                Row row = hiddenSheetMachineCuring.createRow(i);
-                Cell cell = row.createCell(0);
-                cell.setCellValue(machineCuringWCT.get(i));
-            }
-
-            Name namedRangeMachineCuring = workbook.createName();
-            namedRangeMachineCuring.setNameName("machineCuringWCT");
-            namedRangeMachineCuring.setRefersToFormula("HIDDEN_MACHINECURINGS!$A$1:$A$" + machineCuringWCT.size());
-
-            workbook.setSheetHidden(workbook.getSheetIndex(hiddenSheetMachineCuring), true);
-
-            Sheet hiddenSheetItemCuring = workbook.createSheet("HIDDEN_SIZES");
-            for (int i = 0; i < itemCuringID.size(); i++) {
-                Row row = hiddenSheetItemCuring.createRow(i);
-                Cell cell = row.createCell(0);
-                cell.setCellValue(itemCuringID.get(i));
-            }
-
-            Name namedRangeItemCuring = workbook.createName();
-            namedRangeItemCuring.setNameName("itemCuringID");
-            namedRangeItemCuring.setRefersToFormula("HIDDEN_SIZES!$A$1:$A$" + itemCuringID.size());
-
-            workbook.setSheetHidden(workbook.getSheetIndex(hiddenSheetItemCuring), true);
-
-            DataValidationHelper validationHelper = sheet.getDataValidationHelper();
-
-            DataValidationConstraint itemCuringTypeConstraint = validationHelper.createFormulaListConstraint("itemCuringID");
-            CellRangeAddressList itemCuringTypeAddressList = new CellRangeAddressList(3, 1000, 0, 0);
-            DataValidation itemCuringTypeValidation = validationHelper.createValidation(itemCuringTypeConstraint, itemCuringTypeAddressList);
-            itemCuringTypeValidation.setSuppressDropDownArrow(true);
-            itemCuringTypeValidation.setShowErrorBox(true);
-            sheet.addValidationData(itemCuringTypeValidation);
-
-            DataValidationConstraint machineCuringWCTConstraint = validationHelper.createFormulaListConstraint("machineCuringWCT");
-            CellRangeAddressList machineCuringWCTAddressList = new CellRangeAddressList(3, 1000, 5, 5);
-            DataValidation machineCuringWCTValidation = validationHelper.createValidation(machineCuringWCTConstraint, machineCuringWCTAddressList);
-            machineCuringWCTValidation.setSuppressDropDownArrow(true);
-            machineCuringWCTValidation.setShowErrorBox(true);
-            sheet.addValidationData(machineCuringWCTValidation);
-
-            workbook.write(out);
-            return new ByteArrayInputStream(out.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Failed to export CT CURING data.");
-            throw e;
-        } finally {
-            workbook.close();
-            out.close();
-        }
-    }
-    
-    private static CellStyle createCellStyleWithBorder(Workbook workbook, byte[] rgbColor) {
-        XSSFCellStyle cellStyle = (XSSFCellStyle) workbook.createCellStyle();
-        XSSFColor color = new XSSFColor(rgbColor, null);
-        cellStyle.setFillForegroundColor(color);
-        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        cellStyle.setBorderTop(BorderStyle.THIN);
-        cellStyle.setBorderBottom(BorderStyle.THIN);
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-
-        return cellStyle;
-    }
-    
-    private void createMergedHeaderCell(Sheet sheet, Row row, int startCol, int endCol, String text, CellStyle style) {
-        Cell cell = row.createCell(startCol);
-        cell.setCellValue(text);
-        cell.setCellStyle(style);
-        
-        for (int col = startCol; col <= endCol; col++) {
-            Cell currentCell = row.getCell(col);
-            
-            if (currentCell == null) {
-                currentCell = row.createCell(col);
-            }
-            
-            CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
-            cellStyle.cloneStyleFrom(style); 
-            cellStyle.setBorderTop(BorderStyle.THIN);
-            cellStyle.setBorderBottom(BorderStyle.THIN);
-            cellStyle.setBorderLeft(BorderStyle.THIN);
-            cellStyle.setBorderRight(BorderStyle.THIN);
-            
-            cellStyle.setAlignment(HorizontalAlignment.CENTER); 
-            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-            
-            currentCell.setCellStyle(cellStyle);
-        }
-        
-        sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), startCol, endCol));
-    }
-
-    private void createHeaderCell(Row row, int column, String value, CellStyle style) {
-        Cell cell = row.createCell(column);
-        cell.setCellValue(value);
-        
-        CellStyle centeredStyle = row.getSheet().getWorkbook().createCellStyle();
-        centeredStyle.cloneStyleFrom(style); 
-        centeredStyle.setBorderTop(BorderStyle.THIN);
-        centeredStyle.setBorderBottom(BorderStyle.THIN);
-        centeredStyle.setBorderLeft(BorderStyle.THIN);
-        centeredStyle.setBorderRight(BorderStyle.THIN);
-        
-        centeredStyle.setAlignment(HorizontalAlignment.CENTER);
-        centeredStyle.setVerticalAlignment(VerticalAlignment.CENTER); 
-        
-        Sheet sheet = row.getSheet();
-        
-        cell.setCellStyle(centeredStyle);
-    }
-
-    private void createMergedHeaderCell(Sheet sheet, int startRow, int endRow, int startCol, int endCol, String text, CellStyle style) {
-        Row row = sheet.getRow(startRow);
-        if (row == null) {
-            row = sheet.createRow(startRow);
-        }
-
-        Cell cell = row.createCell(startCol);
-        cell.setCellValue(text);
-        
-        CellStyle mergedCellStyle = sheet.getWorkbook().createCellStyle();
-        mergedCellStyle.cloneStyleFrom(style); 
-        
-        mergedCellStyle.setBorderTop(BorderStyle.THIN);
-        mergedCellStyle.setBorderBottom(BorderStyle.THIN);
-        mergedCellStyle.setBorderLeft(BorderStyle.THIN);
-        mergedCellStyle.setBorderRight(BorderStyle.THIN);
-        
-        mergedCellStyle.setAlignment(HorizontalAlignment.CENTER);
-        mergedCellStyle.setVerticalAlignment(VerticalAlignment.CENTER); 
-        
-        cell.setCellStyle(mergedCellStyle);
-
-        sheet.addMergedRegion(new CellRangeAddress(startRow, endRow, startCol, endCol));
-        
-        for (int r = startRow; r <= endRow; r++) {
-            Row mergedRow = sheet.getRow(r);
-            if (mergedRow == null) {
-                mergedRow = sheet.createRow(r);
-            }
-            for (int c = startCol; c <= endCol; c++) {
-                Cell mergedCell = mergedRow.getCell(c);
-                if (mergedCell == null) {
-                    mergedCell = mergedRow.createCell(c);
-                }
-                mergedCell.setCellStyle(mergedCellStyle); 
-            }
-        }
-    }
-     public ByteArrayInputStream layoutCTCuringsExcel() throws IOException {
+   
+    public ByteArrayInputStream layoutCTCuringsExcel() throws IOException {
         ByteArrayInputStream byteArrayInputStream = layoutToExcel();
         return byteArrayInputStream;
     }
 
-    private ByteArrayInputStream layoutToExcel() throws IOException {
+    private static final String[] COLUMNS = {
+            "WIP","GROUP_COUNTER","VAR_GROUP_COUNTER","SEQUENCE","WCT","OPERATION_SHORT_TEXT",
+            "OPERATION_UNIT","BASE_QUANTITY","STANDART_VALUE_UNIT","CT_SEC1","CT_HR1000",
+            "WH_NORMAL_SHIFT_0","WH_NORMAL_SHIFT_1","WH_NORMAL_SHIFT_2","WH_SHIFT_FRIDAY",
+            "WH_TOTAL_NORMAL_SHIFT","WH_TOTAL_SHIFT_FRIDAY","ALLOW_NORMAL_SHIFT_0","ALLOW_NORMAL_SHIFT_1",
+            "ALLOW_NORMAL_SHIFT_2","ALLOW_TOTAL","OP_TIME_NORMAL_SHIFT_0","OP_TIME_NORMAL_SHIFT_1",
+            "OP_TIME_NORMAL_SHIFT_2","OP_TIME_SHIFT_FRIDAY","OP_TIME_TOTAL_NORMAL_SHIFT",
+            "OP_TIME_TOTAL_SHIFT_FRIDAY","KAPS_NORMAL_SHIFT_0","KAPS_NORMAL_SHIFT_1","KAPS_NORMAL_SHIFT_2",
+            "KAPS_SHIFT_FRIDAY","KAPS_TOTAL_NORMAL_SHIFT","KAPS_TOTAL_SHIFT_FRIDAY",
+            "WAKTU_TOTAL_CT_NORMAL","WAKTU_TOTAL_CT_FRIDAY"
+    };
 
+    // ========================================================================
+    // Layout Only (pakai XSSFWorkbook agar auto-size bisa dipakai)
+    // ========================================================================
+    public ByteArrayInputStream layoutToExcel() throws IOException {
         Workbook workbook = new XSSFWorkbook();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
+
         try {
-            List<MachineCuring> activeMachineCurings = machineCuringRepo.findMachineCuringActive();
-            List<ItemCuring> activeItemCurings = itemCuringRepo.findItemCuringActive();
-            List<String> machineCuringWCT = activeMachineCurings.stream()
-                .map(MachineCuring::getWORK_CENTER_TEXT)
-                .collect(Collectors.toList());
-             List<String> itemCuringID = activeItemCurings.stream()
-                 .map(ItemCuring::getITEM_CURING)
-                 .collect(Collectors.toList());
+            Sheet sheet = workbook.createSheet("LAYOUT");
 
-            Sheet sheet = workbook.createSheet("CT_CURING DATA");
+            // Style header
+            CellStyle headerStyle = createHeaderStyle(workbook);
 
-            // Create fonts for header and sub-header
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerFont.setFontHeightInPoints((short) 12);
-            headerFont.setColor(IndexedColors.BLACK.getIndex());
-
-            Font subHeaderFont = workbook.createFont();
-            subHeaderFont.setBold(true);
-            subHeaderFont.setFontHeightInPoints((short) 11);
-            
-            CellStyle borderStyle = workbook.createCellStyle();
-            borderStyle.setBorderTop(BorderStyle.THIN);
-            borderStyle.setBorderBottom(BorderStyle.THIN);
-            borderStyle.setBorderLeft(BorderStyle.THIN);
-            borderStyle.setBorderRight(BorderStyle.THIN);
-            borderStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
-            borderStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
-            borderStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-            borderStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
-            
-            byte[] whiteColor = new byte[] {(byte) 255, (byte) 255, (byte) 255};
-            byte[] greyColor = new byte[] {(byte) 191, (byte) 191, (byte) 191};
-            byte[] brownColor = new byte[] {(byte) 191, (byte) 143, (byte) 0};
-            byte[] babyblueColor = new byte[] {(byte) 142, (byte) 169, (byte) 219};
-            byte[] yellowColor = new byte[] {(byte) 255, (byte) 255, (byte) 0};
-            byte[] sageGreenColor = new byte[] {(byte) 169, (byte) 208, (byte) 142};
-            byte[] orangeColor = new byte[] {(byte) 244, (byte) 176, (byte) 132};
-            byte[] greenColor = new byte[] {(byte) 0, (byte) 176, (byte) 80};
-            byte[] leafgreenColor = new byte[] {(byte) 146, (byte) 208, (byte) 80};
-            byte[] blueColor = new byte[] {(byte) 0, (byte) 112, (byte) 192};
-            byte[] skyblueColor = new byte[] {(byte) 0, (byte) 176, (byte) 240};
-
-
-        // Create cell styles with background colors
-            CellStyle whiteStyle = createCellStyleWithBorder(workbook, whiteColor);
-            CellStyle lightGreyStyle = createCellStyleWithBorder(workbook, greyColor);
-            CellStyle lightBrownStyle = createCellStyleWithBorder(workbook, brownColor);
-            CellStyle skyBlueStyle = createCellStyleWithBorder(workbook, babyblueColor);
-            CellStyle yellowStyle = createCellStyleWithBorder(workbook, yellowColor);
-            CellStyle darkGreenStyle = createCellStyleWithBorder(workbook, greenColor);
-            CellStyle lightGreenStyle = createCellStyleWithBorder(workbook, leafgreenColor);
-            CellStyle sageGreenStyle = createCellStyleWithBorder(workbook, sageGreenColor); 
-            CellStyle lightOrangeStyle = createCellStyleWithBorder(workbook, orangeColor); 
-            CellStyle darkBlueStyle = createCellStyleWithBorder(workbook, blueColor);
-            CellStyle lightBlueStyle = createCellStyleWithBorder(workbook, skyblueColor);
-        
-            // Create the first header row and merge cells
-            Row headerRow0 = sheet.createRow(0);
-            createMergedHeaderCell(sheet, headerRow0, 0, 10, "BASE DATA ROUTING SAP", whiteStyle);
-            createMergedHeaderCell(sheet, headerRow0, 11, 12, "JAM KERJA", whiteStyle);
-            createHeaderCell(headerRow0, 13, ":", whiteStyle);
-            createHeaderCell(headerRow0, 14, "", yellowStyle);
-            createHeaderCell(headerRow0, 15, "BTOL", yellowStyle);
-            createHeaderCell(headerRow0, 16, "", whiteStyle);
-            createMergedHeaderCell(sheet, headerRow0, 17, 20, "ALLOWANCE", lightOrangeStyle);
-            createMergedHeaderCell(sheet, headerRow0, 21, 26, "OPERATIONAL TIME", darkGreenStyle);
-            createMergedHeaderCell(sheet, headerRow0, 27, 34, "KAPASITAS", darkBlueStyle);
-
-            Row headerRow1 = sheet.createRow(1); 
-            Row headerRow2 = sheet.createRow(2); 
-            
-            createMergedHeaderCell(sheet, 1, 2, 0, 0, "WIP", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 1, 1, "Group Counter", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 2, 2, "Var Group Counter", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 3, 3, "Sequence", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 4, 4, "WCT", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 5, 5, "Operation Short Text", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 6, 6, "Operation Unit", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 7, 7, "Base Quantity", lightGreyStyle);
-            createMergedHeaderCell(sheet, 1, 2, 8, 8, "Standard Value Unit", lightGreyStyle);
-
-            
-            createHeaderCell(headerRow1, 9, "CT", lightBrownStyle);
-            createHeaderCell(headerRow1, 10, "CT", lightBrownStyle);
-            createMergedHeaderCell(sheet, headerRow1, 11, 13, "normal shift-", skyBlueStyle);
-            createHeaderCell(headerRow1, 14, "FRIDAY", sageGreenStyle);
-            createMergedHeaderCell(sheet, 1, 2, 15, 15, "TOTAL NORMAL", skyBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 16, 16, "TOTAL FRIDAY", sageGreenStyle);
-            createHeaderCell(headerRow1, 17, "NORMAL", lightOrangeStyle);
-            createHeaderCell(headerRow1, 18, "NORMAL", lightOrangeStyle);
-            createHeaderCell(headerRow1, 19, "NORMAL", lightOrangeStyle);
-            createMergedHeaderCell(sheet, 1, 2, 20, 20, "TOTAL", lightOrangeStyle);
-            createHeaderCell(headerRow1, 21, "NORMAL", lightGreenStyle);
-            createHeaderCell(headerRow1, 22, "NORMAL", lightGreenStyle);
-            createHeaderCell(headerRow1, 23, "NORMAL", lightGreenStyle);
-            createHeaderCell(headerRow1, 24, "JUMAT", darkGreenStyle);
-            createMergedHeaderCell(sheet, 1, 2, 25, 25, "TOTAL NORMAL", lightGreenStyle);
-            createMergedHeaderCell(sheet, 1, 2, 26, 26, "TOTAL FRIDAY", darkGreenStyle);
-            createHeaderCell(headerRow1, 27, "NORMAL", lightBlueStyle);
-            createHeaderCell(headerRow1, 28, "NORMAL", lightBlueStyle);
-            createHeaderCell(headerRow1, 29, "NORMAL", lightBlueStyle);
-            createHeaderCell(headerRow1, 30, "JUMAT", darkBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 31, 31, "TOTAL NORMAL", lightBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 32, 32, "TOTAL FRIDAY", darkBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 33, 33, "WAKTU TOTAL /CT", lightBlueStyle);
-            createMergedHeaderCell(sheet, 1, 2, 34, 34, "WAKTU TOTAL /CT FRIDAY", darkBlueStyle);
-
-
-            createHeaderCell(headerRow2, 9, "SEKON/1PC", lightBrownStyle);
-            createHeaderCell(headerRow2, 10, "HR/1000PC", lightBrownStyle);
-            createHeaderCell(headerRow2, 11, "1", skyBlueStyle);
-            createHeaderCell(headerRow2, 12, "2", skyBlueStyle);
-            createHeaderCell(headerRow2, 13, "3", skyBlueStyle);
-            createHeaderCell(headerRow2, 14, "4", sageGreenStyle);
-            createHeaderCell(headerRow2, 17, "SHIFT 1", lightOrangeStyle);
-            createHeaderCell(headerRow2, 18, "SHIFT 2", lightOrangeStyle);
-            createHeaderCell(headerRow2, 19, "SHIFT 3", lightOrangeStyle);
-            createHeaderCell(headerRow2, 21, "SHIFT 1", lightGreenStyle);
-            createHeaderCell(headerRow2, 22, "SHIFT 2", lightGreenStyle);
-            createHeaderCell(headerRow2, 23, "SHIFT 3", lightGreenStyle);
-            createHeaderCell(headerRow2, 24, "SHIFT 1", darkGreenStyle);
-            createHeaderCell(headerRow2, 27, "SHIFT 1", lightBlueStyle);
-            createHeaderCell(headerRow2, 28, "SHIFT 2", lightBlueStyle);
-            createHeaderCell(headerRow2, 29, "SHIFT 3", lightBlueStyle);
-            createHeaderCell(headerRow2, 30, "SHIFT 1", darkBlueStyle);
-            sheet.setColumnWidth(0, 20 * 256);
-            sheet.setColumnWidth(1, 20 * 256);  // Kolom C: Group Counter
-            sheet.setColumnWidth(2, 20 * 256);  // Kolom D: Var Group Counter
-            sheet.setColumnWidth(3, 20 * 256);  // Kolom E: Sequence
-            sheet.setColumnWidth(4, 10 * 256);  // Kolom F: WCT
-            sheet.setColumnWidth(5, 35 * 256);  // Kolom G: Operation Short Text
-            sheet.setColumnWidth(6, 30 * 256);  // Kolom H: Operation Unit
-            sheet.setColumnWidth(7, 15 * 256);  // Kolom I: Base Quantity
-            sheet.setColumnWidth(8, 20 * 256);  // Kolom J: Standard Value Unit
-            sheet.setColumnWidth(9, 15 * 256); // Kolom K: CT_SEC_1
-            sheet.setColumnWidth(10, 15 * 256); // Kolom L: CT_HR_1000
-            sheet.setColumnWidth(11, 12 * 256); // Kolom M: WH_NORMAL_SHIFT_0
-            sheet.setColumnWidth(12, 12 * 256); // Kolom N: WH_NORMAL_SHIFT_1
-            sheet.setColumnWidth(13, 12 * 256); // Kolom O: WH_NORMAL_SHIFT_2
-            sheet.setColumnWidth(14, 12 * 256); // Kolom P: WH_SHIFT_FRIDAY
-            sheet.setColumnWidth(15, 15 * 256); // Kolom Q: WH_TOTAL_NORMAL_SHIFT
-            sheet.setColumnWidth(16, 15 * 256); // Kolom R: WH_TOTAL_SHIFT_FRIDAY
-            sheet.setColumnWidth(17, 15 * 256); // Kolom S: ALLOW_NORMAL_SHIFT_0
-            sheet.setColumnWidth(18, 15 * 256); // Kolom T: ALLOW_NORMAL_SHIFT_1
-            sheet.setColumnWidth(19, 15 * 256); // Kolom U: ALLOW_NORMAL_SHIFT_2
-            sheet.setColumnWidth(20, 15 * 256); // Kolom V: ALLOW_TOTAL
-            sheet.setColumnWidth(21, 15 * 256); // Kolom W: OP_TIME_NORMAL_SHIFT_0
-            sheet.setColumnWidth(22, 15 * 256); // Kolom X: OP_TIME_NORMAL_SHIFT_1
-            sheet.setColumnWidth(23, 15 * 256); // Kolom Y: OP_TIME_NORMAL_SHIFT_2
-            sheet.setColumnWidth(24, 15 * 256); // Kolom Z: OP_TIME_SHIFT_FRIDAY
-            sheet.setColumnWidth(25, 15 * 256); // Kolom AA: OP_TIME_TOTAL_NORMAL_SHIFT
-            sheet.setColumnWidth(26, 15 * 256); // Kolom AB: OP_TIME_TOTAL_SHIFT_FRIDAY
-            sheet.setColumnWidth(27, 15 * 256); // Kolom AC: KAPS_NORMAL_SHIFT_0
-            sheet.setColumnWidth(28, 15 * 256); // Kolom AD: KAPS_NORMAL_SHIFT_1
-            sheet.setColumnWidth(29, 15 * 256); // Kolom AE: KAPS_NORMAL_SHIFT_2
-            sheet.setColumnWidth(30, 15 * 256); // Kolom AF: KAPS_SHIFT_FRIDAY
-            sheet.setColumnWidth(31, 15 * 256); // Kolom AG: KAPS_TOTAL_NORMAL_SHIFT
-            sheet.setColumnWidth(32, 15 * 256); // Kolom AH: KAPS_TOTAL_SHIFT_FRIDAY
-            sheet.setColumnWidth(33, 25 * 256); // Kolom AI: WAKTU_TOTAL_CT_NORMAL
-            sheet.setColumnWidth(34, 25 * 256); // Kolom AJ: WAKTU_TOTAL_CT_FRIDAY
-           
-
-            Sheet hiddenSheetMachineCuring = workbook.createSheet("HIDDEN_MACHINECURINGS");
-            for (int i = 0; i < machineCuringWCT.size(); i++) {
-                Row row = hiddenSheetMachineCuring.createRow(i);
-                Cell cell = row.createCell(0);
-                cell.setCellValue(machineCuringWCT.get(i));
+            // Buat header row
+            Row header = sheet.createRow(0);
+            for (int i = 0; i < COLUMNS.length; i++) {
+                Cell cell = header.createCell(i);
+                cell.setCellValue(COLUMNS[i]);
+                cell.setCellStyle(headerStyle);
+                sheet.autoSizeColumn(i);
             }
-
-            Name namedRangeMachineCuring = workbook.createName();
-            namedRangeMachineCuring.setNameName("machineCuringWCT");
-            namedRangeMachineCuring.setRefersToFormula("HIDDEN_MACHINECURINGS!$A$1:$A$" + machineCuringWCT.size());
-
-            workbook.setSheetHidden(workbook.getSheetIndex(hiddenSheetMachineCuring), true);
-
-            Sheet hiddenSheetItemCuring = workbook.createSheet("HIDDEN_SIZES");
-            for (int i = 0; i < itemCuringID.size(); i++) {
-                Row row = hiddenSheetItemCuring.createRow(i);
-                Cell cell = row.createCell(0);
-                cell.setCellValue(itemCuringID.get(i));
-            }
-
-            Name namedRangeItemCuring = workbook.createName();
-            namedRangeItemCuring.setNameName("itemCuringID");
-            namedRangeItemCuring.setRefersToFormula("HIDDEN_SIZES!$A$1:$A$" + itemCuringID.size());
-
-            workbook.setSheetHidden(workbook.getSheetIndex(hiddenSheetItemCuring), true);
-
-            DataValidationHelper validationHelper = sheet.getDataValidationHelper();
-
-            DataValidationConstraint itemCuringTypeConstraint = validationHelper.createFormulaListConstraint("itemCuringID");
-            CellRangeAddressList itemCuringTypeAddressList = new CellRangeAddressList(3, 1000, 0, 0);
-            DataValidation itemCuringTypeValidation = validationHelper.createValidation(itemCuringTypeConstraint, itemCuringTypeAddressList);
-            itemCuringTypeValidation.setSuppressDropDownArrow(true);
-            itemCuringTypeValidation.setShowErrorBox(true);
-            sheet.addValidationData(itemCuringTypeValidation);
-
-            DataValidationConstraint machineCuringWCTConstraint = validationHelper.createFormulaListConstraint("machineCuringWCT");
-            CellRangeAddressList machineCuringWCTAddressList = new CellRangeAddressList(3, 1000, 5, 5);
-            DataValidation machineCuringWCTValidation = validationHelper.createValidation(machineCuringWCTConstraint, machineCuringWCTAddressList);
-            machineCuringWCTValidation.setSuppressDropDownArrow(true);
-            machineCuringWCTValidation.setShowErrorBox(true);
-            sheet.addValidationData(machineCuringWCTValidation);
+            
+            sheet.setColumnWidth(0, 20 * 256);  // WIP
+            sheet.setColumnWidth(4, 20 * 256);  // WCT
+            sheet.setColumnWidth(5, 35 * 256);  // OPERATION_SHORT_TEXT
 
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Failed to export Quadrant data");
-            throw e;
         } finally {
             workbook.close();
             out.close();
         }
     }
+
+    // ========================================================================
+    // Data Export (hybrid: XSSF -> autoSize, lalu SXSSF -> streaming)
+    // ========================================================================
+    public ByteArrayInputStream dataToExcelPlain(List<CTCuring> ctCurings) throws IOException {
+        XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
+        Sheet xssfSheet = xssfWorkbook.createSheet("CT_CURING DATA");
+
+        // Style header & data
+        CellStyle headerStyle = createHeaderStyle(xssfWorkbook);
+        CellStyle dataStyle = createDataStyle(xssfWorkbook);
+
+        // Header
+        Row header = xssfSheet.createRow(0);
+        for (int i = 0; i < COLUMNS.length; i++) {
+            Cell cell = header.createCell(i);
+            cell.setCellValue(COLUMNS[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Auto-size pakai XSSF
+        for (int i = 0; i < COLUMNS.length; i++) {
+            xssfSheet.autoSizeColumn(i);
+        }
+        
+        xssfSheet.setColumnWidth(0, 20 * 256);  // WIP
+        xssfSheet.setColumnWidth(4, 20 * 256);  // WCT
+        xssfSheet.setColumnWidth(5, 35 * 256);  // OPERATION_SHORT_TEXT
+
+        // Wrap ke SXSSF (streaming)
+        SXSSFWorkbook workbook = new SXSSFWorkbook(xssfWorkbook, 100);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // Isi data
+            int rowIndex = 1;
+            for (CTCuring c : ctCurings) {
+                Row row = sheet.createRow(rowIndex++);
+                int col = 0;
+
+                createCell(row, col++, safe(c.getWIP()), dataStyle);
+                createCell(row, col++, safe(c.getGROUP_COUNTER()), dataStyle);
+                createCell(row, col++, safe(c.getVAR_GROUP_COUNTER()), dataStyle);
+                createCell(row, col++, safeNum(c.getSEQUENCE()), dataStyle);
+                createCell(row, col++, safe(c.getWCT()), dataStyle);
+                createCell(row, col++, safe(c.getOPERATION_SHORT_TEXT()), dataStyle);
+                createCell(row, col++, safe(c.getOPERATION_UNIT()), dataStyle);
+                createCell(row, col++, safeNum(c.getBASE_QUANTITY()), dataStyle);
+                createCell(row, col++, safe(c.getSTANDART_VALUE_UNIT()), dataStyle);
+                createCell(row, col++, safeNum(c.getCT_SEC1()), dataStyle);
+                createCell(row, col++, safeNum(c.getCT_HR1000()), dataStyle);
+                createCell(row, col++, safeNum(c.getWH_NORMAL_SHIFT_0()), dataStyle);
+                createCell(row, col++, safeNum(c.getWH_NORMAL_SHIFT_1()), dataStyle);
+                createCell(row, col++, safeNum(c.getWH_NORMAL_SHIFT_2()), dataStyle);
+                createCell(row, col++, safeNum(c.getWH_SHIFT_FRIDAY()), dataStyle);
+                createCell(row, col++, safeNum(c.getWH_TOTAL_NORMAL_SHIFT()), dataStyle);
+                createCell(row, col++, safeNum(c.getWH_TOTAL_SHIFT_FRIDAY()), dataStyle);
+                createCell(row, col++, safeNum(c.getALLOW_NORMAL_SHIFT_0()), dataStyle);
+                createCell(row, col++, safeNum(c.getALLOW_NORMAL_SHIFT_1()), dataStyle);
+                createCell(row, col++, safeNum(c.getALLOW_NORMAL_SHIFT_2()), dataStyle);
+                createCell(row, col++, safeNum(c.getALLOW_TOTAL()), dataStyle);
+                createCell(row, col++, safeNum(c.getOP_TIME_NORMAL_SHIFT_0()), dataStyle);
+                createCell(row, col++, safeNum(c.getOP_TIME_NORMAL_SHIFT_1()), dataStyle);
+                createCell(row, col++, safeNum(c.getOP_TIME_NORMAL_SHIFT_2()), dataStyle);
+                createCell(row, col++, safeNum(c.getOP_TIME_SHIFT_FRIDAY()), dataStyle);
+                createCell(row, col++, safeNum(c.getOP_TIME_NORMAL_SHIFT()), dataStyle);
+                createCell(row, col++, safeNum(c.getOP_TIME_TOTAL_SHIFT_FRIDAY()), dataStyle);
+                createCell(row, col++, safeNum(c.getKAPS_NORMAL_SHIFT_0()), dataStyle);
+                createCell(row, col++, safeNum(c.getKAPS_NORMAL_SHIFT_1()), dataStyle);
+                createCell(row, col++, safeNum(c.getKAPS_NORMAL_SHIFT_2()), dataStyle);
+                createCell(row, col++, safeNum(c.getKAPS_SHIFT_FRIDAY()), dataStyle);
+                createCell(row, col++, safeNum(c.getKAPS_TOTAL_NORMAL_SHIFT()), dataStyle);
+                createCell(row, col++, safeNum(c.getKAPS_TOTAL_SHIFT_FRIDAY()), dataStyle);
+                createCell(row, col++, safeNum(c.getWAKTU_TOTAL_CT_NORMAL()), dataStyle);
+                createCell(row, col++, safeNum(c.getWAKTU_TOTAL_CT_FRIDAY()), dataStyle);
+
+                if (rowIndex % 2000 == 0) {
+                    ((SXSSFSheet) sheet).flushRows(2000); // buang dari memory
+                }
+            }
+
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        } finally {
+            workbook.close();
+            out.close();
+        }
+    }
+
+    // ========================================================================
+    // Helpers
+    // ========================================================================
+    private void createCell(Row row, int col, String val, CellStyle style) {
+        Cell cell = row.createCell(col);
+        cell.setCellValue(val);
+        cell.setCellStyle(style);
+    }
+
+    private void createCell(Row row, int col, double val, CellStyle style) {
+        Cell cell = row.createCell(col);
+        cell.setCellValue(val);
+        cell.setCellStyle(style);
+    }
+
+    private String safe(String val) {
+        return val != null ? val : "";
+    }
+
+    private double safeNum(Number num) {
+        return num != null ? num.doubleValue() : 0;
+    }
+
+    private CellStyle createHeaderStyle(Workbook workbook) {
+        CellStyle style = createBorderStyle(workbook);
+        style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+
+        return style;
+    }
+
+    private CellStyle createDataStyle(Workbook workbook) {
+        return createBorderStyle(workbook);
+    }
+
+    private CellStyle createBorderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        return style;
+    }
+
 }

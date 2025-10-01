@@ -17,11 +17,14 @@ import sri.sysint.sri_starter_back.model.view.ViewDistinctMarketingOrder;
 
 public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String>{
 	
+	List<MarketingOrder> findTop2ByMonth0BetweenOrderByMonth0Desc(Date startDate, Date endDate);
+	
+	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER WHERE TO_CHAR(MONTH_0, 'YYYYMM') = :yearMonth AND V_AFTER_AR_RJ_DF = :version ORDER BY MO_ID DESC FETCH FIRST 2 ROWS ONLY", nativeQuery = true)
+	List<MarketingOrder> findTop2ByYearMonth(@Param("yearMonth") String yearMonth,BigDecimal version);
+
+	
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER WHERE MO_ID = :id", nativeQuery = true)
 	Optional<MarketingOrder> findById(@Param("id") String id);
-	
-//	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_T_MARKETINGORDER", nativeQuery = true)
-//	String getNewId();
 	
 	@Query(value = "SELECT * FROM (SELECT * FROM SRI_IMPP_T_MARKETINGORDER ORDER BY MO_ID DESC) WHERE ROWNUM = 1", nativeQuery = true)
 	MarketingOrder findLastMOId();
@@ -35,13 +38,68 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_T_MARKETINGORDER WHERE MONTH_0 = :month0 AND MONTH_1 = :month1 AND MONTH_2 = :month2 AND TYPE = :type", nativeQuery = true)
 	BigDecimal getNewRevisionMarketing(@Param("month0") Date month0, @Param("month1") Date month1, @Param("month2") Date month2, @Param("type") String type);
 	
-	//Add dicky
 	@Query(value = "SELECT MO_ID FROM SRI_IMPP_T_MARKETINGORDER ORDER BY MO_ID DESC FETCH FIRST 1 ROWS ONLY", nativeQuery = true)
 	String getLastIdMo();
 	
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER ORDER BY MO_ID DESC", nativeQuery = true)
     List<MarketingOrder> findAllMOByIdDesc();
 
+	@Query(value = "SELECT COALESCE( " +
+			"    (SELECT V_AFTER_AR_RJ_DF " +
+			"     FROM SRI_IMPP_T_MARKETINGORDER " +
+			"     WHERE TYPE = :type " +
+			"       AND TRUNC(MONTH_0) = TRUNC(TO_DATE(:month0, 'DD-MM-YYYY')) " +
+			"     ORDER BY V_AFTER_AR_RJ_DF DESC " +
+			"     FETCH FIRST 1 ROW ONLY), 0) " +
+			" AS V_AFTER_AR_RJ_DF " +
+			" FROM SRI_IMPP_T_MARKETINGORDER " +
+			" WHERE TYPE = :type " +
+			" AND TRUNC(MONTH_0) = TRUNC(TO_DATE(:month0, 'DD-MM-YYYY')) " +
+			" FETCH FIRST 1 ROW ONLY",
+		nativeQuery = true)
+	BigDecimal findTopVAfterArRjDf(
+		@Param("type") String type,
+		@Param("month0") String month0
+	);
+
+	
+	@Query(value = "SELECT COALESCE( " +
+			"    (SELECT V_BEFORE_AR_RJ_DF " +
+			"     FROM SRI_IMPP_T_MARKETINGORDER " +
+			"     WHERE TYPE = :type " +
+			"       AND TRUNC(MONTH_0) = TRUNC(TO_DATE(:month0, 'DD-MM-YYYY')) " +
+			"     ORDER BY V_BEFORE_AR_RJ_DF DESC " +
+			"     FETCH FIRST 1 ROW ONLY), 0) " +
+			" AS V_BEFORE_AR_RJ_DF " +
+			" FROM SRI_IMPP_T_MARKETINGORDER " +
+			" WHERE TYPE = :type " +
+			" AND TRUNC(MONTH_0) = TRUNC(TO_DATE(:month0, 'DD-MM-YYYY')) " +
+			" FETCH FIRST 1 ROW ONLY",
+		nativeQuery = true)
+	BigDecimal findTopVBeforeArRjDf(
+		@Param("type") String type,
+		@Param("month0") String month0
+	);
+
+	
+	@Query(value = "SELECT COALESCE( " +
+			"    (SELECT REVISION_MARKETING " +
+			"     FROM SRI_IMPP_T_MARKETINGORDER " +
+			"     WHERE TYPE = :type " +
+			"       AND TRUNC(MONTH_0) = TRUNC(TO_DATE(:month0, 'DD-MM-YYYY')) " +
+			"     ORDER BY REVISION_MARKETING DESC " +
+			"     FETCH FIRST 1 ROW ONLY), 0) " +
+			" AS REVISION_MARKETING " +
+			" FROM SRI_IMPP_T_MARKETINGORDER " +
+			" WHERE TYPE = :type " +
+			" AND TRUNC(MONTH_0) = TRUNC(TO_DATE(:month0, 'DD-MM-YYYY')) " +
+			" FETCH FIRST 1 ROW ONLY",
+		nativeQuery = true)
+	BigDecimal findTopRevMarketing(
+		@Param("type") String type,
+		@Param("month0") String month0);
+
+	
 	
 	@Query(value = "SELECT *\r\n"
 			+ "FROM SRI_IMPP_T_MARKETINGORDER t1\r\n"
@@ -88,18 +146,19 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 	List<MarketingOrder> findLatestMarketingOrderFDR();
 	
 	
-	@Query(value = "SELECT * "
-	        + "FROM SRI_IMPP_T_MARKETINGORDER "
-	        + "WHERE TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') "
-	        + "AND TO_DATE(MONTH_1, 'DD-MM-YYYY') = TO_DATE(:month1, 'DD-MM-YYYY') "
-	        + "AND TO_DATE(MONTH_2, 'DD-MM-YYYY') = TO_DATE(:month2, 'DD-MM-YYYY') "
-	        + "AND TYPE = :type", 
-	        nativeQuery = true)
-	
-	List<MarketingOrder> findtMarketingOrders(@Param("month0") String month0, 
-	                                          @Param("month1") String month1, 
-	                                          @Param("month2") String month2, 
-	                                          @Param("type") String type);
+	@Query(value = "SELECT * " +
+				"FROM SRI_IMPP_T_MARKETINGORDER " +
+				"WHERE TRUNC(MONTH_0) = TRUNC(TO_DATE(:month0, 'DD-MM-YYYY')) " +
+				"AND TRUNC(MONTH_1) = TRUNC(TO_DATE(:month1, 'DD-MM-YYYY')) " +
+				"AND TRUNC(MONTH_2) = TRUNC(TO_DATE(:month2, 'DD-MM-YYYY')) " +
+				"AND TYPE = :type " +
+				"ORDER BY MO_ID DESC ",
+		nativeQuery = true)
+	List<MarketingOrder> findtMarketingOrders(@Param("month0") String month0,
+											@Param("month1") String month1,
+											@Param("month2") String month2,
+											@Param("type") String type);
+
 
 	
 	@Query(value = "SELECT * FROM SRI_IMPP_T_MARKETINGORDER \r\n"
@@ -186,11 +245,14 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 		List<MarketingOrder> findByMonthYear(@Param("month") int month,@Param("year") int year);
 		
 		@Query(value = "SELECT DISTINCT " +
+	            "t.MO_ID AS mo_id, " +
 	            "TO_CHAR(t.MONTH_0, 'YYYY-MM-DD') AS month0, " +
 	            "TO_CHAR(t.MONTH_1, 'YYYY-MM-DD') AS month1, " +
-	            "TO_CHAR(t.MONTH_2, 'YYYY-MM-DD') AS month2 " +
+	            "TO_CHAR(t.MONTH_2, 'YYYY-MM-DD') AS month2, " +
+	            "t.V_AFTER_AR_RJ_DF AS version " +
 	            "FROM SRI_IMPP_T_MARKETINGORDER t " +
 	            "ORDER BY " +
+	            "t.MO_ID DESC, " +
 	            "TO_CHAR(t.MONTH_0, 'YYYY-MM-DD'), " +
 	            "TO_CHAR(t.MONTH_1, 'YYYY-MM-DD'), " +
 	            "TO_CHAR(t.MONTH_2, 'YYYY-MM-DD')", 
@@ -198,46 +260,102 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 		List<Map<String, Object>> findOnlyMonth();
 		
 		@Query(value = "SELECT " +
-	            "MO_ID, " +
-	            "TYPE, " +
-	            "DATE_VALID, " +
-	            "REVISION_PPC, " +
-	            "REVISION_MARKETING, " +
-	            "MONTH_0, " +
-	            "MONTH_1, " +
-	            "MONTH_2, " +
-	            "STATUS_FILLED, " +
-	            "STATUS, " +
-	            "CREATION_DATE, " +
-	            "CREATED_BY, " +
-	            "LAST_UPDATE_DATE, " +
-	            "LAST_UPDATED_BY " +
-	            "FROM ( " +
-	            "    SELECT " +
-	            "        MO_ID, " +
-	            "        TYPE, " +
-	            "        DATE_VALID, " +
-	            "        REVISION_PPC, " +
-	            "        REVISION_MARKETING, " +
-	            "        MONTH_0, " +
-	            "        MONTH_1, " +
-	            "        MONTH_2, " +
-	            "        STATUS_FILLED, " +
-	            "        STATUS, " +
-	            "        CREATION_DATE, " +
-	            "        CREATED_BY, " +
-	            "        LAST_UPDATE_DATE, " +
-	            "        LAST_UPDATED_BY, " +
-	            "        ROW_NUMBER() OVER (PARTITION BY TYPE ORDER BY REVISION_PPC DESC, REVISION_MARKETING DESC) AS rn " +
-	            "    FROM SRI_IMPP_T_MARKETINGORDER " +
-	            "    WHERE TO_DATE(MONTH_0, 'DD-MM-YYYY') = TO_DATE(:month0, 'DD-MM-YYYY') " +
-	            "      AND TO_DATE(MONTH_1, 'DD-MM-YYYY') = TO_DATE(:month1, 'DD-MM-YYYY') " +
-	            "      AND TO_DATE(MONTH_2, 'DD-MM-YYYY') = TO_DATE(:month2, 'DD-MM-YYYY') " +
-	            "      AND TYPE IN ('FED', 'FDR', 'REVISION_MARKETING', 'REVISION_PPC') " +
-	            ") " +
-	            "WHERE rn = 1", nativeQuery = true)
+			"MO_ID, " +
+			"TYPE, " +
+			"DATE_VALID, " +
+			"REVISION_PPC, " +
+			"REVISION_MARKETING, " +
+			"MONTH_0, " +
+			"MONTH_1, " +
+			"MONTH_2, " +
+			"STATUS_FILLED, " +
+			"STATUS, " +
+			"CREATION_DATE, " +
+			"CREATED_BY, " +
+			"LAST_UPDATE_DATE, " +
+			"LAST_UPDATED_BY, " +
+			"V_BEFORE_AR_RJ_DF, " +
+			"V_AFTER_AR_RJ_DF " +
+			"FROM ( " +
+			"    SELECT " +
+			"        MO_ID, " +
+			"        TYPE, " +
+			"        DATE_VALID, " +
+			"        REVISION_PPC, " +
+			"        REVISION_MARKETING, " +
+			"        MONTH_0, " +
+			"        MONTH_1, " +
+			"        MONTH_2, " +
+			"        STATUS_FILLED, " +
+			"        STATUS, " +
+			"        CREATION_DATE, " +
+			"        CREATED_BY, " +
+			"        LAST_UPDATE_DATE, " +
+			"        LAST_UPDATED_BY, " +
+			"        V_BEFORE_AR_RJ_DF, " +
+			"        V_AFTER_AR_RJ_DF, " +
+			"        ROW_NUMBER() OVER (PARTITION BY TYPE ORDER BY REVISION_PPC DESC, REVISION_MARKETING DESC) AS rn " +
+			"    FROM SRI_IMPP_T_MARKETINGORDER " +
+			"    WHERE TRUNC(MONTH_0) = TRUNC(TO_DATE(:month0, 'DD-MM-YYYY')) " +
+			"      AND TRUNC(MONTH_1) = TRUNC(TO_DATE(:month1, 'DD-MM-YYYY')) " +
+			"      AND TRUNC(MONTH_2) = TRUNC(TO_DATE(:month2, 'DD-MM-YYYY')) " +
+			"      AND TYPE IN ('FED', 'FDR', 'REVISION_MARKETING', 'REVISION_PPC') " +
+			"      AND V_AFTER_AR_RJ_DF = 0) " +
+			"WHERE rn = 1 " +
+			"ORDER BY MO_ID DESC", nativeQuery = true)
 		List<MarketingOrder> findMoAllTypeByMonth(@Param("month0") String moMonth0, @Param("month1") String moMonth1, @Param("month2") String moMonth2);
-		
+
+
+		@Query(value = "SELECT " +
+						"MO_ID, " +
+						"TYPE, " +
+						"DATE_VALID, " +
+						"REVISION_PPC, " +
+						"REVISION_MARKETING, " +
+						"MONTH_0, " +
+						"MONTH_1, " +
+						"MONTH_2, " +
+						"STATUS_FILLED, " +
+						"STATUS, " +
+						"CREATION_DATE, " +
+						"CREATED_BY, " +
+						"LAST_UPDATE_DATE, " +
+						"LAST_UPDATED_BY, " +
+						"V_BEFORE_AR_RJ_DF, " +
+						"V_AFTER_AR_RJ_DF " +
+						"FROM ( " +
+						"    SELECT " +
+						"        MO_ID, " +
+						"        TYPE, " +
+						"        DATE_VALID, " +
+						"        REVISION_PPC, " +
+						"        REVISION_MARKETING, " +
+						"        MONTH_0, " +
+						"        MONTH_1, " +
+						"        MONTH_2, " +
+						"        STATUS_FILLED, " +
+						"        STATUS, " +
+						"        CREATION_DATE, " +
+						"        CREATED_BY, " +
+						"        LAST_UPDATE_DATE, " +
+						"        LAST_UPDATED_BY, " +
+						"        V_BEFORE_AR_RJ_DF, " +
+						"        V_AFTER_AR_RJ_DF, " +
+						"        ROW_NUMBER() OVER (PARTITION BY TYPE ORDER BY REVISION_PPC DESC, REVISION_MARKETING DESC) AS rn " +
+						"    FROM SRI_IMPP_T_MARKETINGORDER " +
+						"    WHERE TRUNC(MONTH_0) = TRUNC(TO_DATE(:month0, 'DD-MM-YYYY')) " +
+						"      AND TRUNC(MONTH_1) = TRUNC(TO_DATE(:month1, 'DD-MM-YYYY')) " +
+						"      AND TRUNC(MONTH_2) = TRUNC(TO_DATE(:month2, 'DD-MM-YYYY')) " +
+						"      AND TYPE IN ('FED', 'FDR', 'REVISION_MARKETING', 'REVISION_PPC') " +
+						"      AND V_AFTER_AR_RJ_DF = :versionAfterArDfRj) " +
+						"WHERE rn = 1", nativeQuery = true)
+		List<MarketingOrder> findMoAllTypeByMonthAfterAr(
+				@Param("month0") String moMonth0,
+				@Param("month1") String moMonth1,
+				@Param("month2") String moMonth2,
+				@Param("versionAfterArDfRj") BigDecimal versionAfterArDfRj);
+
+
 		@Query(value = "SELECT MONTH_0, MONTH_1, MONTH_2 " +
 	               "FROM SRI_IMPP_T_MARKETINGORDER " +
 	               "GROUP BY MONTH_0, MONTH_1, MONTH_2 " +
@@ -291,6 +409,8 @@ public interface MarketingOrderRepo extends JpaRepository<MarketingOrder, String
 			    + "    RankedOrders.CREATED_BY, "
 			    + "    RankedOrders.LAST_UPDATE_DATE, "
 			    + "    RankedOrders.LAST_UPDATED_BY "
+			    + "    RankedOrders.TOTAL_DEFCT "
+			    + "    RankedOrders.MO_GROSS "
 			    + "FROM "
 			    + "    RankedOrders "
 			    + "WHERE "

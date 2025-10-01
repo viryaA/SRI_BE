@@ -27,6 +27,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,333 +59,196 @@ public class ProductTypeController {
 	@PersistenceContext	
 	private EntityManager em;
 	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@GetMapping("/getAllProductType")
 	public Response getAllProductType(final HttpServletRequest req) throws ResourceNotFoundException {
-		String header = req.getHeader("Authorization");
+		List<ProductType> productTypes = new ArrayList<>();
+		productTypes = producTypeServiceImpl.getAllProductType();
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
-
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-				List<ProductType> productTypes = new ArrayList<>();
-			    productTypes = producTypeServiceImpl.getAllProductType();
-		
-			    response = new Response(
-			        new Date(),
-			        HttpStatus.OK.value(),
-			        null,
-			        HttpStatus.OK.getReasonPhrase(),
-			        req.getRequestURI(),
-			        productTypes
-			    );} else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
-
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			productTypes
+		);
 	    return response;
 	}
-	
+
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@GetMapping("/getProductTypeById/{id}")
 	public Response getProductTypeById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		Optional<ProductType> poductType = Optional.of(new ProductType());
+		poductType = producTypeServiceImpl.getProductTypeById(id);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	Optional<ProductType> poductType = Optional.of(new ProductType());
-	        	poductType = producTypeServiceImpl.getProductTypeById(id);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        poductType
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			poductType
+		);
 
 	    return response;
 	}
-	
+
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/saveProductType")
 	public Response saveProductType(final HttpServletRequest req, @RequestBody ProductType productType) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		ProductType savedProductType = producTypeServiceImpl.saveProductType(productType);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	ProductType savedProductType = producTypeServiceImpl.saveProductType(productType);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        savedProductType
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			savedProductType
+		);
 
 	    return response;
 	}
-	
+
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/updateProductType")
 	public Response updateProductType(final HttpServletRequest req, @RequestBody ProductType productType) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		ProductType updatedProductType = producTypeServiceImpl.updateProductType(productType);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	ProductType updatedProductType = producTypeServiceImpl.updateProductType(productType);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        updatedProductType
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			updatedProductType
+		);
 
 	    return response;
 	}
-	
+
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/deleteProductType")
 	public Response deleteProductType(final HttpServletRequest req, @RequestBody ProductType productType) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		ProductType deletedProductType = producTypeServiceImpl.deleteProductType(productType);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	ProductType deletedProductType = producTypeServiceImpl.deleteProductType(productType);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        deletedProductType
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			deletedProductType
+		);
 
 	    return response;
 	}
-	
+
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")	
 	@PostMapping("/restoreProductType")
 	public Response activateProductType(final HttpServletRequest req, @RequestBody ProductType productType) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		ProductType activatedProductType = producTypeServiceImpl.activateProductType(productType);
 
-	    String token = header.replace("Bearer ", "");
-
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
-
-	        if (user != null) {
-	        	ProductType activatedProductType = producTypeServiceImpl.activateProductType(productType);
-
-	    	    response = new Response(
-	    	        new Date(),
-	    	        HttpStatus.OK.value(),
-	    	        null,
-	    	        HttpStatus.OK.getReasonPhrase(),
-	    	        req.getRequestURI(),
-	    	        activatedProductType
-	    	    );
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			activatedProductType
+		);
 
 	    return response;
 	}
 	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
 	@PostMapping("/saveProductTypeExcel")
 	@Transactional
 	public Response saveProductTypeExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
-	    String header = req.getHeader("Authorization");
+		if (file.isEmpty()) {
+			return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+		}
 
-	    if (header == null || !header.startsWith("Bearer ")) {
-	        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-	    }
+		try (InputStream inputStream = file.getInputStream()) {
+			XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+			XSSFSheet sheet = workbook.getSheetAt(0);
 
-	    String token = header.replace("Bearer ", "");
+			List<ProductType> productTypes = new ArrayList<>();
+			List<String> errorMessages = new ArrayList<>();
 
-	    try {
-	        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-	            .build()
-	            .verify(token)
-	            .getSubject();
+			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
 
-	        if (user != null) {
-	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
-	            }
+				if (row != null) {
+					boolean isEmptyRow = true;
 
-	            try (InputStream inputStream = file.getInputStream()) {
-	                XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-	                XSSFSheet sheet = workbook.getSheetAt(0);
+					for (int j = 0; j < row.getLastCellNum(); j++) {
+						Cell cell = row.getCell(j);
+						if (cell != null && cell.getCellType() != CellType.BLANK) {
+							isEmptyRow = false;
+							break;
+						}
+					}
 
-	                List<ProductType> productTypes = new ArrayList<>();
-	                List<String> errorMessages = new ArrayList<>();
+					if (isEmptyRow) {
+						continue;
+					}
 
-	                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-	                    Row row = sheet.getRow(i);
+					ProductType productType = new ProductType();
+					Cell productMerkCell = row.getCell(2);
+					Cell productTypeCell = row.getCell(3);
+					Cell categoryCell = row.getCell(4);
 
-	                    if (row != null) {
-	                        boolean isEmptyRow = true;
+					if (productMerkCell == null || productMerkCell.getCellType() == CellType.BLANK) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Product Merk)");
+						continue;
+					}
 
-	                        for (int j = 0; j < row.getLastCellNum(); j++) {
-	                            Cell cell = row.getCell(j);
-	                            if (cell != null && cell.getCellType() != CellType.BLANK) {
-	                                isEmptyRow = false;
-	                                break;
-	                            }
-	                        }
+					if (productTypeCell == null || productTypeCell.getCellType() == CellType.BLANK) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 4 (Product Type)");
+						continue;
+					}
 
-	                        if (isEmptyRow) {
-	                            continue;
-	                        }
+					if (categoryCell == null || categoryCell.getCellType() == CellType.BLANK) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (Category)");
+						continue;
+					}
 
-	                        ProductType productType = new ProductType();
-	                        Cell productMerkCell = row.getCell(2);
-	                        Cell productTypeCell = row.getCell(3);
-	                        Cell categoryCell = row.getCell(4);
+					productType.setPRODUCT_TYPE_ID(producTypeServiceImpl.getNewId());
+					productType.setPRODUCT_MERK(productMerkCell.getStringCellValue());
+					productType.setPRODUCT_TYPE(productTypeCell.getStringCellValue());
+					productType.setCATEGORY(categoryCell.getStringCellValue());
+					productType.setSTATUS(BigDecimal.valueOf(1));
+					productType.setCREATION_DATE(new Date());
+					productType.setLAST_UPDATE_DATE(new Date());
 
-	                        if (productMerkCell == null || productMerkCell.getCellType() == CellType.BLANK) {
-	                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 3 (Product Merk)");
-	                            continue;
-	                        }
+					productTypes.add(productType);
+				}
+			}
 
-	                        if (productTypeCell == null || productTypeCell.getCellType() == CellType.BLANK) {
-	                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 4 (Product Type)");
-	                            continue;
-	                        }
+			if (!errorMessages.isEmpty()) {
+				return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+			}
 
-	                        if (categoryCell == null || categoryCell.getCellType() == CellType.BLANK) {
-	                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong pada Baris " + (i + 1) + " Kolom 5 (Category)");
-	                            continue;
-	                        }
+			producTypeServiceImpl.deleteAllProductType();
+			for (ProductType productType : productTypes) {
+				producTypeServiceImpl.saveProductType(productType);
+			}
 
-	                        productType.setPRODUCT_TYPE_ID(producTypeServiceImpl.getNewId());
-	                        productType.setPRODUCT_MERK(productMerkCell.getStringCellValue());
-	                        productType.setPRODUCT_TYPE(productTypeCell.getStringCellValue());
-	                        productType.setCATEGORY(categoryCell.getStringCellValue());
-	                        productType.setSTATUS(BigDecimal.valueOf(1));
-	                        productType.setCREATION_DATE(new Date());
-	                        productType.setLAST_UPDATE_DATE(new Date());
+			return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), productTypes);
 
-	                        productTypes.add(productType);
-	                    }
-	                }
-
-	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
-	                }
-
-	                producTypeServiceImpl.deleteAllProductType();
-	                for (ProductType productType : productTypes) {
-	                    producTypeServiceImpl.saveProductType(productType);
-	                }
-
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), productTypes);
-
-	            } catch (IOException e) {
-	                throw new RuntimeException("Error processing file", e);
-	            }
-	        } else {
-	            throw new ResourceNotFoundException("User not found");
-	        }
-	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
-	    } catch (Exception e) {
-	        throw new ResourceNotFoundException("JWT token is not valid or expired");
-	    }
+		} catch (IOException e) {
+			throw new RuntimeException("Error processing file", e);
+		}
 	}
 
-	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/exportProductTypesExcel")
     public ResponseEntity<InputStreamResource> exportProductTypesExcel() throws IOException {
         String filename = "EXPORT_MASTER_PRODUCT_TYPE.xlsx";
@@ -397,6 +261,8 @@ public class ProductTypeController {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(file);
     }
+
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
     @RequestMapping("/layoutProductTypesExcel")
     public ResponseEntity<InputStreamResource> layoutProductTypesExcel() throws IOException {
         String filename = "LAYOUT_MASTER_PRODUCT_TYPE.xlsx";

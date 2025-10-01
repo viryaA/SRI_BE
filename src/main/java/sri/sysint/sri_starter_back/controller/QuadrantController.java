@@ -83,7 +83,7 @@ public class QuadrantController {
 	        	quadrants = quadrantServiceImpl.getAllQuadrant();
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -121,7 +121,7 @@ public class QuadrantController {
 	        	quadrant = quadrantServiceImpl.getQuadrantById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -159,7 +159,7 @@ public class QuadrantController {
 	        	Quadrant savedQuadrant = quadrantServiceImpl.saveQuadrant(quadrant);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -196,7 +196,7 @@ public class QuadrantController {
 	        	Quadrant updatedQuadrant = quadrantServiceImpl.updateQuadrant(quadrant);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -233,7 +233,7 @@ public class QuadrantController {
 	        	Quadrant deletedQuadrant = quadrantServiceImpl.deleteQuadrant(quadrant);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -270,7 +270,7 @@ public class QuadrantController {
 	            Quadrant restoredQuadrant = quadrantServiceImpl.restoreQuadrant(quadrant);
 
 	            response = new Response(
-	                new Date(),
+	                
 	                HttpStatus.OK.value(),
 	                null,
 	                HttpStatus.OK.getReasonPhrase(),
@@ -307,7 +307,7 @@ public class QuadrantController {
 
 	        if (user != null) {
 	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	            }
 
 	            try (InputStream inputStream = file.getInputStream()) {
@@ -370,7 +370,7 @@ public class QuadrantController {
 	                }
 
 	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+	                    return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 	                }
 
 	                quadrantServiceImpl.deleteAllQuadrant();
@@ -378,7 +378,7 @@ public class QuadrantController {
 	                    quadrantServiceImpl.saveQuadrant(quadrant);
 	                }
 
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), quadrants);
+	                return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), quadrants);
 
 	            } catch (IOException e) {
 	                throw new RuntimeException("Error processing file", e);
@@ -387,7 +387,7 @@ public class QuadrantController {
 	            throw new ResourceNotFoundException("User not found");
 	        }
 	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    } catch (Exception e) {
 	        throw new ResourceNotFoundException("JWT token is not valid or expired");
 	    }

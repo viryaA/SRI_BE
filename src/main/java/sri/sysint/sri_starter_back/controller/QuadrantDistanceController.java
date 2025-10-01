@@ -83,7 +83,7 @@ public class QuadrantDistanceController {
 	    	    quadrantDistances = quadrantDistanceServiceImpl.getAllQuadrantDistance();
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -121,7 +121,7 @@ public class QuadrantDistanceController {
 	    	    quadrantDistance = quadrantDistanceServiceImpl.getQuadrantDistanceById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -159,7 +159,7 @@ public class QuadrantDistanceController {
 	        	QuadrantDistance savedQuadrantDistance = quadrantDistanceServiceImpl.saveQuadrantDistance(quadrantDistance);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -196,7 +196,7 @@ public class QuadrantDistanceController {
 	            QuadrantDistance updatedQuadrantDistance = quadrantDistanceServiceImpl.updateQuadrantDistance(quadrantDistance);
 
 	            response = new Response(
-	                new Date(),
+	                
 	                HttpStatus.OK.value(),
 	                null,
 	                HttpStatus.OK.getReasonPhrase(),
@@ -234,7 +234,7 @@ public class QuadrantDistanceController {
 	            QuadrantDistance deletedQuadrantDistance = quadrantDistanceServiceImpl.deleteQuadrantDistance(quadrantDistance);
 
 	            response = new Response(
-	                new Date(),
+	                
 	                HttpStatus.OK.value(),
 	                null,
 	                HttpStatus.OK.getReasonPhrase(),
@@ -271,7 +271,7 @@ public class QuadrantDistanceController {
 	            QuadrantDistance restoredQuadrantDistance = quadrantDistanceServiceImpl.restoreQuadrantDistance(quadrantDistance);
 
 	            response = new Response(
-	                new Date(),
+	                
 	                HttpStatus.OK.value(),
 	                null,
 	                HttpStatus.OK.getReasonPhrase(),
@@ -308,7 +308,7 @@ public class QuadrantDistanceController {
 
 	        if (user != null) {
 	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	            }
 
 	            try (InputStream inputStream = file.getInputStream()) {
@@ -390,7 +390,7 @@ public class QuadrantDistanceController {
 	                }
 
 	                if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+	                    return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 	                }
 
 	                quadrantDistanceServiceImpl.deleteAllQuadrantDistance();
@@ -398,7 +398,7 @@ public class QuadrantDistanceController {
 	                    quadrantDistanceServiceImpl.saveQuadrantDistance(quadrantDistance);
 	                }
 
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), quadrantDistances);
+	                return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), quadrantDistances);
 
 	            } catch (IOException e) {
 	                throw new RuntimeException("Error processing file", e);
@@ -407,7 +407,7 @@ public class QuadrantDistanceController {
 	            throw new ResourceNotFoundException("User not found");
 	        }
 	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    } catch (Exception e) {
 	        throw new ResourceNotFoundException("JWT token is not valid or expired");
 	    }

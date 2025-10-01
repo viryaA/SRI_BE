@@ -12,7 +12,7 @@ import sri.sysint.sri_starter_back.model.Product;
 import sri.sysint.sri_starter_back.model.ProductType;
 
 public interface ProductRepo extends JpaRepository<Product, BigDecimal>{
-	@Query(value = "SELECT * FROM SRI_IMPP_M_PRODUCT WHERE PART_NUMBER = :id", nativeQuery = true)
+	@Query(value = "SELECT * FROM SRI_IMPP_M_PRODUCT WHERE ID = :id", nativeQuery = true)
     Optional<Product> findById(@Param("id") BigDecimal id);
 	
 	@Query(value = "SELECT COUNT(*) FROM SRI_IMPP_M_PRODUCT", nativeQuery = true)

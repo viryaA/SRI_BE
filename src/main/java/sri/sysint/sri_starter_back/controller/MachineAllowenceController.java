@@ -90,7 +90,7 @@ public class MachineAllowenceController {
 	    	    machineAllowences = machineAllowenceServiceImpl.getAllMachineAllowence();
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -128,7 +128,7 @@ public class MachineAllowenceController {
 	    	    machineAllowence = machineAllowenceServiceImpl.getMachineAllowenceById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -167,7 +167,7 @@ public class MachineAllowenceController {
 	        	MachineAllowence savedMachineAllowence = machineAllowenceServiceImpl.saveMachineAllowence(machineAllowence);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -204,7 +204,7 @@ public class MachineAllowenceController {
 	        	MachineAllowence updatedMachineAllowence = machineAllowenceServiceImpl.updateMachineAllowence(machineAllowence);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -241,7 +241,7 @@ public class MachineAllowenceController {
 	        	MachineAllowence deletedMachineAllowence = machineAllowenceServiceImpl.deleteMachineAllowence(machineAllowence);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -276,7 +276,7 @@ public class MachineAllowenceController {
 
 	        if (user != null) {
 	            if (file.isEmpty()) {
-	                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	                return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	            }
 
 	            try (InputStream inputStream = file.getInputStream()) {
@@ -374,13 +374,13 @@ public class MachineAllowenceController {
 	                }
 
 					if(!errorMessages.isEmpty()){
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+	                    return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 					}
 					machineAllowenceServiceImpl.deleteAllMachineAllowence();
 					for(MachineAllowence machineAllowence : machineAllowences){
 						machineAllowenceServiceImpl.saveMachineAllowence(machineAllowence);
 					}
-	                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), machineAllowences);
+	                return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), machineAllowences);
 
 	            } catch (IOException e) {
 	                throw new RuntimeException("Error processing file", e);
@@ -389,7 +389,7 @@ public class MachineAllowenceController {
 	            throw new ResourceNotFoundException("User not found");
 	        }
 	    } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    } catch (Exception e) {
 	        throw new ResourceNotFoundException("JWT token is not valid or expired");
 	    }
@@ -416,7 +416,7 @@ public class MachineAllowenceController {
 	        	MachineAllowence deletedMachineAllowence = machineAllowenceServiceImpl.restoreMachineAllowence(machineAllowence);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),

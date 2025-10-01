@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sri.sysint.sri_starter_back.util.Auditable;
 
 @Entity
@@ -19,20 +21,28 @@ public class Users extends Auditable<String> implements Serializable {
 	@Id
 	@Column(name = "ID")
 	private Long id;
+	
 	@Column(name="USER_ID")
 	private Integer userId;
+	
 	@Column(name = "USERNAME")
 	private String userName;
+	
 	@Column(name = "EMAIL")
 	private String email;
+	
 	@Column(name = "PASS")
 	private String password;
+	
 	@Column(name = "PASSCONF")
 	private String passWordConf;
+	
 	@Column(name = "STATUS")
 	private String userStatus;
+	
 	@Column(name = "SESSION_KEY")
 	private String sessionKey;
+	
 	@Column(name = "RESET_TOKEN")
 	private String resetToken;
 	
@@ -80,30 +90,38 @@ public class Users extends Auditable<String> implements Serializable {
 		this.email = email;
 	}
 	
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	
+	@JsonIgnore
 	public String getPassWordConf() {
 		return passWordConf;
 	}
 	public void setPassWordConf(String passWordConf) {
 		this.passWordConf = passWordConf;
 	}
+	
 	public String getUserStatus() {
 		return userStatus;
 	}
 	public void setUserStatus(String userStatus) {
 		this.userStatus = userStatus;
 	}
+	
+	@JsonIgnore
 	public String getSessionKey() {
 		return sessionKey;
 	}
 	public void setSessionKey(String sessionKey) {
 		this.sessionKey = sessionKey;
 	}
+	
+	@JsonIgnore
 	public String getResetToken() {
 		return resetToken;
 	}

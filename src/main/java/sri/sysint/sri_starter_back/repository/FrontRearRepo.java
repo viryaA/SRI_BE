@@ -1,6 +1,7 @@
 package sri.sysint.sri_starter_back.repository;
 
 import java.math.BigDecimal;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -9,83 +10,55 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import sri.sysint.sri_starter_back.model.FrontRear;
-import sri.sysint.sri_starter_back.model.MachineProduct;
-
+@Repository
 public interface FrontRearRepo extends JpaRepository<FrontRear, BigDecimal>{
-	@Query(value = "SELECT * FROM SRI_IMPP_M_FRONT_REAR WHERE ID_FRONT_REAR = :id", nativeQuery = true)
+	@Query(value = "SELECT * FROM SRI_IMPP_M_FRONT_REAR  WHERE FRONT_REAR_ID = :id", nativeQuery = true)
     Optional<FrontRear> findById(@Param("id") BigDecimal id);
 	
-	@Query(value = "SELECT * FROM SRI_IMPP_M_FRONT_REAR WHERE ID_FRONT_REAR = :id", nativeQuery = true)
-	List<FrontRear> findListById(@Param("id") BigDecimal id);
-	
-	@Modifying
-    @Transactional 
-    @Query(value = "DELETE FROM SRI_IMPP_M_FRONT_REAR", nativeQuery = true)
-    void deleteAllFr();
-	
-	@Query(value = "SELECT * FROM SRI_IMPP_M_FRONT_REAR ORDER BY ID_FRONT_REAR ASC", nativeQuery = true)
-    List<FrontRear> getDataOrderIdFrontRear();
-	
-    @Query(value = "SELECT COALESCE(MAX(ID_FRONT_REAR), 0) + 1 FROM SRI_IMPP_M_FRONT_REAR", nativeQuery = true)
-    BigDecimal getNextId();
-	
-	
-    @Query(value = "SELECT * FROM SRI_IMPP_M_FRONT_REAR WHERE STATUS = :status", nativeQuery = true)
-    List<FrontRear> findByStatus(@Param("status") BigDecimal status);
+	@Query(value = "SELECT * FROM SRI_IMPP_M_FRONT_REAR  WHERE FRONT_REAR_PARALLEL_ID = :id", nativeQuery = true)
+	List<FrontRear> findListByIdParallel(@Param("id") BigDecimal id);
+
+    @Query("SELECT f FROM FrontRear  f WHERE f.moId1 IN (:moId1, :moId2) " +
+            "AND f.moId2 IN (:moId1, :moId2) ")
+     List<FrontRear> findCheatingFrontRearByMoId(
+             @Param("moId1") String moId1,
+             @Param("moId2") String moId2);
     
-        @Query(value = "SELECT fr.ID_FRONT_REAR, fr.DETAIL_ID_MO, fr.STATUS, fr.CREATION_DATE, fr.CREATED_BY, fr.LAST_UPDATE_DATE, fr.LAST_UPDATED_BY,\r\n"
-        		+ "                       mo.DETAIL_ID, mo.MO_ID, mo.CATEGORY, mo.PART_NUMBER, mo.DESCRIPTION, mo.MACHINE_TYPE, mo.CAPACITY, mo.QTY_PER_MOULD,\r\n"
-        		+ "                       mo.QTY_PER_RAK, mo.MIN_ORDER, mo.MAX_CAP_MONTH_0, mo.MAX_CAP_MONTH_1, mo.MAX_CAP_MONTH_2, mo.INITIAL_STOCK,\r\n"
-        		+ "                       mo.SF_MONTH_0, mo.SF_MONTH_1, mo.SF_MONTH_2, mo.MO_MONTH_0, mo.MO_MONTH_1, mo.MO_MONTH_2, mo.PPD, mo.CAV,\r\n"
-        		+ "                       mo.STATUS AS MO_STATUS, mo.CREATION_DATE AS MO_CREATION_DATE, mo.CREATED_BY AS MO_CREATED_BY, mo.LAST_UPDATE_DATE AS MO_LAST_UPDATE_DATE,\r\n"
-        		+ "                       mo.LAST_UPDATED_BY AS MO_LAST_UPDATED_BY\r\n"
-        		+ "                FROM SRI_IMPP_M_FRONT_REAR fr\r\n"
-        		+ "                JOIN SRI_IMPP_D_MARKETINGORDER mo\r\n"
-        		+ "                  ON fr.DETAIL_ID_MO = mo.DETAIL_ID\r\n"
-        		+ "                WHERE fr.ID_FRONT_REAR = :idFrontRear", nativeQuery = true)
-            List<Map<String, Object>> findMarketingOrderByFrontRearId(@Param("idFrontRear") BigDecimal idFrontRear);
+    @Query("SELECT f FROM FrontRear  f WHERE f.moId1 IN (:moId1, :moId2) " +
+            "AND f.moId2 IN (:moId1, :moId2) " +
+            "AND f.versionCheating = :verCheating")
+     List<FrontRear> findCheatingFrontRearByMoIdAndVcheating(
+             @Param("moId1") String moId1,
+             @Param("moId2") String moId2,
+             @Param("verCheating") BigDecimal verCheating);
 
-            @Query(value = "SELECT fr.ID_FRONT_REAR, fr.DETAIL_ID_MO, fr.STATUS, fr.CREATION_DATE, fr.CREATED_BY, fr.LAST_UPDATE_DATE, fr.LAST_UPDATED_BY,\r\n"
-            		+ "                       mo.DETAIL_ID, mo.MO_ID, mo.CATEGORY, mo.PART_NUMBER, mo.DESCRIPTION, mo.MACHINE_TYPE, mo.CAPACITY, mo.QTY_PER_MOULD,\r\n"
-            		+ "                       mo.QTY_PER_RAK, mo.MIN_ORDER, mo.MAX_CAP_MONTH_0, mo.MAX_CAP_MONTH_1, mo.MAX_CAP_MONTH_2, mo.INITIAL_STOCK,\r\n"
-            		+ "                       mo.SF_MONTH_0, mo.SF_MONTH_1, mo.SF_MONTH_2, mo.MO_MONTH_0, mo.MO_MONTH_1, mo.MO_MONTH_2, mo.PPD, mo.CAV,\r\n"
-            		+ "                       mo.STATUS AS MO_STATUS, mo.CREATION_DATE AS MO_CREATION_DATE, mo.CREATED_BY AS MO_CREATED_BY, mo.LAST_UPDATE_DATE AS MO_LAST_UPDATE_DATE,\r\n"
-            		+ "                       mo.LAST_UPDATED_BY AS MO_LAST_UPDATED_BY\r\n"
-            		+ "                FROM SRI_IMPP_M_FRONT_REAR fr\r\n"
-            		+ "                JOIN SRI_IMPP_D_MARKETINGORDER mo\r\n"
-            		+ "                  ON fr.DETAIL_ID_MO = mo.DETAIL_ID", nativeQuery = true)
-            List<Map<String, Object>> findAllDetailFrMarketingOrders();
-            
-            @Modifying
-            @Transactional
-            @Query(value = "INSERT INTO SRI_IMPP_M_FRONT_REAR (ID_FRONT_REAR, DETAIL_ID_MO, STATUS, CREATION_DATE, LAST_UPDATE_DATE) " +
-                           "VALUES (:id, :detailIdMo, :status, :creationDate, :lastUpdateDate)", nativeQuery = true)
-            int insertNew(
-                @Param("id") BigDecimal id,
-                @Param("detailIdMo") BigDecimal detailIdMo,
-                @Param("status") BigDecimal status,
-                @Param("creationDate") Date creationDate,
-                @Param("lastUpdateDate") Date lastUpdateDate
-            );
-            
-            @Query(value = "SELECT \r\n"
-            		+ "    ROWNUM AS ID_FRONT_REAR,\r\n"
-            		+ "    D.DETAIL_ID AS DETAIL_ID_MO, \r\n"
-            		+ "    1 AS STATUS, \r\n"
-            		+ "    SYSDATE AS CREATION_DATE,\r\n"
-            		+ "    NULL AS CREATED_BY, \r\n"
-            		+ "    SYSDATE AS LAST_UPDATE_DATE, \r\n"
-            		+ "    NULL AS LAST_UPDATED_BY\r\n"
-            		+ "FROM SRI_IMPP_D_MARKETINGORDER D\r\n"
-            		+ "JOIN SRI_IMPP_M_PRODUCT P ON D.PART_NUMBER = P.PART_NUMBER\r\n"
-            		+ "WHERE (D.MO_ID = :moId1 OR D.MO_ID = :moId2)\r\n"
-            		+ "  AND P.ITEM_CURING = :itemCuring\r\n", nativeQuery = true)
-        	List<FrontRear> finddetailIdMoByCuring(@Param("moId1") String moId1, 
-        	                                          @Param("moId2") String moId2, 
-        	                                          @Param("itemCuring") String itemCuring);
+     @Query("SELECT f FROM FrontRear  f WHERE f.moId1 IN (:moId1, :moId2) " +
+            "AND f.moId2 IN (:moId1, :moId2) " +
+            "AND f.versionCheating = :verCheating " +
+            "AND f.itemCuring = :itemCuring")
+     List<FrontRear> findCheatingFrontRearByMoIdVcheatingandItemCuring(
+             @Param("moId1") String moId1,
+             @Param("moId2") String moId2,
+             @Param("verCheating") BigDecimal verCheating,
+             @Param("itemCuring") String itemCuring);
 
+     @Query("SELECT f FROM FrontRear  f WHERE f.moId1 IN (:moId1, :moId2) " +
+            "AND f.moId2 IN (:moId1, :moId2) " +
+            "AND f.versionCheating = :verCheating " +
+            "AND f.frontRearParallelId = :parallelId")
+     List<FrontRear> findCheatingFrontRearByMoIdVcheatingandParallelId(
+             @Param("moId1") String moId1,
+             @Param("moId2") String moId2,
+             @Param("verCheating") BigDecimal verCheating,
+             @Param("parallelId") BigDecimal parallelId);
+     
+     @Transactional
+     @Procedure(name = "SaveFrontRears")
+     void saveFrontRears(@Param("p_json_input") String jsonInput);
 }

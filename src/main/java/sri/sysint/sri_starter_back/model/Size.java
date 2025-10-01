@@ -18,7 +18,7 @@ public class Size {
 	@Id
     @Column(name = "SIZE_ID")
     private String SIZE_ID;
-	@Column(name = "SIZE_NAME")
+	@Column(name = "DESCRIPTION")
     private String DESCRIPTION;
 	@Column(name = "STATUS")
 	private BigDecimal STATUS;

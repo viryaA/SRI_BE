@@ -89,7 +89,7 @@ public class DDeliveryScheduleController {
                 dDeliverySchedules = dDeliveryScheduleServiceImpl.getAllDDeliverySchedule();
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -127,7 +127,7 @@ public class DDeliveryScheduleController {
                 dDeliverySchedule = dDeliveryScheduleServiceImpl.getDDeliveryScheduleById(id);
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -168,7 +168,7 @@ public class DDeliveryScheduleController {
                 DDeliverySchedule savedDDeliverySchedule = dDeliveryScheduleServiceImpl.saveDDeliverySchedule(dDeliverySchedule);
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -220,7 +220,7 @@ public class DDeliveryScheduleController {
                 DDeliverySchedule updatedDDeliverySchedule = dDeliveryScheduleServiceImpl.updateDDeliverySchedule(dDeliverySchedule);
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -257,7 +257,7 @@ public class DDeliveryScheduleController {
                 DDeliverySchedule deletedDDeliverySchedule = dDeliveryScheduleServiceImpl.deleteDDeliverySchedule(dDeliverySchedule);
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -295,7 +295,7 @@ public class DDeliveryScheduleController {
                 DDeliverySchedule restoredDDeliverySchedule = dDeliveryScheduleServiceImpl.restoreDDeliverySchedule(dDeliverySchedule);
 
                 response = new Response(
-                    new Date(),
+                    
                     HttpStatus.OK.value(),
                     null,
                     HttpStatus.OK.getReasonPhrase(),
@@ -330,7 +330,7 @@ public class DDeliveryScheduleController {
 
             if (user != null) {
                 if (file.isEmpty()) {
-                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+                    return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
                 }
 
                 Response response;
@@ -419,25 +419,25 @@ public class DDeliveryScheduleController {
                         }
                     }
                     if (!errorMessages.isEmpty()) {
-	                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+	                    return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
 	                }
                     dDeliveryScheduleServiceImpl.deleteAllDDeliverySchedule();
                     for(DDeliverySchedule dDeliverySchedule : dDeliverySchedules){
                         dDeliveryScheduleServiceImpl.saveDDeliverySchedule(dDeliverySchedule);
                     }
 
-                    return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dDeliverySchedules);
+                    return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), dDeliverySchedules);
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    return new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file: " + e.getMessage(), req.getRequestURI(), null);
+                    return new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file: " + e.getMessage(), req.getRequestURI(), null);
                 }
 
             } else {
                 throw new ResourceNotFoundException("User not found");
             }
         } catch (IllegalArgumentException e) {
-	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
+	        return new Response( HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
 	    } catch (Exception e) {
 	        throw new ResourceNotFoundException("JWT token is not valid or expired");
 	    }

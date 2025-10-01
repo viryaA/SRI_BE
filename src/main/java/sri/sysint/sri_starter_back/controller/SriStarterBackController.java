@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,28 +42,18 @@ public class SriStarterBackController {
 	@GetMapping("/sysdate")
 	public Response getSysdate(final HttpServletRequest req) throws ResourceNotFoundException {
 		Date sys = userRepo.getSysdate();
-		response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(),
+		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(),
 				req.getRequestURI(), sys);
 		return response;
 	}
 	@GetMapping("/truncSysdate")
 	public Response getTruncSysdate(final HttpServletRequest req) throws ResourceNotFoundException {
 		Date sys = userRepo.getTruncSysdate();
-		response = new Response(new Date(), HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(),
+		response = new Response( HttpStatus.OK.value(), null, HttpStatus.OK.getReasonPhrase(),
 				req.getRequestURI(), sys);
 		return response;
 	}
-	@GetMapping("/username/{userName}")
-	public Response getUserByUserName(final HttpServletRequest req, @PathVariable("userName") String userName) throws ResourceNotFoundException{
-		Users users = userRepo.findByUserName(userName);
-		if(users == null) {
-			response = new Response(new Date(), HttpStatus.NOT_FOUND.value(), null, "DATA NOT FOUND", req.getRequestURI(), users);
-		}
-		else {
-			response = new Response(new Date(), HttpStatus.OK.value(), null, "DATA EXIST", req.getRequestURI(), users);
-		}
-		return response;
-	}	
+	
 	@RequestMapping(value = "/insertDataWithGet", method = RequestMethod.GET, headers = "Accept=application/json")
 	public Response insertDataDummyWithGet(@RequestParam("code") String code, @RequestParam("desc") String desc, final HttpServletRequest req) {
 		Dummy res = dummyRepo.findByCode(code);
@@ -71,11 +62,11 @@ public class SriStarterBackController {
 			dt.setCode(code);
 			dt.setDesc(desc);
 			dummyRepo.saveAndFlush(dt);
-			response = new Response(new Date(), HttpStatus.OK.value(), null, "INSERTED", req.getRequestURI(), dt);
+			response = new Response( HttpStatus.OK.value(), null, "INSERTED", req.getRequestURI(), dt);
 		}else {
 			res.setDesc(desc);
 			dummyRepo.saveAndFlush(res);
-			response = new Response(new Date(), HttpStatus.OK.value(), null, "UPDATED", req.getRequestURI(), res);
+			response = new Response( HttpStatus.OK.value(), null, "UPDATED", req.getRequestURI(), res);
 		}
 		return response;
 	}

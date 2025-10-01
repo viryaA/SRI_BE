@@ -12,6 +12,8 @@ import javax.persistence.Table;
 @Table(name = "SRI_IMPP_M_PRODUCT")
 public class Product {
 	@Id
+    @Column(name = "ID")
+    private BigDecimal ID;
     @Column(name = "PART_NUMBER")
     private BigDecimal PART_NUMBER;
 	
@@ -72,6 +74,7 @@ public class Product {
 	public Product() {}
 	
 	public Product(Product product) {
+		this.ID = product.getID();
 		this.PART_NUMBER = product.getPART_NUMBER();
 		this.ITEM_CURING = product.getITEM_CURING();
 		this.PATTERN_ID = product.getPATTERN_ID();
@@ -95,12 +98,13 @@ public class Product {
 	
 	
 
-	public Product(BigDecimal pART_NUMBER, String iTEM_CURING, BigDecimal pATTERN_ID, String sIZE_ID,
+	public Product(BigDecimal iD,BigDecimal pART_NUMBER, String iTEM_CURING, BigDecimal pATTERN_ID, String sIZE_ID,
 			BigDecimal pRODUCT_TYPE_ID, String dESCRIPTION, BigDecimal rIM, String wIB_TUBE, String iTEM_ASSY,
 			String iTEM_EXT, String eXT_DESCRIPTION, BigDecimal qTY_PER_RAK, BigDecimal uPPER_CONSTANT,
 			BigDecimal lOWER_CONSTANT, BigDecimal sTATUS, Date cREATION_DATE, String cREATED_BY, Date lAST_UPDATE_DATE,
 			String lAST_UPDATED_BY) {
 		super();
+		ID= iD;
 		PART_NUMBER = pART_NUMBER;
 		ITEM_CURING = iTEM_CURING;
 		PATTERN_ID = pATTERN_ID;
@@ -120,6 +124,14 @@ public class Product {
 		CREATED_BY = cREATED_BY;
 		LAST_UPDATE_DATE = lAST_UPDATE_DATE;
 		LAST_UPDATED_BY = lAST_UPDATED_BY;
+	}
+	
+	public BigDecimal getID() {
+		return ID;
+	}
+
+	public void setID(BigDecimal iD) {
+		ID = iD;
 	}
 
 	public BigDecimal getPART_NUMBER() {

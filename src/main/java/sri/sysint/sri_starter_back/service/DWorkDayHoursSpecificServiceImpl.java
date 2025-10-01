@@ -79,14 +79,26 @@ public class DWorkDayHoursSpecificServiceImpl {
 	    }
 	    
 	    // Mengambil jam kerja berdasarkan tanggal dan deskripsi
-	    public Optional<DWorkDayHoursSpesific> getWorkDayHoursSpecificByDateDesc(Date date, String description) {
-	        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-	        String formattedDate = dateFormat.format(date);
+        public Optional<DWorkDayHoursSpesific> getWorkDayHoursSpecificByDateDesc(Date date, String description) {
+//            System.out.println("[DEBUG] Raw input - date: " + date + ", description: " + description);
 
-	        System.out.println("Formatted date and description being sent to repository: " + formattedDate + ", " + description);
-	        return dWorkDayHoursSpecificRepo.findDWdHoursByDateAndDescription(formattedDate, description);
-	    }
-	    
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            String formattedDate = dateFormat.format(date);
+
+//            System.out.println("[DEBUG] Formatted date: " + formattedDate);
+//            System.out.println("[DEBUG] Sending to repository - date: " + formattedDate + ", description: " + description);
+
+            Optional<DWorkDayHoursSpesific> result = dWorkDayHoursSpecificRepo.findDWdHoursByDateAndDescription(formattedDate, description);
+
+//            if (result.isPresent()) {
+//                System.out.println("[DEBUG] Repository returned data: " + result.get());
+//            } else {
+//                System.out.println("[DEBUG] Repository returned EMPTY result.");
+//            }
+
+            return result;
+        }
+
 	    // Fungsi untuk mengambil jam kerja berdasarkan bulan dan tahun
 	    public List<DWorkDayHoursSpesific> getWorkDayHoursByMonthAndYear(int month, int year) {
 	        System.out.println("Getting work day hours for month: " + month + " and year: " + year);

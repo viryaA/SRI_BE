@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,403 +67,251 @@ public class MaxCapacityController {
 	@PersistenceContext	
 	private EntityManager em;
 
-	//START - GET MAPPING
-		@GetMapping("/getAllMaxCapacity")
-		public Response getAllMaxCapacity(final HttpServletRequest req) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@GetMapping("/getAllMaxCapacity")
+	public Response getAllMaxCapacity(final HttpServletRequest req) throws ResourceNotFoundException {
+		List<MaxCapacity> maxCapacities = new ArrayList<>();
+		maxCapacities = maxCapacityServiceImpl.getAllMaxCapacity();
 
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			maxCapacities
+		);
 
-		    String token = header.replace("Bearer ", "");
+		return response;
+	}
+	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@GetMapping("/getMaxCapacityById/{id}")
+	public Response getMaxCapacityById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
+		Optional<MaxCapacity> maxCapacity = Optional.of(new MaxCapacity());
+		maxCapacity = maxCapacityServiceImpl.getMaxCapacityById(id);
 
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			maxCapacity
+		);
 
-		        if (user != null) {
-		        	//function goes here
-		        	List<MaxCapacity> maxCapacities = new ArrayList<>();
-		    	    maxCapacities = maxCapacityServiceImpl.getAllMaxCapacity();
+		return response;
+	}
 
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        maxCapacities
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@PostMapping("/saveMaxCapacity")
+	public Response saveMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
+		MaxCapacity savedMaxCapacity = maxCapacityServiceImpl.saveMaxCapacity(maxCapacity);
 
-		    return response;
-		}
-		
-		@GetMapping("/getMaxCapacityById/{id}")
-		public Response getMaxCapacityById(final HttpServletRequest req, @PathVariable BigDecimal id) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			savedMaxCapacity
+		);
 
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
+		return response;
+	}
+	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@PostMapping("/updateMaxCapacity")
+	public Response updateMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
+		MaxCapacity updatedMaxCapacity = maxCapacityServiceImpl.updateMaxCapacity(maxCapacity);
 
-		    String token = header.replace("Bearer ", "");
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			updatedMaxCapacity
+		);
 
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
+		return response;
+	}
+	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@PostMapping("/deleteMaxCapacity")
+	public Response deleteMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
+		MaxCapacity deletedMaxCapacity = maxCapacityServiceImpl.deleteMaxCapacity(maxCapacity);
 
-		        if (user != null) {
-		        	Optional<MaxCapacity> maxCapacity = Optional.of(new MaxCapacity());
-		    	    maxCapacity = maxCapacityServiceImpl.getMaxCapacityById(id);
+		response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			deletedMaxCapacity
+		);
 
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        maxCapacity
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
+		return response;
+	}
+	
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@PostMapping("/restoreMaxCapacity")
+	public Response restoreMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
+		MaxCapacity restoredMaxCapacity = maxCapacityServiceImpl.restoreMaxCapacity(maxCapacity);
 
-		    return response;
-		}
-	//END - GET MAPPING
-	//START - POST MAPPING
-		@PostMapping("/saveMaxCapacity")
-		public Response saveMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
+		Response response = new Response(
+			
+			HttpStatus.OK.value(),
+			null,
+			HttpStatus.OK.getReasonPhrase(),
+			req.getRequestURI(),
+			restoredMaxCapacity
+		);
+		return response;
+	}
 
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
+		@PreAuthorize("isAuthenticated() && hasRole('PPC')")
+	@PostMapping("/saveMaxCapacitiesExcel")
+	@Transactional
+	public Response saveMaxCapacitiesExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
 
-		    String token = header.replace("Bearer ", "");
-
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
-
-		        if (user != null) {
-		        	MaxCapacity savedMaxCapacity = maxCapacityServiceImpl.saveMaxCapacity(maxCapacity);
-
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        savedMaxCapacity
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
-
-		    return response;
-		}
-		
-		@PostMapping("/updateMaxCapacity")
-		public Response updateMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
-
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
-
-		    String token = header.replace("Bearer ", "");
-
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
-
-		        if (user != null) {
-		        	MaxCapacity updatedMaxCapacity = maxCapacityServiceImpl.updateMaxCapacity(maxCapacity);
-
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        updatedMaxCapacity
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
-
-		    return response;
-		}
-		
-		@PostMapping("/deleteMaxCapacity")
-		public Response deleteMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
-
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
-
-		    String token = header.replace("Bearer ", "");
-
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
-
-		        if (user != null) {
-		        	MaxCapacity deletedMaxCapacity = maxCapacityServiceImpl.deleteMaxCapacity(maxCapacity);
-
-		    	    response = new Response(
-		    	        new Date(),
-		    	        HttpStatus.OK.value(),
-		    	        null,
-		    	        HttpStatus.OK.getReasonPhrase(),
-		    	        req.getRequestURI(),
-		    	        deletedMaxCapacity
-		    	    );
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
-
-		    return response;
-		}
-		
-		@PostMapping("/restoreMaxCapacity")
-		public Response restoreMaxCapacity(final HttpServletRequest req, @RequestBody MaxCapacity maxCapacity) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
-
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
-
-		    String token = header.replace("Bearer ", "");
-
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
-
-		        if (user != null) {
-		            MaxCapacity restoredMaxCapacity = maxCapacityServiceImpl.restoreMaxCapacity(maxCapacity);
-
-		            Response response = new Response(
-		                new Date(),
-		                HttpStatus.OK.value(),
-		                null,
-		                HttpStatus.OK.getReasonPhrase(),
-		                req.getRequestURI(),
-		                restoredMaxCapacity
-		            );
-		            return response;
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
+		if (file.isEmpty()) {
+			return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 		}
 
-		
-		@PostMapping("/saveMaxCapacitiesExcel")
-		@Transactional
-		public Response saveMaxCapacitiesExcelFile(@RequestParam("file") MultipartFile file, final HttpServletRequest req) throws ResourceNotFoundException {
-		    String header = req.getHeader("Authorization");
+		try (InputStream inputStream = file.getInputStream()) {
+			XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+			XSSFSheet sheet = workbook.getSheetAt(0);
 
-		    if (header == null || !header.startsWith("Bearer ")) {
-		        throw new ResourceNotFoundException("JWT token not found or maybe not valid");
-		    }
+			List<MaxCapacity> maxCapacities = new ArrayList<>();
+			List<String> errorMessages = new ArrayList<>();
 
-		    String token = header.replace("Bearer ", "");
+			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
 
-		    try {
-		        String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-		            .build()
-		            .verify(token)
-		            .getSubject();
+				if (row != null) {
+					boolean isEmptyRow = true;
 
-		        if (user != null) {
-		            if (file.isEmpty()) {
-		                return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
-		            }
+					for (int j = 0; j < row.getLastCellNum(); j++) {
+						Cell cell = row.getCell(j);
+						if (cell != null && cell.getCellType() != CellType.BLANK) {
+							isEmptyRow = false;
+							break;
+						}
+					}
 
-		            try (InputStream inputStream = file.getInputStream()) {
-		                XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-		                XSSFSheet sheet = workbook.getSheetAt(0);
+					if (isEmptyRow) {
+						continue;
+					}
 
-		                List<MaxCapacity> maxCapacities = new ArrayList<>();
-		                List<String> errorMessages = new ArrayList<>();
+					MaxCapacity maxCapacity = new MaxCapacity();
+					Cell productIdCell = row.getCell(2);
+					Cell machineCurringTypeIDCell = row.getCell(3);
+					Cell cycleTimeCell = row.getCell(4);
+					Cell capacityShift1Cell = row.getCell(5);
+					Cell capacityShift2Cell = row.getCell(6);
+					Cell capacityShift3Cell = row.getCell(7);
 
-		                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-		                    Row row = sheet.getRow(i);
+					if (productIdCell == null || productIdCell.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 3 (Product ID)");
+						continue;
+					}
 
-		                    if (row != null) {
-		                        boolean isEmptyRow = true;
+					if (machineCurringTypeIDCell == null || machineCurringTypeIDCell.getCellType() != CellType.STRING) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 4 (Machine Curring Type ID)");
+						continue;
+					}
 
-		                        for (int j = 0; j < row.getLastCellNum(); j++) {
-		                            Cell cell = row.getCell(j);
-		                            if (cell != null && cell.getCellType() != CellType.BLANK) {
-		                                isEmptyRow = false;
-		                                break;
-		                            }
-		                        }
+					if (cycleTimeCell == null || cycleTimeCell.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 5 (Cycle Time)");
+						continue;
+					}
 
-		                        if (isEmptyRow) {
-		                            continue;
-		                        }
+					if (capacityShift1Cell == null || capacityShift1Cell.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 6 (Capacity Shift 1)");
+						continue;
+					}
 
-		                        MaxCapacity maxCapacity = new MaxCapacity();
-		                        Cell productIdCell = row.getCell(2);
-		                        Cell machineCurringTypeIDCell = row.getCell(3);
-		                        Cell cycleTimeCell = row.getCell(4);
-		                        Cell capacityShift1Cell = row.getCell(5);
-		                        Cell capacityShift2Cell = row.getCell(6);
-		                        Cell capacityShift3Cell = row.getCell(7);
+					if (capacityShift2Cell == null || capacityShift2Cell.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 7 (Capacity Shift 2)");
+						continue;
+					}
 
-		                        if (productIdCell == null || productIdCell.getCellType() != CellType.NUMERIC) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 3 (Product ID)");
-		                            continue;
-		                        }
+					if (capacityShift3Cell == null || capacityShift3Cell.getCellType() != CellType.NUMERIC) {
+						errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 8 (Capacity Shift 3)");
+						continue;
+					}
 
-		                        if (machineCurringTypeIDCell == null || machineCurringTypeIDCell.getCellType() != CellType.STRING) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 4 (Machine Curring Type ID)");
-		                            continue;
-		                        }
+					Optional<Product> productOpt = productRepo.findById(BigDecimal.valueOf(productIdCell.getNumericCellValue()));
+					Optional<MachineCuringType> machineCuringTypeOpt = machineCuringTypeRepo.findById(machineCurringTypeIDCell.getStringCellValue());
 
-		                        if (cycleTimeCell == null || cycleTimeCell.getCellType() != CellType.NUMERIC) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 5 (Cycle Time)");
-		                            continue;
-		                        }
+					if (productOpt.isEmpty()) {
+						errorMessages.add("Data Tidak Valid, Data Product pada Baris " + (i + 1) + " Tidak Ditemukan");
+						continue;
+					}
 
-		                        if (capacityShift1Cell == null || capacityShift1Cell.getCellType() != CellType.NUMERIC) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 6 (Capacity Shift 1)");
-		                            continue;
-		                        }
+					if (machineCuringTypeOpt.isEmpty()) {
+						errorMessages.add("Data Tidak Valid, Data Machine Curring Type pada Baris " + (i + 1) + " Tidak Ditemukan");
+						continue;
+					}
 
-		                        if (capacityShift2Cell == null || capacityShift2Cell.getCellType() != CellType.NUMERIC) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 7 (Capacity Shift 2)");
-		                            continue;
-		                        }
+					maxCapacity.setMAX_CAP_ID(maxCapacityServiceImpl.getNewId());
+					maxCapacity.setPRODUCT_ID(BigDecimal.valueOf(productIdCell.getNumericCellValue()));
+					maxCapacity.setMACHINECURINGTYPE_ID(machineCurringTypeIDCell.getStringCellValue());
+					maxCapacity.setCYCLE_TIME(BigDecimal.valueOf(cycleTimeCell.getNumericCellValue()));
+					maxCapacity.setCAPACITY_SHIFT_1(BigDecimal.valueOf(capacityShift1Cell.getNumericCellValue()));
+					maxCapacity.setCAPACITY_SHIFT_2(BigDecimal.valueOf(capacityShift2Cell.getNumericCellValue()));
+					maxCapacity.setCAPACITY_SHIFT_3(BigDecimal.valueOf(capacityShift3Cell.getNumericCellValue()));
+					maxCapacity.setSTATUS(BigDecimal.valueOf(1));
+					maxCapacity.setCREATION_DATE(new Date());
+					maxCapacity.setLAST_UPDATE_DATE(new Date());
 
-		                        if (capacityShift3Cell == null || capacityShift3Cell.getCellType() != CellType.NUMERIC) {
-		                            errorMessages.add("Data Tidak Valid, Terdapat Data Kosong atau Tidak Valid pada Baris " + (i + 1) + " Kolom 8 (Capacity Shift 3)");
-		                            continue;
-		                        }
+					maxCapacities.add(maxCapacity);
+				}
+			}
 
-		                        Optional<Product> productOpt = productRepo.findById(BigDecimal.valueOf(productIdCell.getNumericCellValue()));
-		                        Optional<MachineCuringType> machineCuringTypeOpt = machineCuringTypeRepo.findById(machineCurringTypeIDCell.getStringCellValue());
+			if (!errorMessages.isEmpty()) {
+				return new Response( HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
+			}
 
-		                        if (productOpt.isEmpty()) {
-		                            errorMessages.add("Data Tidak Valid, Data Product pada Baris " + (i + 1) + " Tidak Ditemukan");
-		                            continue;
-		                        }
+			maxCapacityServiceImpl.deleteAllMaxCapacity();
+			for (MaxCapacity maxCapacity : maxCapacities) {
+				maxCapacityServiceImpl.saveMaxCapacity(maxCapacity);
+			}
 
-		                        if (machineCuringTypeOpt.isEmpty()) {
-		                            errorMessages.add("Data Tidak Valid, Data Machine Curring Type pada Baris " + (i + 1) + " Tidak Ditemukan");
-		                            continue;
-		                        }
+			return new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), maxCapacities);
 
-		                        maxCapacity.setMAX_CAP_ID(maxCapacityServiceImpl.getNewId());
-		                        maxCapacity.setPRODUCT_ID(BigDecimal.valueOf(productIdCell.getNumericCellValue()));
-		                        maxCapacity.setMACHINECURINGTYPE_ID(machineCurringTypeIDCell.getStringCellValue());
-		                        maxCapacity.setCYCLE_TIME(BigDecimal.valueOf(cycleTimeCell.getNumericCellValue()));
-		                        maxCapacity.setCAPACITY_SHIFT_1(BigDecimal.valueOf(capacityShift1Cell.getNumericCellValue()));
-		                        maxCapacity.setCAPACITY_SHIFT_2(BigDecimal.valueOf(capacityShift2Cell.getNumericCellValue()));
-		                        maxCapacity.setCAPACITY_SHIFT_3(BigDecimal.valueOf(capacityShift3Cell.getNumericCellValue()));
-		                        maxCapacity.setSTATUS(BigDecimal.valueOf(1));
-		                        maxCapacity.setCREATION_DATE(new Date());
-		                        maxCapacity.setLAST_UPDATE_DATE(new Date());
-
-		                        maxCapacities.add(maxCapacity);
-		                    }
-		                }
-
-		                if (!errorMessages.isEmpty()) {
-		                    return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, String.join("; ", errorMessages), req.getRequestURI(), null);
-		                }
-
-		                maxCapacityServiceImpl.deleteAllMaxCapacity();
-		                for (MaxCapacity maxCapacity : maxCapacities) {
-		                    maxCapacityServiceImpl.saveMaxCapacity(maxCapacity);
-		                }
-
-		                return new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), maxCapacities);
-
-		            } catch (IOException e) {
-		                throw new RuntimeException("Error processing file", e);
-		            }
-		        } else {
-		            throw new ResourceNotFoundException("User not found");
-		        }
-		    } catch (IllegalArgumentException e) {
-		        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, e.getMessage(), req.getRequestURI(), null);
-		    } catch (Exception e) {
-		        throw new ResourceNotFoundException("JWT token is not valid or expired");
-		    }
+		} catch (IOException e) {
+			throw new RuntimeException("Error processing file", e);
 		}
-		
-	    @RequestMapping("/exportMaxCapacityExcel")
-	    public ResponseEntity<InputStreamResource> exportMaxCapacityExcel() throws IOException {
-	        String filename = "EXPORT_MASTER_MAX_CAPACITY.xlsx"; 
+	}
+	
+	@RequestMapping("/exportMaxCapacityExcel")
+	public ResponseEntity<InputStreamResource> exportMaxCapacityExcel() throws IOException {
+		String filename = "EXPORT_MASTER_MAX_CAPACITY.xlsx"; 
 
-	        ByteArrayInputStream data = maxCapacityServiceImpl.exportMaxCapacitysExcel(); 
-	        InputStreamResource file = new InputStreamResource(data);
+		ByteArrayInputStream data = maxCapacityServiceImpl.exportMaxCapacitysExcel(); 
+		InputStreamResource file = new InputStreamResource(data);
 
-	        return ResponseEntity.ok()
-	                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename) 
-	                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) 
-	                .body(file); 
-	    }
-	    
-	    @RequestMapping("/layoutMaxCapacityExcel")
-	    public ResponseEntity<InputStreamResource> layoutMaxCapacityExcel() throws IOException {
-	        String filename = "LAYOUT_MASTER_MAX_CAPACITY.xlsx"; 
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename) 
+				.contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) 
+				.body(file); 
+	}
+	
+	@RequestMapping("/layoutMaxCapacityExcel")
+	public ResponseEntity<InputStreamResource> layoutMaxCapacityExcel() throws IOException {
+		String filename = "LAYOUT_MASTER_MAX_CAPACITY.xlsx"; 
 
-	        ByteArrayInputStream data = maxCapacityServiceImpl.layoutMaxCapacitysExcel(); 
-	        InputStreamResource file = new InputStreamResource(data);
+		ByteArrayInputStream data = maxCapacityServiceImpl.layoutMaxCapacitysExcel(); 
+		InputStreamResource file = new InputStreamResource(data);
 
-	        return ResponseEntity.ok()
-	                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename) 
-	                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) 
-	                .body(file); 
-	    }
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename) 
+				.contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) 
+				.body(file); 
+	}
 
-//END - POST MAPPING
-//START - PUT MAPPING
-//END - PUT MAPPING
-//START - DELETE MAPPING
-//END - DELETE MAPPING
-//START - PROCEDURE
-//END - PROCEDURE
 }
 
 

@@ -70,7 +70,7 @@ public class KapaController {
 	    	    kapas = kapaServiceImpl.getAllKapa();
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -108,7 +108,7 @@ public class KapaController {
 	    	    kapa = kapaServiceImpl.getKapaById(id);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -145,7 +145,7 @@ public class KapaController {
 	        	Kapa savedKapa = kapaServiceImpl.saveKapa(kapa);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -182,7 +182,7 @@ public class KapaController {
 	        	Kapa updatedKapa = kapaServiceImpl.updateKapa(kapa);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -219,7 +219,7 @@ public class KapaController {
 	        	Kapa deletedKapa = kapaServiceImpl.deleteKapa(kapa);
 
 	    	    response = new Response(
-	    	        new Date(),
+	    	        
 	    	        HttpStatus.OK.value(),
 	    	        null,
 	    	        HttpStatus.OK.getReasonPhrase(),
@@ -254,7 +254,7 @@ public class KapaController {
 
 	        if (user != null) {
 	        	if (file.isEmpty()) {
-	    	        return new Response(new Date(), HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
+	    	        return new Response( HttpStatus.BAD_REQUEST.value(), null, "No file uploaded", req.getRequestURI(), null);
 	    	    }
 	    	    
 	    	    kapaServiceImpl.deleteAllKapa();
@@ -291,10 +291,10 @@ public class KapaController {
 	    	            }
 	    	        }
 
-	    	        response = new Response(new Date(), HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), kapas);
+	    	        response = new Response( HttpStatus.OK.value(), null, "File processed and data saved", req.getRequestURI(), kapas);
 
 	    	    } catch (IOException e) {
-	    	        response = new Response(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
+	    	        response = new Response( HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Error processing file", req.getRequestURI(), null);
 	    	    }
 
 	        } else {

@@ -28,48 +28,42 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
  */
 public class JWTAuthorFilter extends BasicAuthenticationFilter{
 
-    public JWTAuthorFilter(AuthenticationManager authManager){
-        super(authManager);
-    }
+     public JWTAuthorFilter(AuthenticationManager authManager){
+         super(authManager);
+     }
 
-    protected void doFilterInternal(HttpServletRequest req,
-                                    HttpServletResponse res,
-                                    FilterChain chain) throws IOException, ServletException{
-        String header = req.getHeader(HEADER_STRING);
+    // protected void doFilterInternal(HttpServletRequest req,
+    //                                 HttpServletResponse res,
+    //                                 FilterChain chain) throws IOException, ServletException{
+    //     String header = req.getHeader(HEADER_STRING);
 
-        if(header == null || !header.startsWith(TOKEN_PREFIX)){
-            chain.doFilter(req, res);
-            return;
-        }
+    //     if(header == null || !header.startsWith(TOKEN_PREFIX)){
+    //         chain.doFilter(req, res);
+    //         return;
+    //     }
 
-        UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        chain.doFilter(req,res);
-    }
+    //     UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
+    //     SecurityContextHolder.getContext().setAuthentication(authentication);
+    //     chain.doFilter(req,res);
+    // }
 
-    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) throws TokenExpiredException, SignatureVerificationException{
-        String token = request.getHeader(HEADER_STRING);
-        if(token != null){
-     try {
-    	  String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                  .build()
-                  .verify(token.replace(TOKEN_PREFIX,""))
-                  .getSubject();
+    // private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) throws TokenExpiredException, SignatureVerificationException{
+    //     String token = request.getHeader(HEADER_STRING);
+    //     if(token != null){
+    //         try {
+    //             String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
+    //                     .build()
+    //                     .verify(token.replace(TOKEN_PREFIX,""))
+    //                     .getSubject();
 
-          if(user != null){
-              return new UsernamePasswordAuthenticationToken(user,null, new ArrayList<>());
-          }
-          return null;
-      }catch (JWTDecodeException | TokenExpiredException | SignatureVerificationException e) {
-		// TODO: handle exception
-	}
-        	
-		     
-        
-        
-    }
-    return null;
-}
-
-    
+    //             if(user != null){
+    //                 return new UsernamePasswordAuthenticationToken(user,null, new ArrayList<>());
+    //             }
+    //             return null;
+    //         }catch (JWTDecodeException | TokenExpiredException | SignatureVerificationException e) {
+    //             // TODO: handle exception
+    //         }
+    //     }
+    //     return null;
+    // }    
 }

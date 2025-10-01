@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,13 @@ import sri.sysint.sri_starter_back.model.CTAssy;
 import sri.sysint.sri_starter_back.model.CTCuring;
 
 public interface CTCuringRepo extends JpaRepository<CTCuring, BigDecimal>{
+
+//	@Query("SELECT c FROM CTCuring c ORDER BY c.ctCuringId DESC")
+//	Stream<CTCuring> streamAll();
+	
+    @Query(value = "SELECT * FROM SRI_IMPP_M_CT_CURING", nativeQuery = true)
+    Stream<CTCuring> streamAll();
+	
 	@Query(value = "SELECT * FROM SRI_IMPP_M_CT_CURING WHERE CT_CURING_ID = :id", nativeQuery = true)
     Optional<CTCuring> findById(@Param("id") BigDecimal id);
 	

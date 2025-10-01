@@ -104,7 +104,7 @@ public class ProductServiceImpl {
     
     public Product updateProduct(Product product) {
         try {
-            Optional<Product> currentProductOpt = productRepo.findById(product.getPART_NUMBER());
+            Optional<Product> currentProductOpt = productRepo.findById(product.getID());
             
             if (currentProductOpt.isPresent()) {
             	Product currentProduct = currentProductOpt.get();
@@ -137,7 +137,7 @@ public class ProductServiceImpl {
     
     public Product deleteProduct(Product product) {
         try {
-            Optional<Product> currentProductOpt = productRepo.findById(product.getPART_NUMBER());
+            Optional<Product> currentProductOpt = productRepo.findById(product.getID());
             
             if (currentProductOpt.isPresent()) {
             	Product currentProduct = currentProductOpt.get();
@@ -157,7 +157,7 @@ public class ProductServiceImpl {
     }
     public Product activateProduct(Product product) {
         try {
-            Optional<Product> currentProductOpt = productRepo.findById(product.getPART_NUMBER());
+            Optional<Product> currentProductOpt = productRepo.findById(product.getID());
             
             if (currentProductOpt.isPresent()) {
             	Product currentProduct = currentProductOpt.get();
@@ -191,7 +191,7 @@ public class ProductServiceImpl {
             "NOMOR",
             "PART_NUMBER",
             "ITEM_CURING",
-            "PATTERN_NAME",
+//            "PATTERN_NAME",
             "SIZE",
             "CATEGORY",
             "DESCRIPTION",
@@ -210,7 +210,7 @@ public class ProductServiceImpl {
 
         try {
             List<String> itemCuringList = itemCuringRepo.findItemCuringActive().stream().map(ItemCuring::getITEM_CURING).collect(Collectors.toList());
-            List<String> patternList = patternRepo.findPatternActive().stream().map(Pattern::getPATTERN_NAME).collect(Collectors.toList());
+//            List<String> patternList = patternRepo.findPatternActive().stream().map(Pattern::getPATTERN_NAME).collect(Collectors.toList());
             List<String> sizeList = sizeRepo.findSizeActive().stream().map(Size::getSIZE_ID).collect(Collectors.toList());
             List<String> productTypeList = productTypeRepo.findProductTypeActive().stream().map(ProductType::getCATEGORY).collect(Collectors.toList());
             List<String> itemAssyList = itemAssyRepo.findItemAssyActive().stream().map(ItemAssy::getITEM_ASSY).collect(Collectors.toList());
@@ -256,10 +256,10 @@ public class ProductServiceImpl {
             itemCuringName.setNameName("ItemCuringList");
             itemCuringName.setRefersToFormula("HIDDEN_DATA!$A$1:$A$" + itemCuringList.size());
 
-            hiddenRowIndex = populateHiddenSheet(hiddenSheet, patternList, hiddenRowIndex);
-            Name patternName = workbook.createName();
-            patternName.setNameName("PatternList");
-            patternName.setRefersToFormula("HIDDEN_DATA!$A$" + (hiddenRowIndex - patternList.size() + 1) + ":$A$" + hiddenRowIndex);
+//            hiddenRowIndex = populateHiddenSheet(hiddenSheet, patternList, hiddenRowIndex);
+//            Name patternName = workbook.createName();
+//            patternName.setNameName("PatternList");
+//            patternName.setRefersToFormula("HIDDEN_DATA!$A$" + (hiddenRowIndex - patternList.size() + 1) + ":$A$" + hiddenRowIndex);
 
             hiddenRowIndex = populateHiddenSheet(hiddenSheet, sizeList, hiddenRowIndex);
             Name sizeName = workbook.createName();
@@ -287,6 +287,7 @@ public class ProductServiceImpl {
                 nomorCell.setCellStyle(borderStyle);
 
                 Cell partNumberCell = dataRow.createCell(1);
+                System.out.println("PART_NUMBER: " + p.getPART_NUMBER());
                 partNumberCell.setCellValue(p.getPART_NUMBER().doubleValue());
                 partNumberCell.setCellStyle(borderStyle);
 
@@ -294,63 +295,86 @@ public class ProductServiceImpl {
                 itemCuringCell.setCellValue(p.getITEM_CURING() != null ? p.getITEM_CURING() : "");
                 itemCuringCell.setCellStyle(borderStyle);
 
-                Cell patternNameCell = dataRow.createCell(3);
-                patternNameCell.setCellValue(p.getPATTERN_ID() != null ? patternRepo.findById(p.getPATTERN_ID()).map(Pattern::getPATTERN_NAME).orElse("") : "");
-                patternNameCell.setCellStyle(borderStyle);
+//                Cell patternNameCell = dataRow.createCell(3);
+//                patternNameCell.setCellValue(p.getPATTERN_ID() != null ? patternRepo.findById(p.getPATTERN_ID()).map(Pattern::getPATTERN_NAME).orElse("") : "");
+//                patternNameCell.setCellStyle(borderStyle);
 
-                Cell sizeIdCell = dataRow.createCell(4);
+                Cell sizeIdCell = dataRow.createCell(3);
                 sizeIdCell.setCellValue(p.getSIZE_ID() != null ? p.getSIZE_ID() : "");
                 sizeIdCell.setCellStyle(borderStyle);
 
-                Cell categoryCell = dataRow.createCell(5);
+                Cell categoryCell = dataRow.createCell(4);
                 categoryCell.setCellValue(p.getPRODUCT_TYPE_ID() != null ? productTypeRepo.findById(p.getPRODUCT_TYPE_ID()).map(ProductType::getCATEGORY).orElse("") : "");
                 categoryCell.setCellStyle(borderStyle);
 
-                Cell descriptionCell = dataRow.createCell(6);
+                Cell descriptionCell = dataRow.createCell(5);
                 descriptionCell.setCellValue(p.getDESCRIPTION() != null ? p.getDESCRIPTION() : "");
                 descriptionCell.setCellStyle(borderStyle);
 
-                Cell rimCell = dataRow.createCell(7);
-                rimCell.setCellValue(p.getRIM() != null ? p.getRIM().doubleValue() : null);
+                Cell rimCell = dataRow.createCell(6);
+                if (p.getRIM() != null) {
+                    System.out.println("RIM: " + p.getRIM());
+                    rimCell.setCellValue(p.getRIM() != null ? p.getRIM().doubleValue() : null);
+                }
                 rimCell.setCellStyle(borderStyle);
 
-                Cell wibeTubeCell = dataRow.createCell(8);
+                Cell wibeTubeCell = dataRow.createCell(7);
                 wibeTubeCell.setCellValue(p.getWIB_TUBE() != null ? p.getWIB_TUBE() : "");
                 wibeTubeCell.setCellStyle(borderStyle);
 
-                Cell itemAssyCell = dataRow.createCell(9);
+                Cell itemAssyCell = dataRow.createCell(8);
                 itemAssyCell.setCellValue(p.getITEM_ASSY() != null ? p.getITEM_ASSY() : "");
                 itemAssyCell.setCellStyle(borderStyle);
 
-                Cell itemExtCell = dataRow.createCell(10);
+                Cell itemExtCell = dataRow.createCell(9);
                 itemExtCell.setCellValue(p.getITEM_EXT() != null ? p.getITEM_EXT() : "");
                 itemExtCell.setCellStyle(borderStyle);
 
-                Cell extDescriptionCell = dataRow.createCell(11);
+                Cell extDescriptionCell = dataRow.createCell(10);
                 extDescriptionCell.setCellValue(p.getEXT_DESCRIPTION() != null ? p.getEXT_DESCRIPTION() : "");
                 extDescriptionCell.setCellStyle(borderStyle);
 
-                Cell qtyPerRakCell = dataRow.createCell(12);
-                qtyPerRakCell.setCellValue(p.getQTY_PER_RAK() != null ? p.getQTY_PER_RAK().doubleValue() : null);
+                Cell qtyPerRakCell = dataRow.createCell(11);
+                if (p.getQTY_PER_RAK() != null) {
+                    System.out.println("QTY_PER_RAK: " + p.getQTY_PER_RAK());
+                    qtyPerRakCell.setCellValue(p.getQTY_PER_RAK() != null ? p.getQTY_PER_RAK().doubleValue() : null);
+                }
                 qtyPerRakCell.setCellStyle(borderStyle);
 
-                Cell upperConstantCell = dataRow.createCell(13);
-                upperConstantCell.setCellValue(p.getUPPER_CONSTANT() != null ? p.getUPPER_CONSTANT().doubleValue() : null);
+                Cell upperConstantCell = dataRow.createCell(12);
+                if (p.getUPPER_CONSTANT() != null) {
+                    System.out.println("UPPER_CONSTANT: " + p.getUPPER_CONSTANT());
+                    upperConstantCell.setCellValue(p.getUPPER_CONSTANT() != null ? p.getUPPER_CONSTANT().doubleValue() : null);
+                }else {
+                	System.out.println("data : "+p.getUPPER_CONSTANT());
+                }
                 upperConstantCell.setCellStyle(borderStyle);
 
-                Cell lowerConstantCell = dataRow.createCell(14);
-                lowerConstantCell.setCellValue(p.getLOWER_CONSTANT() != null ? p.getLOWER_CONSTANT().doubleValue() : null);
+                Cell lowerConstantCell = dataRow.createCell(13);
+                if (p.getLOWER_CONSTANT() != null) {
+                    System.out.println("LOWER_CONSTANT: " + p.getLOWER_CONSTANT());
+                    lowerConstantCell.setCellValue(p.getLOWER_CONSTANT() != null ? p.getLOWER_CONSTANT().doubleValue() : null);
+                }else {
+                	System.out.println("data : "+p.getLOWER_CONSTANT());
+                }
                 lowerConstantCell.setCellStyle(borderStyle);
             }
+
 
             for (int i = 0; i < header.length; i++) {
                 sheet.autoSizeColumn(i);
             }
-            addValidation(sheet, "ItemCuringList", 2);
-            addValidation(sheet, "PatternList", 3);
-            addValidation(sheet, "SizeList", 4);
-            addValidation(sheet, "ProductTypeList", 5);
-            addValidation(sheet, "ItemAssyList", 9);
+//          addValidation(sheet, "ItemCuringList", 2);
+//          addValidation(sheet, "PatternList", 3);
+//          addValidation(sheet, "SizeList", 4);
+//          addValidation(sheet, "ProductTypeList", 5);
+//          addValidation(sheet, "ItemAssyList", 9);
+          
+          addValidation(sheet, "ItemCuringList", 2);
+//          addValidation(sheet, "PatternList", 3);
+          addValidation(sheet, "SizeList", 3);
+          addValidation(sheet, "ProductTypeList", 4);
+          addValidation(sheet, "ItemAssyList", 8);
 
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
@@ -393,7 +417,7 @@ public class ProductServiceImpl {
             "NOMOR",
             "PART_NUMBER",
             "ITEM_CURING",
-            "PATTERN_NAME",
+//            "PATTERN_NAME",
             "SIZE",
             "CATEGORY",
             "DESCRIPTION",
@@ -412,7 +436,7 @@ public class ProductServiceImpl {
 
         try {
             List<String> itemCuringList = itemCuringRepo.findItemCuringActive().stream().map(ItemCuring::getITEM_CURING).collect(Collectors.toList());
-            List<String> patternList = patternRepo.findPatternActive().stream().map(Pattern::getPATTERN_NAME).collect(Collectors.toList());
+//            List<String> patternList = patternRepo.findPatternActive().stream().map(Pattern::getPATTERN_NAME).collect(Collectors.toList());
             List<String> sizeList = sizeRepo.findSizeActive().stream().map(Size::getSIZE_ID).collect(Collectors.toList());
             List<String> productTypeList = productTypeRepo.findProductTypeActive().stream().map(ProductType::getCATEGORY).collect(Collectors.toList());
             List<String> itemAssyList = itemAssyRepo.findItemAssyActive().stream().map(ItemAssy::getITEM_ASSY).collect(Collectors.toList());
@@ -458,10 +482,10 @@ public class ProductServiceImpl {
             itemCuringName.setNameName("ItemCuringList");
             itemCuringName.setRefersToFormula("HIDDEN_DATA!$A$1:$A$" + itemCuringList.size());
 
-            hiddenRowIndex = populateHiddenSheet(hiddenSheet, patternList, hiddenRowIndex);
-            Name patternName = workbook.createName();
-            patternName.setNameName("PatternList");
-            patternName.setRefersToFormula("HIDDEN_DATA!$A$" + (hiddenRowIndex - patternList.size() + 1) + ":$A$" + hiddenRowIndex);
+//            hiddenRowIndex = populateHiddenSheet(hiddenSheet, patternList, hiddenRowIndex);
+//            Name patternName = workbook.createName();
+//            patternName.setNameName("PatternList");
+//            patternName.setRefersToFormula("HIDDEN_DATA!$A$" + (hiddenRowIndex - patternList.size() + 1) + ":$A$" + hiddenRowIndex);
 
             hiddenRowIndex = populateHiddenSheet(hiddenSheet, sizeList, hiddenRowIndex);
             Name sizeName = workbook.createName();
@@ -493,11 +517,17 @@ public class ProductServiceImpl {
             for (int i = 0; i < header.length; i++) {
                 sheet.autoSizeColumn(i);
             }
+//            addValidation(sheet, "ItemCuringList", 2);
+//            addValidation(sheet, "PatternList", 3);
+//            addValidation(sheet, "SizeList", 4);
+//            addValidation(sheet, "ProductTypeList", 5);
+//            addValidation(sheet, "ItemAssyList", 9);
+            
             addValidation(sheet, "ItemCuringList", 2);
-            addValidation(sheet, "PatternList", 3);
-            addValidation(sheet, "SizeList", 4);
-            addValidation(sheet, "ProductTypeList", 5);
-            addValidation(sheet, "ItemAssyList", 9);
+//            addValidation(sheet, "PatternList", 3);
+            addValidation(sheet, "SizeList", 3);
+            addValidation(sheet, "ProductTypeList", 4);
+            addValidation(sheet, "ItemAssyList", 8);
 
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());

@@ -1,7 +1,9 @@
 package sri.sysint.sri_starter_back.controller;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,51 +28,88 @@ public class MachineProductController {
 	@Autowired
     private MachineProductServiceImpl machineProductServiceImpl;
 
+    public MachineProductController(MachineProductServiceImpl machineProductServiceImpl) {
+        this.machineProductServiceImpl = machineProductServiceImpl;
+    }
+    
     private Response response;
     
     @PostMapping("/saveMachineProduct")
-    public Response saveTempMachineProduct(HttpServletRequest req, @RequestBody List<MachineProduct> list) throws ResourceNotFoundException {
-       System.out.println("halo");
-    	machineProductServiceImpl.deleteAll();  
+    public Response saveMachineProducts(
+            HttpServletRequest req,
+            @RequestBody String jsonInput) {
 
-                for (MachineProduct machineProduct : list) {
-                    if (machineProduct.getPART_NUMBER() == null) {
-                        throw new IllegalArgumentException("ID_FRONT_REAR is required for all items");
-                    }
-                }
+    	machineProductServiceImpl.saveMachineProducts(jsonInput);
 
-                List<MachineProduct> saved = machineProductServiceImpl.save(list);
-                response = new Response(
-                        new Date(),
-                        HttpStatus.OK.value(),
-                        null,
-                        HttpStatus.OK.getReasonPhrase(),
-                        req.getRequestURI(),
-                        saved
-                );
-             
-
-        return response;
+        return new Response(
+                
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                "Data berhasil disimpan."
+        );
     }
+
     
-    @GetMapping("/getMachineProductsmoByCuring")
-    public Response getMachineProductsByCuring(
-            HttpServletRequest req, 
+    @GetMapping("/getMachineProductsmoByVersion")
+    public Response getMachineProductsByVersion(
+            HttpServletRequest req,
             @RequestParam("moId1") String moId1,
             @RequestParam("moId2") String moId2,
-            @RequestParam("itemCuring") String itemCuring) {
-        List<MachineProduct> filteredProducts = machineProductServiceImpl.getAllProductMobyCuring(moId1, moId2, itemCuring);
+            @RequestParam("verCheating") BigDecimal verCheating) {
+        
+        List<MachineProduct> filteredProducts = machineProductServiceImpl
+                .findCheatingMacProdByMoIdAndVcheating(moId1, moId2, verCheating);
 
-        response = new Response(
-                new Date(),
+        return new Response(
+                
                 HttpStatus.OK.value(),
                 null,
                 HttpStatus.OK.getReasonPhrase(),
                 req.getRequestURI(),
                 filteredProducts
         );
+    }
 
-        return response;
+    @GetMapping("/getMachineProductsmoByIdMo")
+    public Response getMachineProductsByVersion(
+            HttpServletRequest req,
+            @RequestParam("moId1") String moId1,
+            @RequestParam("moId2") String moId2) {
+        
+        List<MachineProduct> filteredProducts = machineProductServiceImpl
+                .findCheatingMacProdByMoId(moId1, moId2);
+
+        return new Response(
+                
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                filteredProducts
+        );
+    }    
+
+    @GetMapping("/getMachineProductsmoByCuring")
+    public Response getMachineProductsByCuring(
+            HttpServletRequest req, 
+            @RequestParam("moId1") String moId1,
+            @RequestParam("moId2") String moId2,
+            @RequestParam("verCheating") BigDecimal verCheating,
+            @RequestParam("itemCuring") String itemCuring) {
+        
+        List<MachineProduct> filteredProducts = machineProductServiceImpl
+                .findCheatingMacProdByMoIdVcheatingAndItemCuring(moId1, moId2, verCheating, itemCuring);
+
+        return new Response(
+                
+                HttpStatus.OK.value(),
+                null,
+                HttpStatus.OK.getReasonPhrase(),
+                req.getRequestURI(),
+                filteredProducts
+        );
     }
 
 }
